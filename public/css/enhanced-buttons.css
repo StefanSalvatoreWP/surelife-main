@@ -1,0 +1,211 @@
+/* Enhanced Button Styles for SLC Admin Panel */
+
+/* Primary Action Buttons - Light Green */
+.btn-primary, button[type='submit']:not(.paginate_button) {
+    background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%) !important;
+    color: #15803d !important;
+    font-weight: 600 !important;
+    padding: 0.625rem 1.5rem !important;
+    border-radius: 0.5rem !important;
+    border: none !important;
+    box-shadow: 0 2px 4px rgba(220, 252, 231, 0.3) !important;
+    transition: all 0.2s ease !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+}
+
+.btn-primary:hover, button[type='submit']:not(.paginate_button):hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 8px rgba(187, 247, 208, 0.4) !important;
+    background: linear-gradient(135deg, #bbf7d0 0%, #86efac 100%) !important;
+}
+
+/* View Button - Light Blue */
+.btn-view, a[href*='view']:not(.paginate_button) {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%) !important;
+    color: #1e40af !important;
+    font-weight: 600 !important;
+    padding: 0.5rem 1.25rem !important;
+    border-radius: 0.5rem !important;
+    border: none !important;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3) !important;
+    transition: all 0.2s ease !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.375rem !important;
+    text-decoration: none !important;
+}
+
+.btn-view:hover, a[href*='view']:not(.paginate_button):hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 8px rgba(191, 219, 254, 0.4) !important;
+    background: linear-gradient(135deg, #bfdbfe 0%, #93c5fd 100%) !important;
+}
+
+/* Edit/Update Button - Light Amber */
+.btn-edit, a[href*='update']:not(.paginate_button), a[href*='edit']:not(.paginate_button) {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%) !important;
+    color: #92400e !important;
+    font-weight: 600 !important;
+    padding: 0.5rem 1.25rem !important;
+    border-radius: 0.5rem !important;
+    border: none !important;
+    box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3) !important;
+    transition: all 0.2s ease !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.375rem !important;
+    text-decoration: none !important;
+}
+
+.btn-edit:hover, a[href*='update']:not(.paginate_button):hover, a[href*='edit']:not(.paginate_button):hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 8px rgba(253, 230, 138, 0.4) !important;
+    background: linear-gradient(135deg, #fde68a 0%, #fcd34d 100%) !important;
+}
+
+/* Delete Button - Extra Light Pink/Red */
+.btn-delete, button[onclick*='delete'], form[action*='delete'] button {
+    background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%) !important;
+    color: #7f1d1d !important;
+    font-weight: 600 !important;
+    padding: 0.5rem 1.25rem !important;
+    border-radius: 0.5rem !important;
+    border: none !important;
+    box-shadow: 0 2px 4px rgba(254, 242, 242, 0.3) !important;
+    transition: all 0.2s ease !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.375rem !important;
+}
+
+.btn-delete:hover, button[onclick*='delete']:hover, form[action*='delete'] button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 8px rgba(254, 202, 202, 0.4) !important;
+    background: linear-gradient(135deg, #fecaca 0%, #fca5a5 100%) !important;
+}
+
+/* Create/Add Button - Light Green */
+.btn-create, a[href*='create']:not(.paginate_button) {
+    background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%) !important;
+    color: #15803d !important;
+    font-weight: 600 !important;
+    padding: 0.625rem 1.5rem !important;
+    border-radius: 0.5rem !important;
+    border: none !important;
+    box-shadow: 0 2px 4px rgba(220, 252, 231, 0.3) !important;
+    transition: all 0.2s ease !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    text-decoration: none !important;
+}
+
+.btn-create:hover, a[href*='create']:not(.paginate_button):hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 8px rgba(187, 247, 208, 0.4) !important;
+    background: linear-gradient(135deg, #bbf7d0 0%, #86efac 100%) !important;
+}
+
+/* Cancel/Back Button - Light Gray */
+.btn-cancel, a[href*='back']:not(.paginate_button) {
+    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%) !important;
+    color: #374151 !important;
+    font-weight: 600 !important;
+    padding: 0.625rem 1.5rem !important;
+    border-radius: 0.5rem !important;
+    border: none !important;
+    box-shadow: 0 2px 4px rgba(107, 114, 128, 0.3) !important;
+    transition: all 0.2s ease !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    text-decoration: none !important;
+}
+
+.btn-cancel:hover, a[href*='back']:not(.paginate_button):hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 8px rgba(229, 231, 235, 0.4) !important;
+    background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%) !important;
+}
+
+/* Search Button */
+button[id*='search'], button[id*='Search'] {
+    background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%) !important;
+    color: #15803d !important;
+    font-weight: 600 !important;
+    padding: 0.75rem 2rem !important;
+    border-radius: 0.5rem !important;
+    border: none !important;
+    box-shadow: 0 2px 4px rgba(220, 252, 231, 0.3) !important;
+    transition: all 0.2s ease !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+}
+
+button[id*='search']:hover, button[id*='Search']:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 8px rgba(187, 247, 208, 0.4) !important;
+    background: linear-gradient(135deg, #bbf7d0 0%, #86efac 100%) !important;
+}
+
+/* Icon Buttons */
+.btn-icon {
+    width: 2.5rem !important;
+    height: 2.5rem !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 0.5rem !important;
+    transition: all 0.2s ease !important;
+}
+
+/* Button Group */
+.btn-group {
+    display: flex !important;
+    gap: 0.5rem !important;
+    flex-wrap: wrap !important;
+}
+
+/* Disabled State */
+button:disabled, .btn-disabled {
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+}
+
+button:disabled:hover, .btn-disabled:hover {
+    transform: none !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Loading State */
+.btn-loading {
+    position: relative !important;
+    pointer-events: none !important;
+}
+
+.btn-loading::after {
+    content: '' !important;
+    position: absolute !important;
+    width: 1rem !important;
+    height: 1rem !important;
+    border: 2px solid transparent !important;
+    border-top-color: white !important;
+    border-radius: 50% !important;
+    animation: spin 0.6s linear infinite !important;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}

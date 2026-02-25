@@ -1,0 +1,450 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    body {
+        @apply font-sans antialiased;
+    }
+}
+
+@layer components {
+    .btn-primary {
+        @apply bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+    }
+    
+    .input-field {
+        @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition duration-200 ease-in-out;
+    }
+    
+    .card {
+        @apply bg-white rounded-xl shadow-lg;
+    }
+    
+    /* Dropdown menu positioning fix */
+    .dropdown-menu {
+        position: fixed !important;
+        z-index: 9999 !important;
+        max-height: 80vh;
+    }
+    
+    /* Ensure parent container doesn't clip dropdowns */
+    .group {
+        position: static !important;
+    }
+    
+    /* DataTables Custom Styling */
+    #common_dataTable tbody tr {
+        @apply transition-colors duration-150 ease-in-out;
+    }
+    
+    #common_dataTable tbody tr:hover {
+        @apply bg-gray-50;
+    }
+    
+    #common_dataTable tbody td {
+        @apply px-6 py-4 text-sm text-gray-700;
+    }
+    
+    /* Global DataTables Pagination - Enhanced Light Green Theme */
+    /* Complete reset of all DataTables pagination styling */
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        padding: 0 !important;
+        margin: 0 !important;
+        background: transparent !important;
+        background-color: transparent !important;
+        background-image: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+        color: inherit !important;
+        box-shadow: none !important;
+    }
+
+    /* Beautiful Bootstrap pagination with enhanced styling */
+    .dataTables_wrapper .dataTables_paginate .paginate_button.page-item .page-link,
+    .dataTables_wrapper .dataTables_paginate .paginate_button .page-link,
+    .dataTables_wrapper .dataTables_paginate .paginate_button,
+    .page-item .page-link {
+        position: relative !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0.5rem 0.75rem !important;
+        margin: 0 !important;
+        min-width: 2.5rem !important;
+        line-height: 1.25 !important;
+        color: #059669 !important;
+        background: #ffffff !important;
+        background-color: #ffffff !important;
+        background-image: none !important;
+        border: 2px solid #bbf7d0 !important;
+        border-radius: 0.5rem !important;
+        text-decoration: none !important;
+        font-weight: 500 !important;
+        font-size: 0.875rem !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+        transition: all 0.2s ease-in-out !important;
+        cursor: pointer !important;
+    }
+
+    .page-item:first-child .page-link {
+        margin-left: 0 !important;
+    }
+
+    .page-item:last-child .page-link {
+        margin-right: 0 !important;
+    }
+
+    /* Active/Current page styling */
+    .dataTables_wrapper .dataTables_paginate .paginate_button.page-item.active .page-link,
+    .dataTables_wrapper .dataTables_paginate .paginate_button.active .page-link,
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+    .page-item.active .page-link {
+        z-index: 3 !important;
+        color: #ffffff !important;
+        background: linear-gradient(135deg, #10b981, #059669) !important;
+        background-color: #10b981 !important;
+        background-image: linear-gradient(135deg, #10b981, #059669) !important;
+        border-color: #059669 !important;
+        box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3) !important;
+        transform: translateY(-1px) !important;
+    }
+
+    /* Hover effects */
+    .dataTables_wrapper .dataTables_paginate .paginate_button.page-item:not(.disabled) .page-link:hover,
+    .dataTables_wrapper .dataTables_paginate .paginate_button:not(.disabled) .page-link:hover,
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover,
+    .page-item:not(.disabled) .page-link:hover {
+        z-index: 2 !important;
+        color: #047857 !important;
+        background: #ecfdf5 !important;
+        background-color: #ecfdf5 !important;
+        background-image: none !important;
+        border-color: #10b981 !important;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2) !important;
+        transform: translateY(-2px) !important;
+    }
+
+    /* Disabled state */
+    .dataTables_wrapper .dataTables_paginate .paginate_button.page-item.disabled .page-link,
+    .dataTables_wrapper .dataTables_paginate .paginate_button.disabled .page-link,
+    .page-item.disabled .page-link {
+        color: #9ca3af !important;
+        background: #f9fafb !important;
+        background-color: #f9fafb !important;
+        background-image: none !important;
+        border-color: #e5e7eb !important;
+        box-shadow: none !important;
+        cursor: not-allowed !important;
+        transform: none !important;
+        pointer-events: none !important;
+        opacity: 0.6 !important;
+    }
+
+    /* Previous/Next button styling */
+    .dataTables_wrapper .dataTables_paginate .paginate_button.previous,
+    .dataTables_wrapper .dataTables_paginate .paginate_button.next {
+        font-weight: 600 !important;
+        padding: 0.5rem 1rem !important;
+    }
+
+    /* Global override for ALL purple colors in DataTables - Ultra high specificity */
+    /* This will override any individual CSS files that still have purple colors */
+    
+    /* Remove ALL purple backgrounds and borders */
+    .dataTables_wrapper .dataTables_paginate .paginate_button,
+    .dataTables_paginate .paginate_button,
+    .paginate_button {
+        background: #ffffff !important;
+        border-color: #bbf7d0 !important;
+        color: #059669 !important;
+    }
+    
+    /* Remove ALL purple hover states */
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover,
+    .dataTables_paginate .paginate_button:hover,
+    .paginate_button:hover {
+        background: #ecfdf5 !important;
+        border-color: #10b981 !important;
+        color: #047857 !important;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2) !important;
+    }
+    
+    /* Remove ALL purple active states */
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+    .dataTables_wrapper .dataTables_paginate .paginate_button.active,
+    .dataTables_paginate .paginate_button.current,
+    .dataTables_paginate .paginate_button.active,
+    .paginate_button.current,
+    .paginate_button.active,
+    .dataTables_paginate span .current,
+    .dataTables_paginate span .active,
+    a.paginate_button.current {
+        background: #ffffff !important;
+        background-color: #ffffff !important;
+        background-image: none !important;
+        border-color: #059669 !important;
+        border-width: 3px !important;
+        color: #047857 !important;
+        font-weight: 700 !important;
+        box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3) !important;
+    }
+    
+    /* Remove ALL purple table row hover effects */
+    #common_dataTable tbody tr:hover {
+        background: #f0fdf4 !important;
+        box-shadow: -4px 0 0 0 #10b981, 0 2px 8px rgba(16, 185, 129, 0.1) !important;
+    }
+    
+    /* Remove ALL purple input focus states */
+    .dataTables_length select:hover,
+    .dataTables_length select:focus,
+    .dataTables_filter input:hover,
+    .dataTables_filter input:focus {
+        border-color: #10b981 !important;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+    }
+    
+    /* DataTables Info and Length */
+    .dataTables_wrapper .dataTables_info,
+    .dataTables_wrapper .dataTables_length {
+        @apply text-sm text-gray-600;
+    }
+    
+    /* DataTables Search */
+    .dataTables_wrapper .dataTables_filter input {
+        @apply px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent;
+    }
+    
+    /* DataTables Wrapper Layout */
+    .dataTables_wrapper {
+        @apply w-full;
+    }
+    
+    .dataTables_wrapper .dataTables_length,
+    .dataTables_wrapper .dataTables_filter,
+    .dataTables_wrapper .dataTables_info,
+    .dataTables_wrapper .dataTables_paginate {
+        @apply px-6 py-3;
+    }
+    
+    .dataTables_wrapper .dataTables_length {
+        @apply float-left;
+    }
+    
+    .dataTables_wrapper .dataTables_filter {
+        @apply float-right;
+    }
+    
+    .dataTables_wrapper .dataTables_info {
+        @apply float-left clear-left pt-2;
+    }
+    
+    .dataTables_wrapper .dataTables_paginate {
+        @apply float-right pt-2;
+    }
+    
+    /* DataTables Processing Indicator */
+    .dataTables_processing {
+        @apply fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white px-6 py-4 rounded-lg shadow-xl border border-gray-200 z-50;
+    }
+    
+    /* Ensure table displays properly */
+    table.dataTable {
+        @apply w-full border-collapse;
+    }
+    
+    table.dataTable thead th,
+    table.dataTable thead td {
+        @apply border-b-2 border-gray-200;
+    }
+    
+    table.dataTable tbody tr {
+        @apply border-b border-gray-100;
+    }
+    
+    /* Fix for empty table message */
+    .dataTables_empty {
+        @apply text-center py-8 text-gray-500;
+    }
+    
+    /* Modern Form Styling */
+    .form-control {
+        @apply w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition duration-200 bg-white text-gray-900;
+    }
+    
+    .form-control:focus {
+        @apply outline-none ring-2 ring-green-500 border-transparent;
+    }
+    
+    .form-control:disabled,
+    .form-control[readonly] {
+        @apply bg-gray-100 cursor-not-allowed;
+    }
+    
+    .form-label {
+        @apply block text-sm font-medium text-gray-700 mb-2;
+    }
+    
+    .form-select, select.form-control {
+        @apply appearance-none bg-white bg-no-repeat;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 0.5rem center;
+        background-size: 1.5em 1.5em;
+        padding-right: 2.5rem;
+    }
+    
+    /* Card Styling */
+    .card {
+        @apply bg-white rounded-xl shadow-lg overflow-hidden mb-6;
+    }
+    
+    .card-body {
+        @apply p-6;
+    }
+    
+    /* Button Styling */
+    .btn {
+        @apply px-6 py-2.5 font-semibold rounded-lg transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2;
+    }
+    
+    .btn-success {
+        @apply bg-green-600 hover:bg-green-700 text-white shadow-md hover:shadow-lg transform hover:scale-105 focus:ring-green-500;
+    }
+    
+    .btn-outline-secondary {
+        @apply bg-gray-200 hover:bg-gray-300 text-gray-800 focus:ring-gray-400;
+    }
+    
+    /* Input Group Styling */
+    .input-group {
+        @apply flex;
+    }
+    
+    .input-group .form-control {
+        @apply rounded-l-lg rounded-r-none;
+    }
+    
+    .input-group .form-control:last-child {
+        @apply rounded-r-lg rounded-l-none;
+    }
+    
+    .input-group-text {
+        @apply px-4 py-2.5 bg-gray-100 border border-gray-300 border-l-0 text-gray-700 text-sm font-medium;
+    }
+    
+    /* Alert Styling */
+    .alert {
+        @apply p-4 rounded-lg mb-4;
+    }
+    
+    .alert-danger {
+        @apply bg-red-50 border-l-4 border-red-500 text-red-700;
+    }
+    
+    .alert-success {
+        @apply bg-green-50 border-l-4 border-green-500 text-green-700;
+    }
+    
+    .alert-secondary {
+        @apply bg-gray-50 border-l-4 border-gray-400 text-gray-700;
+    }
+    
+    /* Bootstrap Grid Fix */
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        margin-right: -0.75rem;
+        margin-left: -0.75rem;
+    }
+    
+    .col-sm-3,
+    .col-sm-4 {
+        position: relative;
+        width: 100%;
+        padding-right: 0.75rem;
+        padding-left: 0.75rem;
+    }
+    
+    @media (min-width: 576px) {
+        .col-sm-3 {
+            flex: 0 0 25%;
+            max-width: 25%;
+        }
+        .col-sm-4 {
+            flex: 0 0 33.333333%;
+            max-width: 33.333333%;
+        }
+    }
+    
+    /* Bootstrap Modal Fix for Tailwind */
+    .modal {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        z-index: 1055 !important;
+        display: none;
+        width: 100% !important;
+        height: 100% !important;
+        overflow-x: hidden;
+        overflow-y: auto;
+        outline: 0;
+        background-color: rgba(0, 0, 0, 0.5) !important;
+    }
+    
+    .modal.show {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
+    .modal-dialog {
+        position: relative !important;
+        width: auto !important;
+        margin: 0.5rem !important;
+        pointer-events: auto !important;
+        z-index: 1060 !important;
+    }
+    
+    .modal.fade .modal-dialog {
+        transition: transform 0.3s ease-out;
+        transform: translate(0, -50px);
+    }
+    
+    .modal.show .modal-dialog {
+        transform: none;
+    }
+    
+    .modal-dialog-centered {
+        display: flex !important;
+        align-items: center !important;
+        min-height: calc(100% - 1rem) !important;
+    }
+    
+    .modal-content {
+        position: relative !important;
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        pointer-events: auto !important;
+        background-color: #fff !important;
+        background-clip: padding-box;
+        outline: 0;
+        z-index: 1060 !important;
+    }
+    
+    .modal-backdrop {
+        display: none !important;
+    }
+    
+    @media (min-width: 576px) {
+        .modal-dialog {
+            max-width: 500px !important;
+            margin: 1.75rem auto !important;
+        }
+        
+        .modal-dialog-centered {
+            min-height: calc(100% - 3.5rem) !important;
+        }
+    }
+}

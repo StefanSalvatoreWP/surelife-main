@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataTable Test - FSA Rankings</title>
+    
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>FSA Rankings DataTable Test</h1>
+    
+    <div id="status"></div>
+    
+    <h2>Test Results</h2>
+    <div id="test-results"></div>
+    
+    <h2>DataTable</h2>
+    <table id="test_table" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th>Last Name</th>
+                <th>First Name</th>
+                <th>Middle Name</th>
+                <th>New Sales</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    
+    <script>
+        $(document).ready(function() {
+            let statusHtml = '<div class="status info">Testing components...</div>';
+            $('#status').html(statusHtml);
+            
+            let results = [];
+            
+            // Test 1: jQuery
+            if (typeof jQuery !== 'undefined') {
+                results.push('✓ jQuery loaded: ' + jQuery.fn.jquery);
+                console.log('jQuery version:', jQuery.fn.jquery);
+            } else {
+                results.push('✗ jQuery NOT loaded');
+            }
+            
+            // Test 2: DataTables
+            if (typeof $.fn.DataTable !== 'undefined') {
+                results.push('✓ DataTables loaded');
+                console.log('DataTables available');
+            } else {
+                results.push('✗ DataTables NOT loaded');
+            }
+            
+            // Test 3: AJAX endpoint
+            $.ajax({
+                url: '/fsarankings-sales',
+                type: 'GET',
+                data: {
+                    draw: 1,
+                    start: 0,
+                    length: 10,
+                    search: { value: '', regex: false }
+                },
+                success: function(response) {
+                    console.log('AJAX Success:', response);
+                    results.push('✓ AJAX endpoint accessible');
+                    results.push('  - Total records: ' + response.recordsTotal);
+                    results.push('  - Data rows: ' + response.data.length);
+                    
+                    $('#test-results').html('<div class="status success">' + results.join('<br>') + '</div>');
+                    
+                    // Initialize DataTable
+                    initDataTable();
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', xhr, status, error);
+                    results.push('✗ AJAX endpoint error: ' + error);
+                    results.push('  - Status: ' + xhr.status);
+                    results.push('  - Response: ' + xhr.responseText.substring(0, 200));
+                    
+                    $('#test-results').html('<div class="status error">' + results.join('<br>') + '</div>');
+                    $('#status').html('<div class="status error">AJAX request failed. You may need to log in first.</div>');
+                }
+            });
+            
+            function initDataTable() {
+                try {
+                    console.log('Initializing DataTable...');
+                    
+                    var table = $('#test_table').DataTable({
+                        processing: true,
+                        serverSide: true,
+                        pageLength: 10,
+                        ajax: {
+                            url: "/fsarankings-sales",
+                            type: "GET",
+                            error: function(xhr, error, thrown) {
+                                console.error('DataTable AJAX Error:', xhr, error, thrown);
+                                $('#status').html('<div class="status error">DataTable error: ' + error + '</div>');
+                            }
+                        },
+                        columns: [
+                            { data: 'LastName', name: 'tblstaff.LastName' },
+                            { data: 'FirstName', name: 'tblstaff.FirstName' },
+                            { data: 'MiddleName', name: 'tblstaff.MiddleName' },
+                            { data: 'Sales', name: 'Sales', searchable: false }
+                        ],
+                        order: [[3, 'desc']],
+                        initComplete: function() {
+                            console.log('DataTable initialized successfully!');
+                            $('#status').html('<div class="status success">✓ DataTable loaded successfully!</div>');
+                        }
+                    });
+                    
+                } catch (e) {
+                    console.error('DataTable Init Error:', e);
+                    $('#status').html('<div class="status error">Error: ' + e.message + '</div>');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

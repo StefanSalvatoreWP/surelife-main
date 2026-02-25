@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Console Check</title>
+    <script>
+        // Redirect to FSA Rankings and log console
+        console.log('Opening FSA Rankings page...');
+        console.log('If you see this, JavaScript is working');
+        
+        // Check if we can access the page
+        fetch('/fsarankings-sales')
+            .then(response => {
+                console.log('Page response status:', response.status);
+                console.log('Response headers:', [...response.headers.entries()]);
+                return response.text();
+            })
+            .then(html => {
+                console.log('Page loaded, length:', html.length);
+                console.log('Contains jQuery script?', html.includes('jquery'));
+                console.log('Contains DataTables?', html.includes('DataTables'));
+                console.log('Contains fsarankings-sales.js?', html.includes('fsarankings-sales.js'));
+                
+                // Now check AJAX endpoint
+                return fetch('/fsarankings-sales?draw=1&start=0&length=10', {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+            })
+            .then(response => {
+                console.log('AJAX endpoint status:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('AJAX data received:', data);
+                alert('Check passed! Data: ' + data.recordsTotal + ' records. Check console for details.');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error: ' + error.message + '. Check console for details.');
+            });
+    </script>
+</head>
+<body>
+    <h1>Checking Console...</h1>
+    <p>Press F12 to see console output</p>
+    <p><a href="/fsarankings-sales">Go to FSA Rankings</a></p>
+</body>
+</html>

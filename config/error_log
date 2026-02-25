@@ -1,0 +1,404 @@
+[03-Oct-2024 04:51:15 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/database.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/database.php on line 18
+[03-Dec-2024 09:00:21 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/database.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/database.php on line 18
+[26-Jan-2025 18:30:42 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/app.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/app.php on line 19
+[02-Feb-2025 05:23:03 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/database.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/database.php on line 18
+[11-Feb-2025 07:19:09 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/services.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/services.php on line 18
+[12-Feb-2025 11:56:25 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/services.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/services.php on line 18
+[26-Mar-2025 18:22:02 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/cache.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/cache.php on line 18
+[26-Mar-2025 21:10:00 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/app.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/app.php on line 19
+[27-Mar-2025 02:06:48 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/database.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/database.php on line 18
+[27-Mar-2025 02:06:49 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/mail.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/mail.php on line 16
+[27-Mar-2025 02:49:55 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/services.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/services.php on line 18
+[27-Mar-2025 02:56:07 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/session.php:21
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/session.php on line 21
+[27-Mar-2025 02:56:17 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function resource_path() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/view.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/view.php on line 17
+[27-Mar-2025 02:56:17 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/queue.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/queue.php on line 16
+[27-Mar-2025 02:56:23 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/broadcasting.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/broadcasting.php on line 18
+[27-Mar-2025 02:56:32 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/logging.php:21
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/logging.php on line 21
+[02-Apr-2025 19:14:43 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/cache.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/cache.php on line 18
+[02-Apr-2025 20:19:24 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/app.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/app.php on line 19
+[06-Apr-2025 22:12:04 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/app.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/app.php on line 19
+[07-Apr-2025 21:42:19 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/app.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/app.php on line 19
+[08-Apr-2025 10:19:45 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/app.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/app.php on line 19
+[08-Apr-2025 20:33:31 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/app.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/app.php on line 19
+[09-Apr-2025 07:11:17 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/app.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/app.php on line 19
+[25-Apr-2025 05:51:45 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/app.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/app.php on line 19
+[02-May-2025 23:09:06 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/app.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/app.php on line 19
+[07-May-2025 00:23:38 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/database.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/database.php on line 18
+[07-May-2025 00:23:39 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/mail.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/mail.php on line 16
+[07-May-2025 00:23:39 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/services.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/services.php on line 18
+[07-May-2025 00:25:21 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/app.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/app.php on line 19
+[23-Jul-2025 16:05:12 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/app.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/app.php on line 19
+[23-Jul-2025 16:05:12 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/database.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/database.php on line 18
+[23-Jul-2025 16:05:12 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/mail.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/mail.php on line 16
+[23-Jul-2025 16:05:12 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/cache.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/cache.php on line 18
+[23-Jul-2025 16:05:13 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/queue.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/queue.php on line 16
+[23-Jul-2025 16:05:13 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/session.php:21
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/session.php on line 21
+[23-Jul-2025 16:05:13 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function resource_path() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/view.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/view.php on line 17
+[23-Jul-2025 16:05:14 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/filesystems.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/filesystems.php on line 16
+[23-Jul-2025 16:05:14 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/services.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/services.php on line 18
+[23-Jul-2025 16:05:27 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/app.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/app.php on line 19
+[23-Jul-2025 16:05:28 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/database.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/database.php on line 18
+[23-Jul-2025 16:05:28 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/mail.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/mail.php on line 16
+[23-Jul-2025 16:05:28 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/cache.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/cache.php on line 18
+[23-Jul-2025 16:05:28 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/queue.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/queue.php on line 16
+[23-Jul-2025 16:05:28 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/session.php:21
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/session.php on line 21
+[23-Jul-2025 16:05:29 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function resource_path() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/view.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/view.php on line 17
+[23-Jul-2025 16:05:29 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/filesystems.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/filesystems.php on line 16
+[23-Jul-2025 16:05:29 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/services.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/services.php on line 18
+[23-Jul-2025 16:05:54 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/broadcasting.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/broadcasting.php on line 18
+[23-Jul-2025 16:06:09 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/broadcasting.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/broadcasting.php on line 18
+[06-Aug-2025 09:05:39 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/database.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/database.php on line 18
+[06-Aug-2025 09:05:48 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/mail.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/mail.php on line 16
+[06-Aug-2025 09:05:58 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/services.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/services.php on line 18
+[06-Aug-2025 09:06:15 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/database.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/database.php on line 18
+[06-Aug-2025 09:06:21 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/mail.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/mail.php on line 16
+[06-Aug-2025 09:06:32 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/services.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/services.php on line 18
+[08-Aug-2025 04:13:45 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/database.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/database.php on line 18
+[11-Aug-2025 06:11:47 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/app.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/app.php on line 19
+[11-Aug-2025 06:11:47 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/database.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/database.php on line 18
+[11-Aug-2025 06:14:22 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/app.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/app.php on line 19
+[11-Aug-2025 06:14:22 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/database.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/database.php on line 18
+[16-Aug-2025 10:59:52 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/app.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/app.php on line 19
+[16-Aug-2025 10:59:52 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/database.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/database.php on line 18
+[16-Aug-2025 10:59:53 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/mail.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/mail.php on line 16
+[16-Aug-2025 10:59:53 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/cache.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/cache.php on line 18
+[16-Aug-2025 10:59:53 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/queue.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/queue.php on line 16
+[16-Aug-2025 10:59:53 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/session.php:21
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/session.php on line 21
+[16-Aug-2025 10:59:53 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function resource_path() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/view.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/view.php on line 17
+[16-Aug-2025 10:59:54 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/filesystems.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/filesystems.php on line 16
+[16-Aug-2025 10:59:54 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/services.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/services.php on line 18
+[16-Aug-2025 11:00:12 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/app.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/app.php on line 19
+[16-Aug-2025 11:00:13 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/database.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/database.php on line 18
+[16-Aug-2025 11:00:13 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/mail.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/mail.php on line 16
+[16-Aug-2025 11:00:13 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/cache.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/cache.php on line 18
+[16-Aug-2025 11:00:13 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/queue.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/queue.php on line 16
+[16-Aug-2025 11:00:13 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/session.php:21
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/session.php on line 21
+[16-Aug-2025 11:00:14 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function resource_path() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/view.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/view.php on line 17
+[16-Aug-2025 11:00:14 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/filesystems.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/filesystems.php on line 16
+[16-Aug-2025 11:00:14 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/services.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/services.php on line 18
+[16-Aug-2025 11:00:56 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/broadcasting.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/broadcasting.php on line 18
+[16-Aug-2025 11:01:19 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/broadcasting.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/broadcasting.php on line 18
+[18-Aug-2025 03:27:02 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/app.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/app.php on line 19
+[18-Aug-2025 03:27:03 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/database.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/database.php on line 18
+[18-Aug-2025 03:27:03 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/mail.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/mail.php on line 16
+[18-Aug-2025 03:27:03 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/cache.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/cache.php on line 18
+[18-Aug-2025 03:27:03 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/queue.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/queue.php on line 16
+[18-Aug-2025 03:27:04 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/session.php:21
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/session.php on line 21
+[18-Aug-2025 03:27:04 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function resource_path() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/view.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/view.php on line 17
+[18-Aug-2025 03:27:11 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/filesystems.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/filesystems.php on line 16
+[18-Aug-2025 03:27:11 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/services.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/services.php on line 18
+[18-Aug-2025 03:27:37 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/app.php:19
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/app.php on line 19
+[18-Aug-2025 03:27:38 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/database.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/database.php on line 18
+[18-Aug-2025 03:27:38 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/mail.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/mail.php on line 16
+[18-Aug-2025 03:27:38 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/cache.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/cache.php on line 18
+[18-Aug-2025 03:27:39 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/queue.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/queue.php on line 16
+[18-Aug-2025 03:27:39 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/session.php:21
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/session.php on line 21
+[18-Aug-2025 03:27:39 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function resource_path() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/view.php:17
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/view.php on line 17
+[18-Aug-2025 03:27:40 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/filesystems.php:16
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/filesystems.php on line 16
+[18-Aug-2025 03:27:40 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/services.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/services.php on line 18
+[18-Aug-2025 03:28:39 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/broadcasting.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/broadcasting.php on line 18
+[18-Aug-2025 03:28:40 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/broadcasting.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/broadcasting.php on line 18
+[26-Aug-2025 13:37:39 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/broadcasting.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/surelifenet12/public_html/admin.surelifenetworkglobal.co/config/broadcasting.php on line 18

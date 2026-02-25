@@ -1,0 +1,529 @@
+<!-- 2023 SilverDust) S. Maceren --> 
+@extends('layouts.main')
+
+@section('content')
+    <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <!-- Header Section -->
+            <div class="mb-6">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Update Staff</h1>
+                <p class="text-gray-600 text-sm mb-4">Update selected staff information</p>
+                
+                @if(session('duplicate'))
+                    <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-red-700">{{ session('duplicate') }}</p>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+                
+                <a href="/staff-view/{{ $selstaff->Id }}" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors duration-200 shadow-sm">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Return
+                </a>
+            </div>
+            <!-- Form Start -->
+            <form action="/submit-staff-update/{{ $selstaff->Id }}" method="POST">
+                @csrf
+                @method('PUT')
+                
+                <!-- IDENTIFICATION Section -->
+                <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+                    <h2 class="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-6 pb-3 border-b border-gray-200">IDENTIFICATION</h2>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                @php
+                                    $selectedPosition = old('staffposition', $selstaff->Position);
+                                @endphp
+                                <label for="staffPosition" class="form-label">Position</label>
+                                <select class="form-control font-sm" id="staffPosition" name="staffposition">
+                                    @foreach($roles as $role)
+                                        <option value="{{ $role->Id }}" {{ $selectedPosition == $role->Id ? 'selected' : '' }}>
+                                            {{ $role->Role }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-sm-3">
+                                @php
+                                    $selectedRegion = old('staffregion', $selstaff->RegionId);
+                                @endphp
+                                <label for="staffRegion" class="form-label">Region</label>
+                                <select class="form-control font-sm" id="staffRegion" name="staffregion">
+                                    @foreach($regions as $region)
+                                        <option value="{{ $region->Id }}" {{ $selectedRegion == $region->Id ? 'selected' : '' }}>
+                                            {{ $region->RegionName }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-sm-3">
+                                @php
+                                    $selectedBranch = old('staffbranch', $selstaff->BranchId);
+                                @endphp
+                                <label for="staffBranch" class="form-label">Branch</label>
+                                <select class="form-control font-sm" id="staffBranch" name="staffbranch">
+                                    @foreach($branches as $branch)
+                                        <option value="{{ $branch->Id }}" {{ $selectedBranch == $branch->Id ? 'selected' : '' }}>
+                                            {{ $branch->BranchName }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>     
+                        <div class="row mt-4">
+                            <div class="col-sm-3">
+                                @php
+                                    $selectedScheme = old('staffscheme', $selstaff->Scheme);
+                                @endphp
+                                <label for="staffScheme" class="form-label">Scheme</label>
+                                <select class="form-control font-sm" id="staffScheme" name="staffscheme">
+                                    <option value="Old">Old</option>
+                                    <option value="New">New</option>
+                                    @if($selectedScheme != null)
+                                        <option hidden selected value="{{ $selectedScheme }}">{{ $selectedScheme }}</option>
+                                    @endif
+                                </select>
+                            </div>
+                            <div class="col-sm-3">
+                                @php
+                                    $selectedRecruitedBy = old('staffrecruitedby', $selstaff->RecruitedBy);
+                                @endphp
+                                <label for="staffRecruitedBy" class="form-label">Recruited By</label>
+                                <select class="form-control font-sm" id="staffRecruitedBy" name="staffrecruitedby">
+                                    @foreach($staffs as $staff)
+                                        <option value="{{ $staff->Id }}" {{ $selectedRecruitedBy == $staff->Id ? 'selected' : '' }}>
+                                            {{ $staff->LastName . ", " . $staff->FirstName }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-sm-3">
+                                @php
+                                    $prevStaffDateAccomplished = old('staffdateaccomplished', $selstaff->DateAccomplished);
+                                @endphp
+                                <label for="staffDateAccomplished" class="form-label">Date Accomplished</label>
+                                <input type="date" class="form-control font-sm" id="staffDateAccomplished" name="staffdateaccomplished" maxlength="30" value="{{ $prevStaffDateAccomplished }}" />
+                                    @error('staffdateaccomplished')
+                                    <p class="text-danger">{{ $message }}</p>
+                                    @enderror
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white mt-3 p-3">
+                <div class="card">
+                    <h6 class="fw-bold text-dark p-3">PERSONAL</h6>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                @php
+                                    $prevStaffFirstName = old('stafffirstname', $selstaff->FirstName);
+                                @endphp
+                                <label for="staffFirstName" class="form-label">First Name</label>
+                                <input type="text" class="form-control font-sm" id="staffFirstName" name="stafffirstname" maxlength="30" value="{{ $prevStaffFirstName }}" />
+                                    @error('stafffirstname')
+                                    <p class="text-danger">{{ $message }}</p>
+                                    @enderror
+                            </div>
+                            <div class="col-sm-3">
+                                @php
+                                    $prevStaffLastName = old('stafflastname', $selstaff->LastName);
+                                @endphp
+                                <label for="staffLastName" class="form-label">Last Name</label>
+                                <input type="text" class="form-control font-sm" id="staffLastName" name="stafflastname" maxlength="30" value="{{ $prevStaffLastName }}" />
+                                    @error('stafflastname')
+                                    <p class="text-danger">{{ $message }}</p>
+                                    @enderror
+                            </div>
+                            <div class="col-sm-3">
+                                @php
+                                    $prevStaffMiddleName = old('staffmiddlename', $selstaff->MiddleName);
+                                @endphp
+                                <label for="staffMiddleName" class="form-label">Middle Name</label>
+                                <input type="text" class="form-control font-sm" id="staffMiddleName" name="staffmiddlename" maxlength="30" value="{{ $prevStaffMiddleName }}" />
+                                    @error('staffmiddlename')
+                                    <p class="text-danger">{{ $message }}</p>
+                                    @enderror
+                            </div>
+                            <div class="col-sm-3">
+                                @php
+                                    $selectedGender = old('staffgender', $selstaff->Gender);
+                                @endphp
+                                <label for="staffGender" class="form-label">Gender</label>
+                                <select class="form-control font-sm" id="staffGender" name="staffgender">
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    @if($selectedGender != null)
+                                        <option hidden selected value="{{ $selectedGender }}">{{ $selectedGender }}</option>
+                                    @endif
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-sm-3">
+                                @php
+                                    $prevStaffBirthDate = old('staffbirthdate', $selstaff->BirthDate);
+                                @endphp
+                                <label for="staffBirthDate" class="form-label">Birth Date</label>
+                                <input type="date" class="form-control font-sm" id="staffBirthDate" name="staffbirthdate" maxlength="30" value="{{ $prevStaffBirthDate }}" />
+                                    @error('staffbirthdate')
+                                    <p class="text-danger">{{ $message }}</p>
+                                    @enderror
+                            </div>
+                            <div class="col-sm-3">
+                                @php
+                                    $prevStaffAge = old('staffage', $selstaff->Age);
+                                @endphp
+                                <label for="staffAge" class="form-label">Age</label>
+                                <input type="text" class="form-control font-sm" id="staffAge" name="staffage" maxlength="30" value="{{ $prevStaffAge }}" readonly />
+                                    @error('staffage')
+                                    <p class="text-danger">{{ $message }}</p>
+                                    @enderror
+                            </div>
+                            <div class="col-sm-3">
+                                @php
+                                    $prevStaffBirthPlace = old('staffbirthplace', $selstaff->BirthPlace);
+                                @endphp
+                                <label for="staffBirthPlace" class="form-label">Birth Place</label>
+                                <input type="text" class="form-control font-sm" id="staffBirthPlace" name="staffbirthplace" maxlength="30" value="{{ $prevStaffBirthPlace }}" />
+                                    @error('staffbirthplace')
+                                    <p class="text-danger">{{ $message }}</p>
+                                    @enderror
+                            </div>
+                            <div class="col-sm-3">
+                                @php
+                                    $prevStaffNationality = old('staffnationality', $selstaff->Nationality);
+                                @endphp
+                                <label for="staffNationality" class="form-label">Nationality</label>
+                                <input type="text" class="form-control font-sm" id="staffNationality" name="staffnationality" maxlength="30" value="{{ $prevStaffNationality }}" />
+                                    @error('staffnationality')
+                                    <p class="text-danger">{{ $message }}</p>
+                                    @enderror
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-sm-3">
+                                @php
+                                    $selectedCivilStatus = old('staffcivilstatus', $selstaff->CivilStatus);
+                                @endphp
+                                <label for="staffCivilStatus" class="form-label">Civil Status</label>
+                                <select class="form-control font-sm" id="staffCivilStatus" name="staffcivilstatus">
+                                    <option value="Single">Single</option>
+                                    <option value="Married">Married</option>
+                                    <option value="Divorced">Divorced</option>
+                                    <option value="Separated">Separated</option>
+                                    <option value="Widowed">Widowed</option>
+                                    @if($selectedCivilStatus != null)
+                                        <option hidden selected value="{{ $selectedCivilStatus }}">{{ $selectedCivilStatus }}</option>
+                                    @endif
+                                </select>
+                            </div>
+                            <div class="col-sm-3">
+                                @php
+                                    $prevStaffSss = old('staffsss', $selstaff->SSS);
+                                @endphp
+                                <label for="staffSss" class="form-label">SSS</label>
+                                <input type="text" class="form-control font-sm" id="staffSss" name="staffsss" maxlength="30" value="{{ $prevStaffSss }}" />
+                                    @error('staffsss')
+                                    <p class="text-danger">{{ $message }}</p>
+                                    @enderror
+                            </div>
+                            <div class="col-sm-3">
+                                @php
+                                    $prevStaffTin = old('stafftin', $selstaff->TIN);
+                                @endphp
+                                <label for="staffTin" class="form-label">TIN</label>
+                                <input type="text" class="form-control font-sm" id="staffTin" name="stafftin" maxlength="30" value="{{ $prevStaffTin }}" />
+                                    @error('stafftin')
+                                    <p class="text-danger">{{ $message }}</p>
+                                    @enderror
+                            </div>
+                            <div class="col-sm-3">
+                                @php
+                                    $prevStaffGsis = old('staffgsis', $selstaff->GSIS);
+                                @endphp
+                                <label for="staffGsis" class="form-label">GSIS</label>
+                                <input type="text" class="form-control font-sm" id="staffGsis" name="staffgsis" maxlength="30" value="{{ $prevStaffGsis }}" />
+                                    @error('staffgsis')
+                                    <p class="text-danger">{{ $message }}</p>
+                                    @enderror
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-sm-3">
+                                @php
+                                    $prevStaffSpouse = old('staffspouse', $selstaff->Spouse);
+                                @endphp
+                                <label for="staffSpouse" class="form-label">Spouse</label>
+                                <input type="text" class="form-control font-sm" id="staffSpouse" name="staffspouse" maxlength="30" value="{{ $prevStaffSpouse }}" />
+                                    @error('staffspouse')
+                                    <p class="text-danger">{{ $message }}</p>
+                                    @enderror
+                            </div>
+                            <div class="col-sm-3">
+                                @php
+                                    $prevStaffSpouseOccu = old('staffspouseoccu', $selstaff->Occupation);
+                                @endphp
+                                <label for="staffSpouseOccu" class="form-label">Occupation</label>
+                                <input type="text" class="form-control font-sm" id="staffSpouseOccu" name="staffspouseoccu" maxlength="30" value="{{ $prevStaffSpouseOccu }}" />
+                                    @error('staffspouseoccu')
+                                    <p class="text-danger">{{ $message }}</p>
+                                    @enderror
+                            </div>
+                            <div class="col-sm-3">
+                                @php
+                                    $prevStaffNoOfDependencies = old('staffnoofdependencies', $selstaff->NoOfDependents);
+                                @endphp
+                                <label for="staffNoOfDependencies" class="form-label">No. of Dependencies</label>
+                                <input type="number" class="form-control font-sm" id="staffNoOfDependencies" name="staffnoofdependencies" maxlength="30" value="{{ $prevStaffNoOfDependencies }}" />
+                                    @error('staffnoofdependencies')
+                                    <p class="text-danger">{{ $message }}</p>
+                                    @enderror
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white mt-3 p-3">
+                <div class="card">
+                    <h6 class="fw-bold text-dark p-3">ADDRESS</h6>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                @php
+                                    $selectedCity = old('staffcity', $selstaff->Municipality);
+                                @endphp
+                                <label for="staffCity" class="form-label">City</label>
+                                <select class="form-control font-sm" id="staffCity" name="staffcity">
+                                    @foreach($cities as $city)
+                                        <option value="{{ $city->City }}" {{ $selectedCity == $city->City ? 'selected' : '' }}>
+                                            {{ $city->City }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-sm-3">
+                                @php
+                                    $prevStaffZipcode = old('staffzipcode', $selstaff->ZipCode);
+                                @endphp
+                                <label for="staffZipcode" class="form-label">ZIP code</label>
+                                <input type="text" class="form-control font-sm" id="staffZipcode" name="staffzipcode" maxlength="30" value="{{ $prevStaffZipcode }}" readonly />
+                                    @error('staffzipcode')
+                                    <p class="text-danger">{{ $message }}</p>
+                                    @enderror
+                            </div>
+                            <div class="col-sm-3">
+                                <label for="staffBarangay" class="form-label">Barangay</label>
+                                @php
+                                    $selectedBarangay = old('staffbarangay', $selstaff->Barangay);
+                                @endphp
+                                <select class="form-control font-sm" id="staffBarangay" name="staffbarangay">
+                                    @foreach($barangays as $barangay)
+                                        <option value="{{ $barangay->Barangay }}" {{ $selectedBarangay == $barangay->Barangay ? 'selected' : '' }}>
+                                            {{ $barangay->Barangay }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-sm-3">
+                                @php
+                                    $prevStaffStreet = old('staffstreet', $selstaff->Street);
+                                @endphp
+                                <label for="staffStreet" class="form-label">Street</label>
+                                <input type="text" class="form-control font-sm" id="staffStreet" name="staffstreet" maxlength="30" value="{{ $prevStaffStreet }}" />
+                                    @error('staffstreet')
+                                    <p class="text-danger">{{ $message }}</p>
+                                    @enderror
+                            </div>
+                            <div class="col-sm-3">
+                                @php
+                                    $prevStaffSubdiv = old('staffsubdiv', $selstaff->Subdivision);
+                                @endphp
+                                <label for="staffSubdiv" class="form-label">Subdivision</label>
+                                <input type="text" class="form-control font-sm" id="staffSubdiv" name="staffsubdiv" maxlength="30" value="{{ $prevStaffSubdiv }}" />
+                                    @error('staffsubdiv')
+                                    <p class="text-danger">{{ $message }}</p>
+                                    @enderror
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white mt-3 p-3">
+                <div class="card">
+                    <h6 class="fw-bold text-dark p-3">CONTACT</h6>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                @php
+                                    $prevStaffTelephone = old('stafftelephone', $selstaff->TelephoneNumber);
+                                @endphp
+                                <label for="staffTelephone" class="form-label">Telephone</label>
+                                <input type="text" class="form-control font-sm" id="staffTelephone" name="stafftelephone" maxlength="30" value="{{ $prevStaffTelephone }}" />
+                                    @error('stafftelephone')
+                                    <p class="text-danger">{{ $message }}</p>
+                                    @enderror
+                            </div>
+                            <div class="col-sm-3">
+                                <label for="staffMobileNetwork" class="form-label">Mobile (+63)</label>
+                                <div class="input-group">
+                                    @php 
+                                        $mobilenetwork = substr($selstaff->MobileNumber, 1, 3);
+                                        $mobileno = substr($selstaff->MobileNumber, 4);
+                
+                                        $selectedMobileNetwork = old('staffmobilenetwork', $mobilenetwork); 
+                                        $selectedMobileNo = old('staffmobileno', $mobileno); 
+                                    @endphp
+                                    <select class="form-control font-sm" id="staffMobileNetwork" name="staffmobilenetwork">
+                                        @foreach($mobiles as $mobile)
+                                            <option value="{{ $mobile->NetworkNo }}" {{ $selectedMobileNetwork == $mobile->NetworkNo ? 'selected' : '' }}>
+                                                {{ $mobile->NetworkNo }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    <input type="number" class="form-control font-sm" id="staffMobileNo" name="staffmobileno" maxlength="30" value="{{ $selectedMobileNo }}" />
+                                </div>
+                                <div>
+                                    @error('staffmobileno')
+                                    <p class="text-danger">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <label for="staffEmail" class="form-label">Email</label>
+                                <div class="input-group">
+                                    @php 
+                                        $origEmail = $selstaff->EmailAddress;
+                                        if(empty($origEmail)){
+                                            $email = "";
+                                        }
+
+                                        $atPosition = strpos($origEmail, '@');
+                
+                                        if ($atPosition !== false) {
+                                            $email = substr($origEmail, 0, $atPosition);
+                                        }
+                                        $emailAddress = substr($origEmail, $atPosition + 1);
+                                        
+                                        $selectedEmail = old('staffemail', $email); 
+                                        $selectedEmailAddress = old('staffemailaddress', $emailAddress); 
+                                    @endphp
+                                    <input type="text" class="form-control font-sm" id="staffEmail" name="staffemail" maxlength="30" value="{{ $selectedEmail }}" />
+                                    <span class="input-group-text" id="basic-addon1">@</span>
+                                    <select class="form-control font-sm" id="staffEmail" name="staffemailaddress">
+                                        @foreach($emails as $email)
+                                            <option value="{{ $email->Email }}" {{ $selectedEmailAddress == $email->Email ? 'selected' : '' }}>
+                                                {{ $email->Email }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div>
+                                    @error('staffemail')
+                                    <p class="text-danger">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white mt-3 p-3">
+                <div class="card">
+                    <h6 class="fw-bold text-dark p-3">EDUCATIONAL BACKGROUND</h6>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                @php
+                                    $prevStaffLastSchool = old('stafflastschool', $selstaff->LastSchoolAttended);
+                                @endphp
+                                <label for="staffLastSchool" class="form-label">Last School Attended</label>
+                                <input type="text" class="form-control font-sm" id="staffLastSchool" name="stafflastschool" maxlength="30" value="{{ $prevStaffLastSchool }}" />
+                                    @error('stafflastschool')
+                                    <p class="text-danger">{{ $message }}</p>
+                                    @enderror
+                            </div>
+                            <div class="col-sm-3">
+                                @php
+                                    $prevStaffEducationalAttainment = old('staffleducationalattainment', $selstaff->EducationalAttainment);
+                                @endphp
+                                <label for="staffEducationalAttainment" class="form-label">Educational Attainment</label>
+                                <input type="text" class="form-control font-sm" id="staffEducationalAttainment" name="staffleducationalattainment" maxlength="30" value="{{ $prevStaffEducationalAttainment }}" />
+                                    @error('staffleducationalattainment')
+                                    <p class="text-danger">{{ $message }}</p>
+                                    @enderror
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white mt-3 p-3">
+                <div class="card">
+                    <h6 class="fw-bold text-dark p-3">WORK HISTORY</h6>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                @php
+                                    $prevStaffCompany = old('staffcompany', $selstaff->CompanyName);
+                                @endphp
+                                <label for="staffCompany" class="form-label">Company</label>
+                                <input type="text" class="form-control font-sm" id="staffCompany" name="staffcompany" maxlength="30" value="{{ $prevStaffCompany }}" />
+                                    @error('staffcompany')
+                                    <p class="text-danger">{{ $message }}</p>
+                                    @enderror
+                            </div>
+                            <div class="col-sm-3">
+                                @php
+                                    $prevStaffWorkNature = old('staffworknature', $selstaff->WorkNature);
+                                @endphp
+                                <label for="staffWorkNature" class="form-label">Nature of Work</label>
+                                <input type="text" class="form-control font-sm" id="staffWorkNature" name="staffworknature" maxlength="30" value="{{ $prevStaffWorkNature }}" />
+                                    @error('staffworknature')
+                                    <p class="text-danger">{{ $message }}</p>
+                                    @enderror
+                            </div>
+                            <div class="col-sm-3">
+                                @php
+                                    $prevStaffWorkStartDate = old('staffworkstartdate', $selstaff->StartDateC);
+                                @endphp
+                                <label for="staffWorkStartDate" class="form-label">Start Date</label>
+                                <input type="date" class="form-control font-sm" id="staffWorkStartDate" name="staffworkstartdate" maxlength="30" value="{{ $prevStaffWorkStartDate }}" />
+                                    @error('staffworkstartdate')
+                                    <p class="text-danger">{{ $message }}</p>
+                                    @enderror
+                            </div>
+                            <div class="col-sm-3">
+                                @php
+                                    $prevStaffWorkEndDate = old('staffworkenddate', $selstaff->EndDateC);
+                                @endphp
+                                <label for="staffWorkEndDate" class="form-label">End Date</label>
+                                <input type="date" class="form-control font-sm" id="staffWorkEndDate" name="staffworkenddate" maxlength="30" value="{{ $prevStaffWorkEndDate }}" />
+                                    @error('staffworkenddate')
+                                    <p class="text-danger">{{ $message }}</p>
+                                    @enderror
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-grid gap-2 col-2 mx-auto">
+                <button type="submit" class="btn btn-success btn-md mt-5">Submit</button>
+            </div>
+            </form>
+        </div>
+    </div>
+    <script src="{{ asset('js/staff-update.js') }}"></script>
+@endsection

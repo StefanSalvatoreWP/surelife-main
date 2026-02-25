@@ -1,0 +1,417 @@
+/* Global Font Size Control System */
+
+/* Small Font Size */
+body.font-size-small {
+    font-size: 12px;
+}
+
+body.font-size-small h1 {
+    font-size: 1.75rem;
+}
+
+body.font-size-small h2 {
+    font-size: 1.5rem;
+}
+
+body.font-size-small h3 {
+    font-size: 1.25rem;
+}
+
+body.font-size-small h4 {
+    font-size: 1.1rem;
+}
+
+body.font-size-small h5 {
+    font-size: 1rem;
+}
+
+body.font-size-small h6 {
+    font-size: 0.9rem;
+}
+
+body.font-size-small .text-xs {
+    font-size: 0.65rem;
+}
+
+body.font-size-small .text-sm {
+    font-size: 0.75rem;
+}
+
+body.font-size-small .text-base {
+    font-size: 0.875rem;
+}
+
+body.font-size-small .text-lg {
+    font-size: 1rem;
+}
+
+body.font-size-small .text-xl {
+    font-size: 1.125rem;
+}
+
+body.font-size-small .text-2xl {
+    font-size: 1.25rem;
+}
+
+body.font-size-small .text-3xl {
+    font-size: 1.5rem;
+}
+
+body.font-size-small .text-4xl {
+    font-size: 1.75rem;
+}
+
+/* Medium Font Size (Default) */
+body.font-size-medium {
+    font-size: 14px;
+}
+
+body.font-size-medium h1 {
+    font-size: 2rem;
+}
+
+body.font-size-medium h2 {
+    font-size: 1.75rem;
+}
+
+body.font-size-medium h3 {
+    font-size: 1.5rem;
+}
+
+body.font-size-medium h4 {
+    font-size: 1.25rem;
+}
+
+body.font-size-medium h5 {
+    font-size: 1.125rem;
+}
+
+body.font-size-medium h6 {
+    font-size: 1rem;
+}
+
+body.font-size-medium .text-xs {
+    font-size: 0.75rem;
+}
+
+body.font-size-medium .text-sm {
+    font-size: 0.875rem;
+}
+
+body.font-size-medium .text-base {
+    font-size: 1rem;
+}
+
+body.font-size-medium .text-lg {
+    font-size: 1.125rem;
+}
+
+body.font-size-medium .text-xl {
+    font-size: 1.25rem;
+}
+
+body.font-size-medium .text-2xl {
+    font-size: 1.5rem;
+}
+
+body.font-size-medium .text-3xl {
+    font-size: 1.875rem;
+}
+
+body.font-size-medium .text-4xl {
+    font-size: 2.25rem;
+}
+
+/* Large Font Size */
+body.font-size-large {
+    font-size: 16px;
+}
+
+body.font-size-large h1 {
+    font-size: 2.25rem;
+}
+
+body.font-size-large h2 {
+    font-size: 2rem;
+}
+
+body.font-size-large h3 {
+    font-size: 1.75rem;
+}
+
+body.font-size-large h4 {
+    font-size: 1.5rem;
+}
+
+body.font-size-large h5 {
+    font-size: 1.25rem;
+}
+
+body.font-size-large h6 {
+    font-size: 1.125rem;
+}
+
+body.font-size-large .text-xs {
+    font-size: 0.8rem;
+}
+
+body.font-size-large .text-sm {
+    font-size: 0.95rem;
+}
+
+body.font-size-large .text-base {
+    font-size: 1.1rem;
+}
+
+body.font-size-large .text-lg {
+    font-size: 1.25rem;
+}
+
+body.font-size-large .text-xl {
+    font-size: 1.4rem;
+}
+
+body.font-size-large .text-2xl {
+    font-size: 1.6rem;
+}
+
+body.font-size-large .text-3xl {
+    font-size: 2rem;
+}
+
+body.font-size-large .text-4xl {
+    font-size: 2.5rem;
+}
+
+/* Extra Large Font Size */
+body.font-size-xlarge {
+    font-size: 18px;
+}
+
+body.font-size-xlarge h1 {
+    font-size: 2.5rem;
+}
+
+body.font-size-xlarge h2 {
+    font-size: 2.25rem;
+}
+
+body.font-size-xlarge h3 {
+    font-size: 2rem;
+}
+
+body.font-size-xlarge h4 {
+    font-size: 1.75rem;
+}
+
+body.font-size-xlarge h5 {
+    font-size: 1.5rem;
+}
+
+body.font-size-xlarge h6 {
+    font-size: 1.25rem;
+}
+
+body.font-size-xlarge .text-xs {
+    font-size: 0.9rem;
+}
+
+body.font-size-xlarge .text-sm {
+    font-size: 1.05rem;
+}
+
+body.font-size-xlarge .text-base {
+    font-size: 1.2rem;
+}
+
+body.font-size-xlarge .text-lg {
+    font-size: 1.4rem;
+}
+
+body.font-size-xlarge .text-xl {
+    font-size: 1.6rem;
+}
+
+body.font-size-xlarge .text-2xl {
+    font-size: 1.9rem;
+}
+
+body.font-size-xlarge .text-3xl {
+    font-size: 2.25rem;
+}
+
+body.font-size-xlarge .text-4xl {
+    font-size: 2.75rem;
+}
+
+/* DataTables Font Size Adjustments */
+body.font-size-small table.dataTable,
+body.font-size-small table.dataTable tbody td,
+body.font-size-small table.dataTable thead th,
+body.font-size-small table.dataTable tfoot th,
+body.font-size-small .dataTables_wrapper,
+body.font-size-small div.dataTables_info,
+body.font-size-small div.dataTables_length label,
+body.font-size-small div.dataTables_filter label {
+    font-size: 0.75rem !important;
+}
+
+body.font-size-medium table.dataTable,
+body.font-size-medium table.dataTable tbody td,
+body.font-size-medium table.dataTable thead th,
+body.font-size-medium table.dataTable tfoot th,
+body.font-size-medium .dataTables_wrapper,
+body.font-size-medium div.dataTables_info,
+body.font-size-medium div.dataTables_length label,
+body.font-size-medium div.dataTables_filter label {
+    font-size: 0.875rem !important;
+}
+
+body.font-size-large table.dataTable,
+body.font-size-large table.dataTable tbody td,
+body.font-size-large table.dataTable thead th,
+body.font-size-large table.dataTable tfoot th,
+body.font-size-large .dataTables_wrapper,
+body.font-size-large div.dataTables_info,
+body.font-size-large div.dataTables_length label,
+body.font-size-large div.dataTables_filter label {
+    font-size: 1rem !important;
+}
+
+body.font-size-xlarge table.dataTable,
+body.font-size-xlarge table.dataTable tbody td,
+body.font-size-xlarge table.dataTable thead th,
+body.font-size-xlarge table.dataTable tfoot th,
+body.font-size-xlarge .dataTables_wrapper,
+body.font-size-xlarge div.dataTables_info,
+body.font-size-xlarge div.dataTables_length label,
+body.font-size-xlarge div.dataTables_filter label {
+    font-size: 1.125rem !important;
+}
+
+/* DataTables Pagination Styling - Clean & Modern */
+.dataTables_wrapper .dataTables_paginate {
+    padding-top: 1rem !important;
+}
+
+/* Reset all default DataTables pagination styles */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    background: none !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    border: none !important;
+    color: #6b7280 !important;
+    transition: all 0.2s ease !important;
+    margin: 0 4px !important;
+    padding: 8px 14px !important;
+    border-radius: 8px !important;
+    font-weight: 500 !important;
+    box-shadow: none !important;
+}
+
+/* Hover state for non-active buttons */
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover:not(.current):not(.disabled) {
+    background: #f3f4f6 !important;
+    background-color: #f3f4f6 !important;
+    background-image: none !important;
+    color: #111827 !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Active/Current page button - Highlighted */
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:focus,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:active {
+    background: #6366f1 !important;
+    background-color: #6366f1 !important;
+    background-image: none !important;
+    color: white !important;
+    border: none !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.3), 0 2px 4px -1px rgba(99, 102, 241, 0.2) !important;
+}
+
+/* Disabled buttons (Previous/Next when at first/last page) */
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {
+    background: none !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    color: #d1d5db !important;
+    border: none !important;
+    cursor: not-allowed !important;
+    opacity: 0.5 !important;
+    box-shadow: none !important;
+}
+
+/* Previous and Next button styling */
+.dataTables_wrapper .dataTables_paginate .paginate_button.previous,
+.dataTables_wrapper .dataTables_paginate .paginate_button.next {
+    font-weight: 600 !important;
+}
+
+/* Regular HTML Tables */
+body.font-size-small table,
+body.font-size-small table tbody td,
+body.font-size-small table thead th,
+body.font-size-small table tfoot th {
+    font-size: 0.75rem !important;
+}
+
+body.font-size-medium table,
+body.font-size-medium table tbody td,
+body.font-size-medium table thead th,
+body.font-size-medium table tfoot th {
+    font-size: 0.875rem !important;
+}
+
+body.font-size-large table,
+body.font-size-large table tbody td,
+body.font-size-large table thead th,
+body.font-size-large table tfoot th {
+    font-size: 1rem !important;
+}
+
+body.font-size-xlarge table,
+body.font-size-xlarge table tbody td,
+body.font-size-xlarge table thead th,
+body.font-size-xlarge table tfoot th {
+    font-size: 1.125rem !important;
+}
+
+/* Button Font Size Adjustments */
+body.font-size-small button,
+body.font-size-small .btn {
+    font-size: 0.75rem;
+}
+
+body.font-size-large button,
+body.font-size-large .btn {
+    font-size: 1rem;
+}
+
+body.font-size-xlarge button,
+body.font-size-xlarge .btn {
+    font-size: 1.125rem;
+}
+
+/* Form Input Font Size Adjustments */
+body.font-size-small input,
+body.font-size-small select,
+body.font-size-small textarea {
+    font-size: 0.75rem;
+}
+
+body.font-size-large input,
+body.font-size-large select,
+body.font-size-large textarea {
+    font-size: 1rem;
+}
+
+body.font-size-xlarge input,
+body.font-size-xlarge select,
+body.font-size-xlarge textarea {
+    font-size: 1.125rem;
+}
