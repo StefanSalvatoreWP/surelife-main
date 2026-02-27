@@ -274,56 +274,88 @@ class BarangayController extends Controller
     // Get cities from reference tables by province name
     public function getRefCitiesByProvince(Request $request){
         
-        $provinceName = $request->input('provinceName');
-        
-        // Find the province code from the province name
-        $province = RefProvince::where('provDesc', strtoupper($provinceName))->first();
-        
-        if (!$province) {
-            return response()->json([]);
+        try {
+            // Test database connection
+            \DB::connection()->getPdo();
+            
+            $provinceName = $request->input('provinceName');
+            \Log::info("getRefCitiesByProvince called with provinceName: " . $provinceName);
+            
+            // Find the province code from the province name
+            $province = RefProvince::where('provDesc', $provinceName)->first();
+            
+            if (!$province) {
+                \Log::warning("Province not found: " . $provinceName);
+                return response()->json([]);
+            }
+            
+            \Log::info("Found province: " . $province->provDesc . " with code: " . $province->provCode);
+            
+            // Get cities by province code
+            $cities = RefCityMun::where('provCode', $province->provCode)
+                ->orderBy('citymunDesc', 'asc')
+                ->get();
+            
+            \Log::info("Found " . $cities->count() . " cities for province: " . $provinceName);
+            
+            // Transform to match expected format
+            $transformedCities = $cities->map(function($city) {
+                return [
+                    'City' => $city->citymunDesc,
+                    'citymunCode' => $city->citymunCode
+                ];
+            });
+            
+            return response()->json($transformedCities, 200, ['Content-Type' => 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
+            
+        } catch (\Exception $e) {
+            \Log::error("Error in getRefCitiesByProvince: " . $e->getMessage());
+            \Log::error("Stack trace: " . $e->getTraceAsString());
+            return response()->json(['error' => 'Database connection error', 'message' => $e->getMessage()], 500);
         }
-        
-        // Get cities by province code
-        $cities = RefCityMun::where('provCode', $province->provCode)
-            ->orderBy('citymunDesc', 'asc')
-            ->get();
-        
-        // Transform to match expected format
-        $transformedCities = $cities->map(function($city) {
-            return [
-                'City' => $city->citymunDesc,
-                'citymunCode' => $city->citymunCode
-            ];
-        });
-        
-        return response()->json($transformedCities, 200, ['Content-Type' => 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
     }
 
     // Get barangays from reference tables by city name
     public function getRefBarangaysByCity(Request $request){
         
-        $cityName = $request->input('cityName');
-        
-        // Find the city code from the city name
-        $city = RefCityMun::where('citymunDesc', strtoupper($cityName))->first();
-        
-        if (!$city) {
-            return response()->json([]);
+        try {
+            // Test database connection
+            \DB::connection()->getPdo();
+            
+            $cityName = $request->input('cityName');
+            \Log::info("getRefBarangaysByCity called with cityName: " . $cityName);
+            
+            // Find the city code from the city name
+            $city = RefCityMun::where('citymunDesc', $cityName)->first();
+            
+            if (!$city) {
+                \Log::warning("City not found: " . $cityName);
+                return response()->json([]);
+            }
+            
+            \Log::info("Found city: " . $city->citymunDesc . " with code: " . $city->citymunCode);
+            
+            // Get barangays by city code
+            $barangays = RefBrgy::where('citymunCode', $city->citymunCode)
+                ->orderBy('brgyDesc', 'asc')
+                ->get();
+            
+            \Log::info("Found " . $barangays->count() . " barangays for city: " . $cityName);
+            
+            // Transform to match expected format
+            $transformedBarangays = $barangays->map(function($barangay) {
+                return [
+                    'Barangay' => $barangay->brgyDesc
+                ];
+            });
+            
+            return response()->json($transformedBarangays, 200, ['Content-Type' => 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
+            
+        } catch (\Exception $e) {
+            \Log::error("Error in getRefBarangaysByCity: " . $e->getMessage());
+            \Log::error("Stack trace: " . $e->getTraceAsString());
+            return response()->json(['error' => 'Database connection error', 'message' => $e->getMessage()], 500);
         }
-        
-        // Get barangays by city code
-        $barangays = RefBrgy::where('citymunCode', $city->citymunCode)
-            ->orderBy('brgyDesc', 'asc')
-            ->get();
-        
-        // Transform to match expected format
-        $transformedBarangays = $barangays->map(function($barangay) {
-            return [
-                'Barangay' => $barangay->brgyDesc
-            ];
-        });
-        
-        return response()->json($transformedBarangays, 200, ['Content-Type' => 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
     }
 
     /************** 2024 **************/
