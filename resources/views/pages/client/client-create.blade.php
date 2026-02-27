@@ -600,7 +600,7 @@
                                     $prevTelephone = old('telephone');
                                 @endphp
                                 <label for="telephone" class="block text-sm font-medium text-gray-700 mb-2">Telephone</label>
-                                <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="telephone" name="telephone" maxlength="30" value="{{ $prevTelephone }}" />
+                                <input type="tel" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="telephone" name="telephone" maxlength="15" value="{{ $prevTelephone }}" placeholder="02 8123 4567" inputmode="numeric" onkeypress="var c=event.charCode;return c===0||(c>=48&&c<=57);" oninput="formatTelephone(this);" />
                             </div>
                             <div>
                                 <label for="mobileNumber" class="block text-sm font-medium text-gray-700 mb-2">Mobile (+63)</label>
@@ -611,7 +611,7 @@
                                         $fullMobileNumber = substr($fullMobileNumber, 1);
                                     }
                                 @endphp
-                                <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="mobileNumber" name="mobilenumber" placeholder="9123456789" maxlength="10" value="{{ $fullMobileNumber }}" />
+                                <input type="tel" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="mobileNumber" name="mobilenumber" placeholder="912 345 6789" maxlength="12" value="{{ $fullMobileNumber }}" inputmode="numeric" onkeypress="var c=event.charCode;return c===0||(c>=48&&c<=57);" oninput="formatMobile(this);" />
                                 @error('mobilenumber')
                                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -624,7 +624,7 @@
                                         $selectedEmailAddress = old('emailaddress');
                                         $customEmailDomain = old('customemaildomain');
                                     @endphp
-                                    <input type="text" class="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="email" name="email" maxlength="30" value="{{ $selectedEmail }}" />
+                                    <input type="text" class="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="email" name="email" maxlength="30" value="{{ $selectedEmail }}" placeholder="juan.santos" />
                                     <span class="flex items-center px-3 border border-gray-300 bg-gray-50 rounded-lg text-gray-600">@</span>
                                     <select class="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="emailDomainSelect" name="emailaddress" onchange="toggleCustomEmailDomain()">
                                         @foreach($emails as $email)
@@ -1860,6 +1860,27 @@
                     console.error('Error fetching home zipcode:', error);
                 }
             });
+        }
+        
+        // Phone number formatting functions
+        function formatMobile(input) {
+            let value = input.value.replace(/\D/g, '');
+            if (value.length >= 4 && value.length <= 7) {
+                value = value.slice(0, 3) + ' ' + value.slice(3);
+            } else if (value.length >= 8) {
+                value = value.slice(0, 3) + ' ' + value.slice(3, 7) + ' ' + value.slice(7, 11);
+            }
+            input.value = value;
+        }
+
+        function formatTelephone(input) {
+            let value = input.value.replace(/\D/g, '');
+            if (value.length >= 3 && value.length <= 6) {
+                value = value.slice(0, 2) + ' ' + value.slice(2);
+            } else if (value.length >= 7) {
+                value = value.slice(0, 2) + ' ' + value.slice(2, 6) + ' ' + value.slice(6);
+            }
+            input.value = value;
         }
     </script>
 @endsection
