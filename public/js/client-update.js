@@ -1,6 +1,6 @@
 /* 2023 SilverDust) S. Maceren */
 
-$(document).ready(function() {
+$(document).ready(function () {
 
     // packages
     let selectedPackageId = $('#package').val();
@@ -12,12 +12,12 @@ $(document).ready(function() {
         data: { packageId: selectedPackageId },
         dataType: 'json',
         cache: false,
-        success: function(packgePrices) {
-            packgePrices.forEach(function(package) {
+        success: function (packgePrices) {
+            packgePrices.forEach(function (package) {
                 packagePriceSelect.val(package.Price);
             });
         },
-        error: function(xhr, status, error) {
+        error: function (xhr, status, error) {
             packagePriceSelect.val(0);
         }
     });
@@ -34,14 +34,14 @@ $(document).ready(function() {
         data: { packageId: selectedPackageId },
         dataType: 'json',
         cache: false,
-        success: function(paymentTerms) {
+        success: function (paymentTerms) {
 
-            paymentTerms.forEach(function(paymentTerm) {
+            paymentTerms.forEach(function (paymentTerm) {
 
-                if(paymentTerm.Id == defPaymentTerm){  
+                if (paymentTerm.Id == defPaymentTerm) {
                     paymentTermSelect.append('<option value="' + paymentTerm.Id + '" selected>' + paymentTerm.Term + '</option>');
                 }
-                else{
+                else {
                     paymentTermSelect.append('<option value="' + paymentTerm.Id + '">' + paymentTerm.Term + '</option>');
                 }
             });
@@ -53,22 +53,22 @@ $(document).ready(function() {
             $.ajax({
                 url: '/get-paymenttermamount',
                 method: 'GET',
-                data: { paymentTermId: selectedPaymentTermId},
+                data: { paymentTermId: selectedPaymentTermId },
                 dataType: 'json',
                 cache: false,
-                success: function(termAmounts) {
+                success: function (termAmounts) {
 
                     selectedTermAmount.val(0);
-                    termAmounts.forEach(function(termAmount) {
+                    termAmounts.forEach(function (termAmount) {
                         selectedTermAmount.val(termAmount.Price);
                     });
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     selectedTermAmount.val(0);
                 }
             });
         },
-        error: function(xhr, status, error) {
+        error: function (xhr, status, error) {
             paymentTermSelect.append('<option value="0">Select package</option>');
         }
     });
@@ -82,7 +82,7 @@ $(document).ready(function() {
     // partial payment
     if (downpaymentTypeSelect.val() === "Partial") {
         paymentAmount.empty();
-        partialPayments.forEach(function(partialPayment) {
+        partialPayments.forEach(function (partialPayment) {
             let paymentValues = $('<option>', {
                 value: partialPayment,
                 text: partialPayment
@@ -101,45 +101,45 @@ $(document).ready(function() {
 
         let paymentMultiplier = 12;
         let selectedTermAmount = $('#termAmount').val();
-        
+
         let defPaymentTerm = $('#defPaymentTerm').val();
         let selectedPackageId = $('#package').val();
 
         // get the default term upon page refresh if not null
-        if(defPaymentTerm != null){
+        if (defPaymentTerm != null) {
             $.ajax({
                 url: '/get-paymentterm',
                 method: 'GET',
                 data: { packageId: selectedPackageId },
                 dataType: 'json',
                 cache: false,
-                success: function(paymentTerms) {
+                success: function (paymentTerms) {
 
-                    paymentTerms.forEach(function(paymentTerm) {
+                    paymentTerms.forEach(function (paymentTerm) {
 
-                        if(paymentTerm.Id == defPaymentTerm){
+                        if (paymentTerm.Id == defPaymentTerm) {
 
                             if (paymentTerm.Term === "Spotcash") {
                                 paymentMultiplier = 1;
-                            } 
+                            }
                             else if (paymentTerm.Term === "Annual") {
                                 paymentMultiplier = 1;
-                            } 
+                            }
                             else if (paymentTerm.Term === "Semi-Annual") {
                                 paymentMultiplier = 2;
-                            } 
+                            }
                             else if (paymentTerm.Term === "Quarterly") {
                                 paymentMultiplier = 4;
                             }
 
                             for (let i = 1; i <= paymentMultiplier; i++) {
-                                
+
                                 let paymentValues = $('<option>', {
                                     value: selectedTermAmount * i,
                                     text: selectedTermAmount * i
                                 });
 
-                                if(defDownpaymentAmount == selectedTermAmount * i){
+                                if (defDownpaymentAmount == selectedTermAmount * i) {
                                     paymentValues.attr('selected', 'selected');
                                 }
                                 paymentAmount.append(paymentValues);
@@ -147,37 +147,37 @@ $(document).ready(function() {
                         }
                     });
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     paymentTermSelect.append('<option value="0">Select package</option>');
                 }
             });
         }
-        else{
-            
+        else {
+
             // if default term is empty
             let paymentTermSelect = $('#paymentTerm option:selected').text();
 
             if (paymentTermSelect === "Spotcash") {
                 paymentMultiplier = 1;
-            } 
+            }
             else if (paymentTermSelect === "Annual") {
                 paymentMultiplier = 1;
-            } 
+            }
             else if (paymentTermSelect === "Semi-Annual") {
                 paymentMultiplier = 2;
-            } 
+            }
             else if (paymentTermSelect === "Quarterly") {
                 paymentMultiplier = 4;
             }
 
             for (let i = 1; i <= paymentMultiplier; i++) {
-                
+
                 let paymentValues = $('<option>', {
                     value: selectedTermAmount * i,
                     text: selectedTermAmount * i
                 });
 
-                if(defDownpaymentAmount == selectedTermAmount * i){
+                if (defDownpaymentAmount == selectedTermAmount * i) {
                     paymentValues.attr('selected', 'selected');
                 }
                 paymentAmount.append(paymentValues);
@@ -197,21 +197,21 @@ $(document).ready(function() {
         data: { regionId: selectedRegionId },
         dataType: 'json',
         cache: false,
-        success: function(branches) {
+        success: function (branches) {
 
-            if(branches.length === 0){
+            if (branches.length === 0) {
                 branchSelect.append('<option value="0">Not available</option>');
             }
-            else{
-                branches.forEach(function(branch) {
-                    if(branch.Id == defBranch){
+            else {
+                branches.forEach(function (branch) {
+                    if (branch.Id == defBranch) {
                         branchSelect.append('<option value="' + branch.Id + '" selected>' + branch.BranchName + '</option>');
                     }
-                    else{
+                    else {
                         branchSelect.append('<option value="' + branch.Id + '">' + branch.BranchName + '</option>');
                     }
 
-                     // after branches are loaded, fetch the recruited staff
+                    // after branches are loaded, fetch the recruited staff
                     let selectedBranchId = $('#branch').val();
                     let recruitedBySelect = $('#recruitedBy');
                     let defRecruitedBy = $('#defRecruitedBy').val();
@@ -222,32 +222,32 @@ $(document).ready(function() {
                         data: { branchId: selectedBranchId },
                         dataType: 'json',
                         cache: false,
-                        success: function(staffs) {
+                        success: function (staffs) {
 
                             recruitedBySelect.empty();
-                            if(staffs.length === 0){
+                            if (staffs.length === 0) {
                                 recruitedBySelect.append('<option value="0">Not available</option>');
                             }
-                            else{
-                                staffs.forEach(function(staff) {
+                            else {
+                                staffs.forEach(function (staff) {
 
-                                    if(staff.Id == defRecruitedBy){
+                                    if (staff.Id == defRecruitedBy) {
                                         recruitedBySelect.append('<option value="' + staff.Id + '" selected>' + staff.LastName + ', ' + staff.FirstName + '</option>');
                                     }
-                                    else{
+                                    else {
                                         recruitedBySelect.append('<option value="' + staff.Id + '">' + staff.LastName + ', ' + staff.FirstName + '</option>');
                                     }
                                 });
                             }
                         },
-                        error: function(xhr, status, error) {
+                        error: function (xhr, status, error) {
                             recruitedBySelect.empty().append('<option value="0">Select staff</option>');
                         }
                     });
                 });
             }
         },
-        error: function(xhr, status, error) {
+        error: function (xhr, status, error) {
             branchSelect.append('<option value="0">Select region</option>');
         }
     });
@@ -259,22 +259,22 @@ $(document).ready(function() {
     $.ajax({
         url: '/get-cities',
         method: 'GET',
-        data: { provinceName: selectedProvince},
+        data: { provinceName: selectedProvince },
         dataType: 'json',
         cache: false,
-        success: function(cities) {
+        success: function (cities) {
 
             citySelect.empty();
-            if(cities.length === 0){
+            if (cities.length === 0) {
                 citySelect.append('<option value="0">Not available</option>');
             }
-            else{
-                cities.forEach(function(city) {
+            else {
+                cities.forEach(function (city) {
                     citySelect.append('<option value="' + city.City + '">' + city.City + '</option>');
                 });
             }
         },
-        error: function(xhr, status, error) {
+        error: function (xhr, status, error) {
             citySelect.append('<option value="0">Not available</option>');
         }
     });
@@ -286,22 +286,22 @@ $(document).ready(function() {
     $.ajax({
         url: '/get-barangays',
         method: 'GET',
-        data: { cityName: selectedCity},
+        data: { cityName: selectedCity },
         dataType: 'json',
         cache: false,
-        success: function(barangays) {
+        success: function (barangays) {
 
             barangaySelect.empty();
-            if(barangays.length === 0){
+            if (barangays.length === 0) {
                 barangaySelect.append('<option value="0">Not available</option>');
             }
-            else{
-                barangays.forEach(function(barangay) {
+            else {
+                barangays.forEach(function (barangay) {
                     barangaySelect.append('<option value="' + barangay.Barangay + '">' + barangay.Barangay + '</option>');
                 });
             }
         },
-        error: function(xhr, status, error) {
+        error: function (xhr, status, error) {
             barangaySelect.append('<option value="0">Not available</option>');
         }
     });
@@ -312,13 +312,13 @@ $(document).ready(function() {
     $.ajax({
         url: '/get-cities-zipcode',
         method: 'GET',
-        data: { cityName: selectedCity},
+        data: { cityName: selectedCity },
         dataType: 'json',
         cache: false,
-        success: function(zipcode) {
+        success: function (zipcode) {
             zipcodeSelect.val(zipcode);
         },
-        error: function(xhr, status, error) {
+        error: function (xhr, status, error) {
             zipcodeSelect.val('NA');
         }
     });
@@ -326,7 +326,7 @@ $(document).ready(function() {
     /*** ON CHANGE ****/
 
     // packages
-    $('#package').on('change', function() {
+    $('#package').on('change', function () {
 
         let selectedPackageId = $('#package').val();
         let packagePriceSelect = $('#packagePrice');
@@ -339,9 +339,9 @@ $(document).ready(function() {
             data: { packageId: selectedPackageId },
             dataType: 'json',
             cache: false,
-            success: function(packgePrices) {
+            success: function (packgePrices) {
 
-                packgePrices.forEach(function(package) {
+                packgePrices.forEach(function (package) {
                     packagePriceSelect.val(package.Price);
                 });
 
@@ -357,33 +357,33 @@ $(document).ready(function() {
                     data: { packageId: selectedPackageId },
                     dataType: 'json',
                     cache: false,
-                    success: function(paymentTerms) {
+                    success: function (paymentTerms) {
 
                         paymentTermSelect.empty();
                         if (paymentTerms.length === 0) {
                             paymentTermSelect.append('<option value="0">Not available</option>');
                             selectedTermAmount.val(0);
                         } else {
-                            paymentTerms.forEach(function(paymentTerm) {
+                            paymentTerms.forEach(function (paymentTerm) {
                                 paymentTermSelect.append('<option value="' + paymentTerm.Id + '">' + paymentTerm.Term + '</option>');
                             });
 
                             // payment term amount
                             let selectedPaymentTermId = $('#paymentTerm').val();
-                            
+
                             $.ajax({
                                 url: '/get-paymenttermamount',
                                 method: 'GET',
-                                data: { paymentTermId: selectedPaymentTermId},
+                                data: { paymentTermId: selectedPaymentTermId },
                                 dataType: 'json',
                                 cache: false,
-                                success: function(termAmounts) {
+                                success: function (termAmounts) {
 
                                     selectedTermAmount.val(0);
-                                    termAmounts.forEach(function(termAmount) {
+                                    termAmounts.forEach(function (termAmount) {
                                         selectedTermAmount.val(termAmount.Price);
                                     });
-                                    
+
                                     // update downpayment values 
                                     let downpaymentTypeSelect = $('#downpaymentType');
                                     let paymentAmount = $('#paymentAmount');
@@ -400,7 +400,7 @@ $(document).ready(function() {
                                                 text: partialPayments[i]
                                             }));
                                         }
-                                    } 
+                                    }
                                     else {
                                         paymentAmount.empty();
 
@@ -409,13 +409,13 @@ $(document).ready(function() {
 
                                         if (paymentTermSelect === "Spotcash") {
                                             paymentMultiplier = 1;
-                                        } 
+                                        }
                                         else if (paymentTermSelect === "Annual") {
                                             paymentMultiplier = 1;
-                                        } 
+                                        }
                                         else if (paymentTermSelect === "Semi-Annual") {
                                             paymentMultiplier = 2;
-                                        } 
+                                        }
                                         else if (paymentTermSelect === "Quarterly") {
                                             paymentMultiplier = 4;
                                         }
@@ -428,40 +428,40 @@ $(document).ready(function() {
                                         }
                                     }
                                 },
-                                error: function(xhr, status, error) {
+                                error: function (xhr, status, error) {
                                     selectedTermAmount.val(0);
                                 }
                             });
                         }
                     },
-                    error: function(xhr, status, error) {
+                    error: function (xhr, status, error) {
                         paymentTermSelect.empty();
                         paymentTermSelect.append('<option value="0">Select package</option>');
                     }
                 });
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 packagePriceSelect.val(0);
             }
         });
     });
 
     // payment term amount
-    $('#paymentTerm').on('change', function() {
-       
+    $('#paymentTerm').on('change', function () {
+
         let selectedPaymentTermId = $('#paymentTerm').val();
         let selectedTermAmount = $('#termAmount');
 
         $.ajax({
             url: '/get-paymenttermamount',
             method: 'GET',
-            data: { paymentTermId: selectedPaymentTermId},
+            data: { paymentTermId: selectedPaymentTermId },
             dataType: 'json',
             cache: false,
-            success: function(termAmounts) {
+            success: function (termAmounts) {
 
                 selectedTermAmount.val(0);
-                termAmounts.forEach(function(termAmount) {
+                termAmounts.forEach(function (termAmount) {
                     selectedTermAmount.val(termAmount.Price);
                 });
 
@@ -481,7 +481,7 @@ $(document).ready(function() {
                             text: partialPayments[i]
                         }));
                     }
-                } 
+                }
                 else {
                     paymentAmount.empty();
 
@@ -490,13 +490,13 @@ $(document).ready(function() {
 
                     if (paymentTermSelect === "Spotcash") {
                         paymentMultiplier = 1;
-                    } 
+                    }
                     else if (paymentTermSelect === "Annual") {
                         paymentMultiplier = 1;
-                    } 
+                    }
                     else if (paymentTermSelect === "Semi-Annual") {
                         paymentMultiplier = 2;
-                    } 
+                    }
                     else if (paymentTermSelect === "Quarterly") {
                         paymentMultiplier = 4;
                     }
@@ -509,7 +509,7 @@ $(document).ready(function() {
                     }
                 }
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 selectedTermAmount.val(0);
             }
         });
@@ -533,7 +533,7 @@ $(document).ready(function() {
                     text: partialPayments[i]
                 }));
             }
-        } 
+        }
         else {
             paymentAmount.empty();
 
@@ -542,13 +542,13 @@ $(document).ready(function() {
 
             if (paymentTermSelect === "Spotcash") {
                 paymentMultiplier = 1;
-            } 
+            }
             else if (paymentTermSelect === "Annual") {
                 paymentMultiplier = 1;
-            } 
+            }
             else if (paymentTermSelect === "Semi-Annual") {
                 paymentMultiplier = 2;
-            } 
+            }
             else if (paymentTermSelect === "Quarterly") {
                 paymentMultiplier = 4;
             }
@@ -562,9 +562,9 @@ $(document).ready(function() {
         }
     });
 
-    
+
     // regions and branches
-    $('#region').on('change', function() {
+    $('#region').on('change', function () {
 
         let selectedRegionId = $(this).val();
         let branchSelect = $('#branch');
@@ -576,18 +576,18 @@ $(document).ready(function() {
             data: { regionId: selectedRegionId },
             dataType: 'json',
             cache: false,
-            success: function(branches) {
+            success: function (branches) {
 
-                if(branches.length === 0){
+                if (branches.length === 0) {
                     branchSelect.append('<option value="0">Not available</option>');
                 }
-                else{
-                    branches.forEach(function(branch) {
+                else {
+                    branches.forEach(function (branch) {
                         branchSelect.append('<option value="' + branch.Id + '">' + branch.BranchName + '</option>');
                     });
 
                     // after branches are loaded, fetch the recruited staff
-                    let selectedBranchId = branchSelect.val(); 
+                    let selectedBranchId = branchSelect.val();
                     let recruitedBySelect = $('#recruitedBy');
 
                     $.ajax({
@@ -596,34 +596,34 @@ $(document).ready(function() {
                         data: { branchId: selectedBranchId },
                         dataType: 'json',
                         cache: false,
-                        success: function(staffs) {
+                        success: function (staffs) {
 
                             recruitedBySelect.empty();
-                            if(staffs.length === 0){
+                            if (staffs.length === 0) {
                                 recruitedBySelect.append('<option value="0">Not available</option>');
                             }
-                            else{
-                                staffs.forEach(function(staff) {
+                            else {
+                                staffs.forEach(function (staff) {
                                     recruitedBySelect.append('<option value="' + staff.Id + '">' + staff.LastName + ', ' + staff.FirstName + '</option>');
                                 });
                             }
                         },
-                        error: function(xhr, status, error) {
+                        error: function (xhr, status, error) {
                             recruitedBySelect.empty().append('<option value="0">Select staff</option>');
                         }
                     });
                 }
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 branchSelect.empty().append('<option value="0">Select region</option>');
             }
         });
     });
 
     // get staff by branch
-    $('#branch').on('change', function() {
+    $('#branch').on('change', function () {
 
-        let selectedBranchId = $(this).val(); 
+        let selectedBranchId = $(this).val();
         let recruitedBySelect = $('#recruitedBy');
 
         $.ajax({
@@ -632,25 +632,25 @@ $(document).ready(function() {
             data: { branchId: selectedBranchId },
             dataType: 'json',
             cache: false,
-            success: function(staffs) {
+            success: function (staffs) {
 
-                recruitedBySelect.empty(); 
-                if(staffs.length === 0){
+                recruitedBySelect.empty();
+                if (staffs.length === 0) {
                     recruitedBySelect.append('<option value="0">Not available</option>');
                 }
-                else{
-                    staffs.forEach(function(staff) {
+                else {
+                    staffs.forEach(function (staff) {
                         recruitedBySelect.append('<option value="' + staff.Id + '">' + staff.LastName + ', ' + staff.FirstName + '</option>');
                     });
                 }
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 recruitedBySelect.empty().append('<option value="0">Select staff</option>');
             }
         });
     });
 
-    $('#province').on('change', function() {
+    $('#province').on('change', function () {
 
         // cities
         let selectedProvince = $('#province').val();
@@ -659,17 +659,17 @@ $(document).ready(function() {
         $.ajax({
             url: '/get-cities',
             method: 'GET',
-            data: { provinceName: selectedProvince},
+            data: { provinceName: selectedProvince },
             dataType: 'json',
             cache: false,
-            success: function(cities) {
+            success: function (cities) {
 
                 citySelect.empty();
-                if(cities.length === 0){
+                if (cities.length === 0) {
                     citySelect.append('<option value="0">Not available</option>');
                 }
-                else{
-                    cities.forEach(function(city) {
+                else {
+                    cities.forEach(function (city) {
                         citySelect.append('<option value="' + city.City + '">' + city.City + '</option>');
                     });
 
@@ -680,22 +680,22 @@ $(document).ready(function() {
                     $.ajax({
                         url: '/get-barangays',
                         method: 'GET',
-                        data: { cityName: selectedCity},
+                        data: { cityName: selectedCity },
                         dataType: 'json',
                         cache: false,
-                        success: function(barangays) {
+                        success: function (barangays) {
 
                             barangaySelect.empty();
-                            if(barangays.length === 0){
+                            if (barangays.length === 0) {
                                 barangaySelect.append('<option value="0">Not available</option>');
                             }
-                            else{
-                                barangays.forEach(function(barangay) {
+                            else {
+                                barangays.forEach(function (barangay) {
                                     barangaySelect.append('<option value="' + barangay.Barangay + '">' + barangay.Barangay + '</option>');
                                 });
                             }
                         },
-                        error: function(xhr, status, error) {
+                        error: function (xhr, status, error) {
                             barangaySelect.append('<option value="0">Not available</option>');
                         }
                     });
@@ -706,26 +706,26 @@ $(document).ready(function() {
                     $.ajax({
                         url: '/get-cities-zipcode',
                         method: 'GET',
-                        data: { cityName: selectedCity},
+                        data: { cityName: selectedCity },
                         dataType: 'json',
                         cache: false,
-                        success: function(zipcode) {
+                        success: function (zipcode) {
                             zipcodeSelect.val(zipcode);
                         },
-                        error: function(xhr, status, error) {
+                        error: function (xhr, status, error) {
                             zipcodeSelect.val('NA');
                         }
                     });
                 }
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 citySelect.append('<option value="0">Not available</option>');
             }
         });
     });
 
     // barangay
-    $('#city').on('change', function() {
+    $('#city').on('change', function () {
 
         selectedCity = $('#city').val();
         let barangaySelect = $('#barangay');
@@ -733,22 +733,22 @@ $(document).ready(function() {
         $.ajax({
             url: '/get-barangays',
             method: 'GET',
-            data: { cityName: selectedCity},
+            data: { cityName: selectedCity },
             dataType: 'json',
             cache: false,
-            success: function(barangays) {
+            success: function (barangays) {
 
                 barangaySelect.empty();
-                if(barangays.length === 0){
+                if (barangays.length === 0) {
                     barangaySelect.append('<option value="0">Not available</option>');
                 }
-                else{
-                    barangays.forEach(function(barangay) {
+                else {
+                    barangays.forEach(function (barangay) {
                         barangaySelect.append('<option value="' + barangay.Barangay + '">' + barangay.Barangay + '</option>');
                     });
                 }
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 barangaySelect.append('<option value="0">Not available</option>');
             }
         });
@@ -759,13 +759,13 @@ $(document).ready(function() {
         $.ajax({
             url: '/get-cities-zipcode',
             method: 'GET',
-            data: { cityName: selectedCity},
+            data: { cityName: selectedCity },
             dataType: 'json',
             cache: false,
-            success: function(zipcode) {
+            success: function (zipcode) {
                 zipcodeSelect.val(zipcode);
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 zipcodeSelect.val('NA');
             }
         });
@@ -776,7 +776,7 @@ $(document).ready(function() {
     let ageInput = $('#age');
 
     // Add an event listener to the birthDate input
-    birthDateInput.on('input', function() {
+    birthDateInput.on('input', function () {
         let birthDate = new Date(birthDateInput.val());
         let currentDate = new Date();
 
@@ -786,11 +786,11 @@ $(document).ready(function() {
     });
 
     // Prevent email username field from being completely cleared only when "Others" is selected
-    $('#email').on('input', function() {
+    $('#email').on('input', function () {
         const emailInput = $(this);
         const currentValue = emailInput.val();
         const emailDomainSelect = $('#emailDomainSelect').val();
-        
+
         // Only prevent clearing if "Others" is selected
         if (emailDomainSelect === 'others' && currentValue === '') {
             // Store the last valid value
@@ -804,25 +804,25 @@ $(document).ready(function() {
     });
 
     // Form submission debugging - Console log for mobile and email
-    $('form').on('submit', function(e) {
+    $('form').on('submit', function (e) {
         console.log('=== CLIENT UPDATE FORM SUBMISSION DEBUG ===');
-        
+
         // Check if form is actually being submitted
         console.log('Form submission detected');
         console.log('Form action:', $(this).attr('action'));
         console.log('Form method:', $(this).attr('method'));
         console.log('Submit button clicked:', e.originalEvent ? e.originalEvent.submitter : 'Unknown');
-        
+
         // Mobile Number
         const mobileNumber = $('#mobileNumber').val();
         console.log('Mobile Number (+63):', mobileNumber);
         console.log('Full Mobile Number:', '+63' + mobileNumber);
-        
+
         // Email
         const emailUsername = $('#email').val();
         const emailDomainSelect = $('#emailDomainSelect').val();
         const customEmailDomain = $('#customEmailDomain').val();
-        
+
         let fullEmail = '';
         if (emailDomainSelect === 'others') {
             fullEmail = emailUsername + '@' + customEmailDomain;
@@ -835,7 +835,7 @@ $(document).ready(function() {
             console.log('Email Domain (Selected):', emailDomainSelect);
             console.log('Full Email Address:', fullEmail);
         }
-        
+
         // Form data that will be sent
         console.log('--- Complete Form Data to be Submitted ---');
         const formData = new FormData(this);
@@ -843,7 +843,7 @@ $(document).ready(function() {
             console.log(`${key}:`, value);
         }
         console.log('--- End Form Data ---');
-        
+
         // Validation warnings
         if (!mobileNumber || mobileNumber.length !== 10) {
             console.warn('⚠️ WARNING: Mobile number should be exactly 10 digits!');
@@ -854,24 +854,24 @@ $(document).ready(function() {
         if (emailDomainSelect === 'others' && !customEmailDomain) {
             console.warn('⚠️ WARNING: Custom email domain is empty!');
         }
-        
+
         // Check for required fields
         const requiredFields = ['contractno', 'package', 'paymentterm', 'region', 'branch', 'recruitedby', 'lastname', 'firstname', 'gender', 'birthdate', 'age', 'address_region', 'address_province', 'address_city', 'address_barangay'];
         const missingFields = [];
-        
+
         requiredFields.forEach(fieldName => {
             const fieldValue = $(`[name="${fieldName}"]`).val();
             if (!fieldValue || fieldValue === '0' || fieldValue === '') {
                 missingFields.push(fieldName);
             }
         });
-        
+
         if (missingFields.length > 0) {
             console.error('❌ ERROR: Missing required fields:', missingFields);
         } else {
             console.log('✅ All required fields appear to be filled');
         }
-        
+
         console.log('=====================================');
     });
 });
@@ -880,7 +880,7 @@ $(document).ready(function() {
 function toggleCustomEmailDomain() {
     const emailDomainSelect = document.getElementById('emailDomainSelect');
     const customEmailDomain = document.getElementById('customEmailDomain');
-    
+
     if (emailDomainSelect.value === 'others') {
         customEmailDomain.style.display = 'block';
         customEmailDomain.focus();

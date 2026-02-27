@@ -1,7 +1,27 @@
-<!-- 2023 SilverDust) S. Maceren --> 
+<!-- 2023 SilverDust) S. Maceren -->
 @extends('layouts.main')
 
+@section('styles')
+<style>
+    /* Hide number-input spinners on phone fields so they look like normal text inputs */
+    #telephone::-webkit-outer-spin-button,
+    #telephone::-webkit-inner-spin-button,
+    #mobileNumber::-webkit-outer-spin-button,
+    #mobileNumber::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    #telephone,
+    #mobileNumber {
+        -moz-appearance: textfield;
+    }
+</style>
+@endsection
+
+
 @section('content')
+
+
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Header Section -->
         <div class="bg-white rounded-xl border-2 border-blue-300 p-6 mb-6">
@@ -24,11 +44,11 @@
             $canEditContractNumber = $canEditContractNumber ?? false;
             // Debug: Log the permission value
             \Log::info('Client Update View - canEditContractNumber: ' . ($canEditContractNumber ? 'true' : 'false'));
-            
+
             // Get user role details for debugging
             $userRole = \App\Models\Role::query()->where('id', session('user_roleid'))->first();
         @endphp
-        
+
         <script>
             console.log('=== USER ROLE DEBUG ===');
             console.log('User Role ID:', '{{ session('user_roleid') }}');
@@ -42,7 +62,7 @@
                 console.log('Role Check: Role not found');
             @endif
             console.log('========================');
-            
+
             // Check contract number field state
             document.addEventListener('DOMContentLoaded', function() {
                 const contractField = document.getElementById('contractNo');
@@ -196,108 +216,106 @@
                 </div>
             </div>
             @if($clients->Status != '3')
-            <!-- PAYMENT Section -->
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
-                <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
-                    <h3 class="text-lg font-bold text-gray-800 flex items-center">
-                        <svg class="w-5 h-5 mr-2 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4zM18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z"/>
-                        </svg>
-                        PAYMENT
-                    </h3>
-                </div>
-                <div class="p-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                            <div>
-                                <label for="downpaymentType" class="block text-sm font-medium text-gray-700 mb-2">Downpayment Type</label>
-                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="downpaymentType" name="downpaymenttype">
-                                    @php
-                                        if($orbatchinfo->Type == null){
-                                            $downpaymentType = 'Standard';
-                                        }
-                                        else{
-                                            if($orbatchinfo->Type == '1'){
+                <!-- PAYMENT Section -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
+                    <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-bold text-gray-800 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4zM18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z"/>
+                            </svg>
+                            PAYMENT
+                        </h3>
+                    </div>
+                    <div class="p-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                <div>
+                                    <label for="downpaymentType" class="block text-sm font-medium text-gray-700 mb-2">Downpayment Type</label>
+                                    <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="downpaymentType" name="downpaymenttype">
+                                        @php
+                                            if ($orbatchinfo->Type == null) {
                                                 $downpaymentType = 'Standard';
+                                            } else {
+                                                if ($orbatchinfo->Type == '1') {
+                                                    $downpaymentType = 'Standard';
+                                                } else if ($orbatchinfo->Type == '2') {
+                                                    $downpaymentType = 'Partial';
+                                                }
                                             }
-                                            else if($orbatchinfo->Type == '2'){
-                                                $downpaymentType = 'Partial';
-                                            }
-                                        }
 
-                                        $selectedDownpaymentType = old('downpaymenttype', $downpaymentType);
-                                    @endphp
-                                    <option value="Partial" {{ $selectedDownpaymentType === 'Partial' ? 'selected' : '' }}>Partial</option>
-                                    <option value="Standard" {{ $selectedDownpaymentType === 'Standard' ? 'selected' : '' }}>Standard</option>
-                                </select>
-                                @error('downpaymenttype')
-                                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                                @enderror
-                            </div>
-                            <div>
-                                @php
-                                    $prevDownpaymentAmount = old('paymentamount', $paymentinfo->AmountPaid);
-                                @endphp
-                                <input type="hidden" id="defAmountPaid" value="{{ $prevDownpaymentAmount }}" />
-                                <label for="paymentAmount" class="block text-sm font-medium text-gray-700 mb-2">Payment Amount</label>
-                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="paymentAmount" name="paymentamount">
-                                </select>
-                                @error('paymentamount')
-                                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                                @enderror
-                            </div>
-                            <div>
-                                @php 
-                                    $prevOrSeriesCode = old('orseriescode', $orbatchinfo->SeriesCode); 
-                                @endphp
-                                <label for="orSeriesCode" class="block text-sm font-medium text-gray-700 mb-2">O.R Series Code</label>
-                                <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="orSeriesCode" name="orseriescode" maxlength="30" value="{{ $prevOrSeriesCode }}" />
-                                @error('orseriescode')
-                                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                                            $selectedDownpaymentType = old('downpaymenttype', $downpaymentType);
+                                        @endphp
+                                        <option value="Partial" {{ $selectedDownpaymentType === 'Partial' ? 'selected' : '' }}>Partial</option>
+                                        <option value="Standard" {{ $selectedDownpaymentType === 'Standard' ? 'selected' : '' }}>Standard</option>
+                                    </select>
+                                    @error('downpaymenttype')
+                                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                                     @enderror
-                            </div>
-                            <div>
-                                @php
-                                    $prevOrNumber = old('ornumber', $paymentinfo->ORNo); 
-                                @endphp
-                                <label for="orNumber" class="block text-sm font-medium text-gray-700 mb-2">O.R Number</label>
-                                <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="orNumber" name="ornumber" maxlength="30" value="{{ $prevOrNumber }}" />
-                                @error('ornumber')
-                                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
-                            <div>
-                                <label for="paymentMethod" class="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
-                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="paymentMethod" name="paymentmethod">
+                                </div>
+                                <div>
                                     @php
-                                        $selectedPaymentMethod = old('paymentmethod');
-
-                                        if($paymentinfo->PaymentType == '1'){
-                                            $selectedPaymentMethod = 'Cash';
-                                        }
+                                        $prevDownpaymentAmount = old('paymentamount', $paymentinfo->AmountPaid);
                                     @endphp
-                                    <option value="Cash" {{ $selectedPaymentMethod === 'Cash' ? 'selected' : '' }}>Cash</option>
-                                </select>
-                                @error('paymentmethod')
-                                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                                @enderror
+                                    <input type="hidden" id="defAmountPaid" value="{{ $prevDownpaymentAmount }}" />
+                                    <label for="paymentAmount" class="block text-sm font-medium text-gray-700 mb-2">Payment Amount</label>
+                                    <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="paymentAmount" name="paymentamount">
+                                    </select>
+                                    @error('paymentamount')
+                                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                                <div>
+                                    @php 
+                                        $prevOrSeriesCode = old('orseriescode', $orbatchinfo->SeriesCode); 
+                                    @endphp
+                                    <label for="orSeriesCode" class="block text-sm font-medium text-gray-700 mb-2">O.R Series Code</label>
+                                    <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="orSeriesCode" name="orseriescode" maxlength="30" value="{{ $prevOrSeriesCode }}" />
+                                    @error('orseriescode')
+                                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                                <div>
+                                    @php
+                                        $prevOrNumber = old('ornumber', $paymentinfo->ORNo); 
+                                    @endphp
+                                    <label for="orNumber" class="block text-sm font-medium text-gray-700 mb-2">O.R Number</label>
+                                    <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="orNumber" name="ornumber" maxlength="30" value="{{ $prevOrNumber }}" />
+                                    @error('ornumber')
+                                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
                             </div>
-                            <div>
-                                @php
-                                    $prevPaymentDate = old('paymentdate', $paymentinfo->Date);
-                                @endphp
-                                <label for="paymentDate" class="block text-sm font-medium text-gray-700 mb-2">Payment Date</label>
-                                <input type="date" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="paymentDate" name="paymentdate" value="{{ $prevPaymentDate }}" />
-                                @error('paymentdate')
-                                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                                @enderror
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+                                <div>
+                                    <label for="paymentMethod" class="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
+                                    <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="paymentMethod" name="paymentmethod">
+                                        @php
+                                            $selectedPaymentMethod = old('paymentmethod');
+
+                                            if ($paymentinfo->PaymentType == '1') {
+                                                $selectedPaymentMethod = 'Cash';
+                                            }
+                                        @endphp
+                                        <option value="Cash" {{ $selectedPaymentMethod === 'Cash' ? 'selected' : '' }}>Cash</option>
+                                    </select>
+                                    @error('paymentmethod')
+                                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                                <div>
+                                    @php
+                                        $prevPaymentDate = old('paymentdate', $paymentinfo->Date);
+                                    @endphp
+                                    <label for="paymentDate" class="block text-sm font-medium text-gray-700 mb-2">Payment Date</label>
+                                    <input type="date" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="paymentDate" name="paymentdate" value="{{ $prevPaymentDate }}" />
+                                    @error('paymentdate')
+                                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
                             </div>
-                        </div>
+                    </div>
                 </div>
-            </div>
             @endif
-            
+
             <!-- PERSONAL Section -->
             <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
                 <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
@@ -362,7 +380,7 @@
                                 <label for="birthDate" class="form-label">Birth Date</label>
                                 <input type="date" class="form-control font-sm" id="birthDate" name="birthdate" maxlength="30" value="{{ $prevBirthDate }}" />
                                     @error('birthdate')
-                                    <p class="text-danger">{{ $message }}</p>
+                                        <p class="text-danger">{{ $message }}</p>
                                     @enderror
                             </div>
                             <div class="col-sm-3">
@@ -372,7 +390,7 @@
                                 <label for="age" class="form-label">Age</label>
                                 <input type="number" class="form-control font-sm" id="age" name="age" maxlength="30" value="{{ $prevAge }}" readonly />
                                     @error('age')
-                                    <p class="text-danger">{{ $message }}</p>
+                                        <p class="text-danger">{{ $message }}</p>
                                     @enderror
                             </div>
                             <div class="col-sm-3">
@@ -421,7 +439,7 @@
                                 <label for="bestPlaceToCollect" class="form-label">Best Place to Collect</label>
                                 <input type="text" class="form-control font-sm" id="bestPlaceToCollect" name="bestplacetocollect" maxlength="30" value="{{ $prevPlaceToCollect }}" />
                                     @error('bestplacetocollect')
-                                    <p class="text-danger">{{ $message }}</p>
+                                        <p class="text-danger">{{ $message }}</p>
                                     @enderror
                             </div>
                             <div class="col-sm-3">
@@ -431,7 +449,7 @@
                                 <label for="bestTimeToCollect" class="form-label">Best Time to Collect</label>
                                 <input type="time" class="form-control font-sm" id="bestTimeToCollect" name="besttimetocollect" maxlength="30" value="{{ $prevTimeToCollect }}" />
                                     @error('besttimetocollect')
-                                    <p class="text-danger">{{ $message }}</p>
+                                        <p class="text-danger">{{ $message }}</p>
                                     @enderror
                             </div>
                         </div>
@@ -614,7 +632,7 @@
                         </div>
                 </div>
             </div>
-            
+
             <!-- CONTACT Section -->
             <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
                 <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
@@ -629,15 +647,15 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             <div>
                                 @php
-                                    $prevTelephone = old('telephone', $clients->HomeNumber);
-                                @endphp
+                                    $prevTelephone = preg_replace('/[^0-9+]/', '', old('telephone', $clients->HomeNumber));
+                                @endphp                
                                 <label for="telephone" class="block text-sm font-medium text-gray-700 mb-2">Telephone</label>
-                                <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="telephone" name="telephone" maxlength="30" value="{{ $prevTelephone }}" />
+                                <input type="tel" class="w-full px-4 py-2.5 border-4 border-red-500 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="telephone" name="telephone" maxlength="30" value="{{ $prevTelephone }}" inputmode="tel" placeholder="e.g. +63212345678" onkeypress="console.log('Telephone KEY pressed:', event.key); var c=event.charCode; return c===0||c===43||(c>=48&&c<=57);" oninput="console.log('Telephone VALUE changed:', this.value); this.value=this.value.replace(/[^0-9+]/g,'');" />
                             </div>
                             <div>
                                 <label for="mobileNumber" class="block text-sm font-medium text-gray-700 mb-2">Mobile (+63)</label>
                                 @php 
-                                    $fullMobileNumber = old('mobilenumber', $clients->MobileNumber);
+                                                                        $fullMobileNumber = old('mobilenumber', $clients->MobileNumber);
                                     // Remove leading 0 if present (convert 09123456789 to 9123456789)
                                     if (strlen($fullMobileNumber) == 11 && substr($fullMobileNumber, 0, 1) == '0') {
                                         $fullMobileNumber = substr($fullMobileNumber, 1);
@@ -645,7 +663,7 @@
                                 @endphp
                                 <div class="flex">
                                     <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-600 font-medium">+63</span>
-                                    <input type="text" class="flex-1 px-4 py-2.5 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="mobileNumber" name="mobilenumber" placeholder="9123456789" maxlength="10" value="{{ $fullMobileNumber }}" />
+                                    <input type="tel" class="flex-1 px-4 py-2.5 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="mobileNumber" name="mobilenumber" placeholder="9123456789" maxlength="10" value="{{ $fullMobileNumber }}" inputmode="numeric" onkeypress="var c=event.charCode;return c===0||(c>=48&&c<=57);" oninput="this.value=this.value.replace(/[^0-9]/g,'');" />
                                 </div>
                                 @error('mobilenumber')
                                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
@@ -655,13 +673,13 @@
                                 <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
                                 <div class="flex gap-2">
                                     @php 
-                                        $selectedEmail = old('email', substr($clients->EmailAddress, 0, strpos($clients->EmailAddress, '@')));
+                                                                                $selectedEmail = old('email', substr($clients->EmailAddress, 0, strpos($clients->EmailAddress, '@')));
                                         $selectedEmailAddress = old('emailaddress', substr($clients->EmailAddress, strpos($clients->EmailAddress, '@') + 1));
-                                        
+
                                         // Check if the current email domain is in the predefined list
                                         $isCustomDomain = true;
-                                        foreach($emails as $emailOption) {
-                                            if($selectedEmailAddress == $emailOption->Email) {
+                                        foreach ($emails as $emailOption) {
+                                            if ($selectedEmailAddress == $emailOption->Email) {
                                                 $isCustomDomain = false;
                                                 break;
                                             }
@@ -681,10 +699,10 @@
                                 <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 mt-2" id="customEmailDomain" name="customemaildomain" placeholder="Enter custom domain (e.g., company.com)" maxlength="50" value="{{ $isCustomDomain ? $selectedEmailAddress : '' }}" style="display: {{ $isCustomDomain ? 'block' : 'none' }};" />
                                 <div class="space-y-1 mt-1">
                                     @error('email')
-                                    <p class="text-red-600 text-sm">{{ $message }}</p>
+                                        <p class="text-red-600 text-sm">{{ $message }}</p>
                                     @enderror
                                     @error('customemaildomain')
-                                    <p class="text-red-600 text-sm">{{ $message }}</p>
+                                        <p class="text-red-600 text-sm">{{ $message }}</p>
                                     @enderror
                                 </div>
                             </div>
@@ -739,7 +757,7 @@
                                     @error('principalbeneficiaryid')
                                         <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                                     @enderror
-                                    
+
                                     @if($clients->principalbeneficiaryid_path)
                                         <div class="mt-2 text-sm">
                                             <span class="text-gray-600">Current ID: </span>
@@ -772,7 +790,7 @@
                                     <input type="number" class="w-20 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="beneficiary2age" name="beneficiary2age" maxlength="3" value="{{ $prevBeneficiary2Age }}" />
                                 </div>
                             </div>
-                            
+
                             <div>
                                 @php
                                     $prevBeneficiary3 = old('beneficiary3', $clients->Secondary3Name);
@@ -784,7 +802,7 @@
                                     <input type="number" class="w-20 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="beneficiary3age" name="beneficiary3age" maxlength="3" value="{{ $prevBeneficiary3Age }}" />
                                 </div>
                             </div>
-                            
+
                             <div>
                                 @php
                                     $prevBeneficiary4 = old('beneficiary4', $clients->Secondary4Name);
@@ -799,7 +817,7 @@
                         </div>
                 </div>
             </div>
-            
+
             <!-- Submit Button -->
             <div class="flex justify-center mt-8">
                 <button type="submit" class="px-12 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
@@ -813,7 +831,7 @@
             </div>
         </form>
     </div>
-    
+
     <script>
         // Email domain toggle functionality (based on client create form pattern)
         function toggleCustomEmailDomain() {
@@ -874,10 +892,10 @@
         document.addEventListener('DOMContentLoaded', function () {
             const emailDomainSelect = document.getElementById('emailDomainSelect');
             const customDomainInput = document.getElementById('customEmailDomain');
-            
+
             // Initialize on page load
             toggleCustomEmailDomain();
-            
+
             if (emailDomainSelect) {
                 emailDomainSelect.addEventListener('change', toggleCustomEmailDomain);
             }
@@ -894,7 +912,7 @@
             }
         });
     </script>
-    
+
     <!-- Hidden inputs for address cascading system -->
     @php
         $clientRegionId = $clients->RegionId ?? '';
@@ -904,22 +922,22 @@
     <input type="hidden" id="oldProvince" value="{{ $clients->Province ?? '' }}" />
     <input type="hidden" id="oldCity" value="{{ $clients->City ?? '' }}" />
     <input type="hidden" id="oldBarangay" value="{{ $clients->Barangay ?? '' }}" />
-    
+
     <!-- Hidden inputs for home address cascading system -->
     <input type="hidden" id="oldHomeRegion" value="{{ $clients->HomeRegion ?? '' }}" />
     <input type="hidden" id="oldHomeProvince" value="{{ $clients->HomeProvinceDisplay ?? $clients->HomeProvince ?? '' }}" />
     <input type="hidden" id="oldHomeCity" value="{{ $clients->HomeCityDisplay ?? $clients->HomeCity ?? '' }}" />
     <input type="hidden" id="oldHomeBarangay" value="{{ $clients->HomeBarangayDisplay ?? $clients->HomeBarangay ?? '' }}" />
-    
-    <script src="{{ asset('js/client-update.js') }}"></script>
+
+    <script src="{{ asset('js/client-update.js') }}?v={{ time() }}"></script>
     <script src="{{ asset('js/client-address-cascading.js') }}"></script>
-    
+
     <script>
         // Home Address - Same as Current Address functionality
         document.addEventListener('DOMContentLoaded', function() {
             const sameAsCurrentCheckbox = document.getElementById('sameAsCurrentAddress');
             const homeAddressFields = document.getElementById('homeAddressFields');
-            
+
             // Home address field selects
             const homeRegionSelect = document.getElementById('homeRegion');
             const homeProvinceSelect = document.getElementById('homeProvince');
@@ -927,7 +945,7 @@
             const homeBarangaySelect = document.getElementById('homeBarangay');
             const homeZipcodeInput = document.getElementById('homeZipcode');
             const homeStreetInput = document.getElementById('homeStreet');
-            
+
             // Current address field selects
             const addressRegionSelect = document.getElementById('addressRegion');
             const addressProvinceSelect = document.getElementById('addressProvince');
@@ -935,29 +953,29 @@
             const addressBarangaySelect = document.getElementById('addressBarangay');
             const zipcodeInput = document.getElementById('zipcode');
             const streetInput = document.getElementById('street');
-            
+
             function copyCurrentToHome() {
                 // Copy region
                 homeRegionSelect.innerHTML = addressRegionSelect.innerHTML;
                 homeRegionSelect.value = addressRegionSelect.value;
-                
+
                 // Copy province
                 homeProvinceSelect.innerHTML = addressProvinceSelect.innerHTML;
                 homeProvinceSelect.value = addressProvinceSelect.value;
-                
+
                 // Copy city
                 homeCitySelect.innerHTML = addressCitySelect.innerHTML;
                 homeCitySelect.value = addressCitySelect.value;
-                
+
                 // Copy barangay
                 homeBarangaySelect.innerHTML = addressBarangaySelect.innerHTML;
                 homeBarangaySelect.value = addressBarangaySelect.value;
-                
+
                 // Copy zipcode and street
                 homeZipcodeInput.value = zipcodeInput.value;
                 homeStreetInput.value = streetInput.value;
             }
-            
+
             function toggleHomeAddressFields(disabled) {
                 const fieldsToToggle = [homeRegionSelect, homeProvinceSelect, homeCitySelect, homeBarangaySelect, homeZipcodeInput, homeStreetInput];
                 fieldsToToggle.forEach(field => {
@@ -971,7 +989,7 @@
                     }
                 });
             }
-            
+
             if (sameAsCurrentCheckbox) {
                 sameAsCurrentCheckbox.addEventListener('change', function() {
                     if (this.checked) {
@@ -981,7 +999,7 @@
                         toggleHomeAddressFields(false);
                     }
                 });
-                
+
                 // Also listen for changes on current address fields to sync when checkbox is checked
                 [addressRegionSelect, addressProvinceSelect, addressCitySelect, addressBarangaySelect, zipcodeInput, streetInput].forEach(field => {
                     if (field) {
@@ -994,11 +1012,11 @@
                     }
                 });
             }
-            
+
             // Initialize home address cascading dropdown
             initHomeAddressCascading();
         });
-        
+
         // Home Address Cascading Functionality
         function initHomeAddressCascading() {
             const homeRegionSelect = document.getElementById('homeRegion');
@@ -1006,7 +1024,7 @@
             const homeCitySelect = document.getElementById('homeCity');
             const homeBarangaySelect = document.getElementById('homeBarangay');
             const homeZipcodeInput = document.getElementById('homeZipcode');
-            
+
             const oldHomeRegion = document.getElementById('oldHomeRegion')?.value || '';
             const oldHomeProvince = document.getElementById('oldHomeProvince')?.value || '';
             const oldHomeCity = document.getElementById('oldHomeCity')?.value || '';
@@ -1017,7 +1035,7 @@
             console.log('Old Home Province:', oldHomeProvince);
             console.log('Old Home City:', oldHomeCity);
             console.log('Old Home Barangay:', oldHomeBarangay);
-            
+
             // On region change
             if (homeRegionSelect) {
                 homeRegionSelect.addEventListener('change', function() {
@@ -1026,19 +1044,19 @@
                     homeCitySelect.innerHTML = '<option value="">Select City/Municipality</option>';
                     homeBarangaySelect.innerHTML = '<option value="">Select Barangay</option>';
                     homeZipcodeInput.value = '';
-                    
+
                     if (regionCode) {
                         fetchHomeProvinces(regionCode);
                     }
                 });
-                
+
                 // Initial load if region exists
                 if (oldHomeRegion) {
                     homeRegionSelect.value = oldHomeRegion;
                     fetchHomeProvinces(oldHomeRegion, oldHomeProvince, oldHomeCity, oldHomeBarangay);
                 }
             }
-            
+
             // On province change
             if (homeProvinceSelect) {
                 homeProvinceSelect.addEventListener('change', function() {
@@ -1046,20 +1064,20 @@
                     homeCitySelect.innerHTML = '<option value="">Select City/Municipality</option>';
                     homeBarangaySelect.innerHTML = '<option value="">Select Barangay</option>';
                     homeZipcodeInput.value = '';
-                    
+
                     if (provinceCode) {
                         fetchHomeCities(provinceCode);
                     }
                 });
             }
-            
+
             // On city change
             if (homeCitySelect) {
                 homeCitySelect.addEventListener('change', function() {
                     const cityCode = this.value;
                     const cityName = this.options[this.selectedIndex]?.text || '';
                     homeBarangaySelect.innerHTML = '<option value="">Select Barangay</option>';
-                    
+
                     if (cityCode) {
                         fetchHomeBarangays(cityCode);
                         fetchHomeZipcode(cityName);
@@ -1067,10 +1085,10 @@
                 });
             }
         }
-        
+
         function fetchHomeProvinces(regionCode, preselectedProvince = '', preselectedCity = '', preselectedBarangay = '') {
             const homeProvinceSelect = document.getElementById('homeProvince');
-            
+
             $.ajax({
                 url: '/get-address-provinces',
                 method: 'GET',
@@ -1091,7 +1109,7 @@
                             else if (provinceName.includes(selectedName)) score = 80;
                             else if (selectedName.includes(provinceName)) score = 60;
                             else if (selectedName.length >= 3 && provinceName.includes(selectedName.substring(0, 3))) score = 40;
-                            
+
                             // Fallback: match by code
                             if (String(province.code) == String(preselectedProvince)) score = 100;
 
@@ -1100,7 +1118,7 @@
                                 bestMatch = option;
                             }
                         }
-                        
+
                         homeProvinceSelect.appendChild(option);
                     });
 
@@ -1108,7 +1126,7 @@
                     if (bestMatch && bestMatchScore >= 40) {
                         bestMatch.selected = true;
                     }
-                    
+
                     // If preselected (and we seemingly found a match or proceeded anyway), trigger city fetch
                     // If preselected (and we seemingly found a match or proceeded anyway), trigger city fetch
                     // improved condition: check if we have a value OR if we have a preselected string that drove the match
@@ -1123,10 +1141,10 @@
                 }
             });
         }
-        
+
         function fetchHomeCities(provinceCode, preselectedCity = '', preselectedBarangay = '') {
             const homeCitySelect = document.getElementById('homeCity');
-            
+
             $.ajax({
                 url: '/get-address-cities',
                 method: 'GET',
@@ -1147,7 +1165,7 @@
                             else if (cityName.includes(selectedName)) score = 80;
                             else if (selectedName.includes(cityName)) score = 60;
                             else if (selectedName.length >= 3 && cityName.includes(selectedName.substring(0, 3))) score = 40;
-                            
+
                             // Fallback: match by code
                             if (String(city.code) == String(preselectedCity)) score = 100;
 
@@ -1163,7 +1181,7 @@
                      if (bestMatch && bestMatchScore >= 40) {
                         bestMatch.selected = true;
                     }
-                    
+
                     // If preselected, trigger barangay fetch
                     if (preselectedCity && homeCitySelect.value) {
                         const selectedValue = homeCitySelect.value;
@@ -1177,10 +1195,10 @@
                 }
             });
         }
-        
+
         function fetchHomeBarangays(cityCode, preselectedBarangay = '') {
             const homeBarangaySelect = document.getElementById('homeBarangay');
-            
+
             $.ajax({
                 url: '/get-address-barangays',
                 method: 'GET',
@@ -1189,7 +1207,7 @@
                     homeBarangaySelect.innerHTML = '<option value="">Select Barangay</option>';
                     let bestMatch = null;
                     let bestMatchScore = 0;
-                    
+
                     barangays.forEach(function(barangay) {
                         const option = new Option(barangay.name, barangay.code);
                         const barangayName = String(barangay.name).toLowerCase().trim();
@@ -1201,7 +1219,7 @@
                             else if (barangayName.includes(selectedName)) score = 80;
                             else if (selectedName.includes(barangayName)) score = 60;
                             else if (selectedName.length >= 3 && barangayName.includes(selectedName.substring(0, 3))) score = 40;
-                            
+
                             // Fallback: match by code
                             if (String(barangay.code) == String(preselectedBarangay)) score = 100;
 
@@ -1213,7 +1231,7 @@
 
                         homeBarangaySelect.appendChild(option);
                     });
-                    
+
                     if (bestMatch && bestMatchScore >= 40) {
                         bestMatch.selected = true;
                     }
@@ -1223,10 +1241,10 @@
                 }
             });
         }
-        
+
         function fetchHomeZipcode(cityName) {
             const homeZipcodeInput = document.getElementById('homeZipcode');
-            
+
             $.ajax({
                 url: '/get-cities-zipcode',
                 method: 'GET',
@@ -1242,4 +1260,76 @@
             });
         }
     </script>
+
+    @section('scripts')
+    {{-- Numeric and Plus restriction for phone fields --}}
+    <script>
+        (function() {
+            console.log('Phone restriction script STARTING');
+            function restrictPhoneInput(fieldId, allowPlus) {
+                const el = document.getElementById(fieldId);
+                if (!el) {
+                    console.error('CRITICAL: Field not found for restriction:', fieldId);
+                    return;
+                }
+                console.log('Successfully attached restriction to:', fieldId);
+
+                // Keydown restriction
+                el.addEventListener('keydown', function(e) {
+                    const navKeys = ['Backspace', 'Tab', 'Enter', 'Escape', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Delete', 'Home', 'End'];
+                    if (navKeys.includes(e.key)) return;
+                    if (e.ctrlKey || e.metaKey || e.altKey) return; 
+
+                    const isDigit = /^[0-9]$/.test(e.key);
+                    const isPlus = e.key === '+';
+
+                    if (allowPlus && (isDigit || isPlus)) return;
+                    if (!allowPlus && isDigit) return;
+
+                    console.log('BLOCKING KEY:', e.key, 'on', fieldId);
+                    e.preventDefault();
+                }, true);
+
+                // Input sanitation (fallback)
+                el.addEventListener('input', function() {
+                    console.log('Input event on:', fieldId, 'Value:', this.value);
+                    const regex = allowPlus ? /[^0-9+]/g : /[^0-9]/g;
+                    const cleaned = this.value.replace(regex, '');
+                    if (this.value !== cleaned) {
+                        console.log('CLEANING field:', fieldId, 'Original:', this.value, 'Cleaned:', cleaned);
+                        this.value = cleaned;
+                    }
+                }, true);
+
+                // Paste sanitation
+                el.addEventListener('paste', function(e) {
+                    console.log('Paste event on:', fieldId);
+                    e.preventDefault();
+                    const text = (e.clipboardData || window.clipboardData).getData('text');
+                    const regex = allowPlus ? /[^0-9+]/g : /[^0-9]/g;
+                    const digits = text.replace(regex, '');
+                    const start = this.selectionStart;
+                    const end = this.selectionEnd;
+                    const val = this.value;
+                    let next = val.slice(0, start) + digits + val.slice(end);
+                    if (this.maxLength > 0) next = next.slice(0, this.maxLength);
+                    console.log('Sanitized paste for:', fieldId, 'New val:', next);
+                    this.value = next;
+                }, true);
+            }
+
+            function init() {
+                console.log('Initializing phone restrictions...');
+                restrictPhoneInput('telephone', true);
+                restrictPhoneInput('mobileNumber', false);
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+        })();
+    </script>
+    @endsection
 @endsection
