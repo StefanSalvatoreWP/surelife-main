@@ -231,11 +231,12 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
                             <div>
                                 <label for="paymentMethod" class="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
-                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="paymentMethod" name="paymentmethod">
+                                <select class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 hover:border-gray-400 shadow-sm" id="paymentMethod" name="paymentmethod">
                                     @php
                                         $selectedPaymentMethod = old('paymentmethod');
                                     @endphp
-                                    <option value="Cash" {{ $selectedPaymentMethod === 'Cash' ? 'selected' : '' }}>Cash</option>
+                                    <option value=""> Select Payment Method</option>
+                                    <option value="Cash" {{ $selectedPaymentMethod === 'Cash' ? 'selected' : '' }}> Cash</option>
                                 </select>
                                 @error('paymentmethod')
                                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
@@ -1862,6 +1863,35 @@
             });
         }
         
+        // Currency formatting function
+        function formatCurrency(amount) {
+            if (!amount || amount === '') return '';
+            
+            // Convert to number and format with commas and 2 decimal places
+            const num = parseFloat(amount);
+            if (isNaN(num)) return amount;
+            
+            return num.toLocaleString('en-PH', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+        
+        // Function to update price and term amount with formatting
+        function updateContractPrice(price) {
+            const priceField = document.getElementById('packagePrice');
+            if (priceField) {
+                priceField.value = formatCurrency(price);
+            }
+        }
+        
+        function updateTermAmount(amount) {
+            const termField = document.getElementById('termAmount');
+            if (termField) {
+                termField.value = formatCurrency(amount);
+            }
+        }
+
         // Phone number formatting functions
         function formatMobile(input) {
             let value = input.value.replace(/\D/g, '');

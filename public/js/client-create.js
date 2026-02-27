@@ -73,6 +73,9 @@ $(document).ready(function () {
         success: function (packgePrices) {
             packgePrices.forEach(function (currentPackage) {
                 packagePriceSelect.val(currentPackage.Price);
+                if (typeof formatCurrency === 'function') {
+                    packagePriceSelect.val(formatCurrency(currentPackage.Price));
+                }
             });
         },
         error: function (xhr, status, error) {
@@ -118,6 +121,9 @@ $(document).ready(function () {
                     selectedTermAmount.val(0);
                     termAmounts.forEach(function (termAmount) {
                         selectedTermAmount.val(termAmount.Price);
+                        if (typeof formatCurrency === 'function') {
+                            selectedTermAmount.val(formatCurrency(termAmount.Price));
+                        }
                     });
                 },
                 error: function (xhr, status, error) {
@@ -477,6 +483,9 @@ $(document).ready(function () {
 
                 packgePrices.forEach(function (package) {
                     packagePriceSelect.val(package.Price);
+                    if (typeof formatCurrency === 'function') {
+                        packagePriceSelect.val(formatCurrency(package.Price));
+                    }
                 });
 
                 // payment term
@@ -516,6 +525,9 @@ $(document).ready(function () {
                                     selectedTermAmount.val(0);
                                     termAmounts.forEach(function (termAmount) {
                                         selectedTermAmount.val(termAmount.Price);
+                                        if (typeof formatCurrency === 'function') {
+                                            selectedTermAmount.val(formatCurrency(termAmount.Price));
+                                        }
                                     });
 
                                     // update downpayment values 
@@ -604,6 +616,9 @@ $(document).ready(function () {
                 selectedTermAmount.val(0);
                 termAmounts.forEach(function (termAmount) {
                     selectedTermAmount.val(termAmount.Price);
+                    if (typeof formatCurrency === 'function') {
+                        selectedTermAmount.val(formatCurrency(termAmount.Price));
+                    }
                 });
 
                 // update downpayment values 
