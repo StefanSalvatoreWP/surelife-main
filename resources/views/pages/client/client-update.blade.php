@@ -56,7 +56,7 @@
                 }
             });
         </script>
-        <form action="/submit-client-update/{{ $clients->Id }}" method="POST">
+        <form action="/submit-client-update/{{ $clients->Id }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             <!-- CONTRACT Section -->
@@ -702,18 +702,54 @@
                     </h3>
                 </div>
                 <div class="p-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                @php
-                                    $prevPrincipalBeneficiary = old('principalbeneficiary', $clients->PrincipalBeneficiaryName);
-                                    $prevPrincipalBeneficiaryAge = old('principalbeneficiaryage', $clients->PrincipalBeneficiaryAge);
-                                @endphp
-                                <label for="principalBeneficiary" class="block text-sm font-medium text-gray-700 mb-2">Principal Beneficiary (Age)</label>
-                                <div class="flex gap-2">
-                                    <input type="text" class="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="principalBeneficiary" name="principalbeneficiary" maxlength="30" value="{{ $prevPrincipalBeneficiary }}" />
-                                    <input type="number" class="w-20 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="principalBeneficiaryAge" name="principalbeneficiaryage" maxlength="3" value="{{ $prevPrincipalBeneficiaryAge }}" />
+                        <div class="mb-6 bg-blue-50/50 p-5 rounded-xl border border-blue-100">
+                            <h4 class="text-sm font-bold text-gray-800 mb-3 flex items-center">
+                                <svg class="w-4 h-4 mr-1.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                Principal Beneficiary Details
+                            </h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    @php
+                                        $prevPrincipalBeneficiary = old('principalbeneficiary', $clients->PrincipalBeneficiaryName);
+                                        $prevPrincipalBeneficiaryAge = old('principalbeneficiaryage', $clients->PrincipalBeneficiaryAge);
+                                        $prevPrincipalBeneficiaryRelation = old('principalbeneficiaryrelation', $clients->principalbeneficiaryrelation);
+                                    @endphp
+                                    <label for="principalBeneficiary" class="block text-xs font-medium text-gray-700 mb-1">Full Name & Age</label>
+                                    <div class="flex gap-2">
+                                        <input type="text" class="flex-1 px-4 py-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 bg-white" id="principalBeneficiary" name="principalbeneficiary" maxlength="30" value="{{ $prevPrincipalBeneficiary }}" placeholder="Full Name" />
+                                        <input type="number" class="w-20 px-4 py-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 bg-white" id="principalBeneficiaryAge" name="principalbeneficiaryage" maxlength="3" value="{{ $prevPrincipalBeneficiaryAge }}" placeholder="Age" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="principalBeneficiaryRelation" class="block text-xs font-medium text-gray-700 mb-1">Relationship</label>
+                                    <select class="w-full px-4 py-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 bg-white" id="principalBeneficiaryRelation" name="principalbeneficiaryrelation">
+                                        <option value="">Select Relationship</option>
+                                        <option value="Spouse" {{ $prevPrincipalBeneficiaryRelation == 'Spouse' ? 'selected' : '' }}>Spouse</option>
+                                        <option value="Parent" {{ $prevPrincipalBeneficiaryRelation == 'Parent' ? 'selected' : '' }}>Parent</option>
+                                        <option value="Child" {{ $prevPrincipalBeneficiaryRelation == 'Child' ? 'selected' : '' }}>Child</option>
+                                        <option value="Sibling" {{ $prevPrincipalBeneficiaryRelation == 'Sibling' ? 'selected' : '' }}>Sibling</option>
+                                        <option value="Other Relative" {{ $prevPrincipalBeneficiaryRelation == 'Other Relative' ? 'selected' : '' }}>Other Relative</option>
+                                        <option value="Non-Relative" {{ $prevPrincipalBeneficiaryRelation == 'Non-Relative' ? 'selected' : '' }}>Non-Relative</option>
+                                    </select>
+                                </div>
+                                <div class="col-span-1 md:col-span-2">
+                                    <label for="principalBeneficiaryId" class="block text-xs font-medium text-gray-700 mb-1">Upload New Valid ID (Optional)</label>
+                                    <input type="file" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition duration-200" id="principalBeneficiaryId" name="principalbeneficiaryid" accept="image/jpeg,image/png,application/pdf" />
+                                    <p class="text-xs text-gray-400 mt-1">Accepted formats: JPG, PNG, PDF. Max size: 2MB.</p>
+                                    @error('principalbeneficiaryid')
+                                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                                    @enderror
+                                    
+                                    @if($clients->principalbeneficiaryid_path)
+                                        <div class="mt-2 text-sm">
+                                            <span class="text-gray-600">Current ID: </span>
+                                            <a href="{{ asset('storage/' . $clients->principalbeneficiaryid_path) }}" target="_blank" class="text-blue-600 hover:underline">View Uploaded ID</a>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 @php
                                     $prevBeneficiary1 = old('beneficiary1', $clients->Secondary1Name);

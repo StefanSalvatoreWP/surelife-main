@@ -309,6 +309,8 @@ Route::post('/reports-daily', [ReportController::class, 'searchDailyReports'])->
 Route::post('/reports-daily-pdf', [ReportController::class, 'searchDailyReportsPDF'])->name('reports.daily.pdf');
 Route::post('/reports-monthly', [ReportController::class, 'searchMonthlyReports'])->name('reports.monthly');
 Route::post('/reports-annual', [ReportController::class, 'searchAnnualReports'])->name('reports.annual');
+Route::post('/reports-status', [ReportController::class, 'searchStatusReport'])->name('reports.status');
+Route::post('/reports-status-pdf', [ReportController::class, 'searchStatusReportPDF'])->name('reports.status.pdf');
 
 /* ----- REQUEST LOANS - ADMIN VIEW -----*/
 // loans - main screen

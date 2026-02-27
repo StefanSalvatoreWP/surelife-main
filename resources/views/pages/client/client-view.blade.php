@@ -274,45 +274,67 @@
                     <div class="p-6 space-y-6">
                         <!-- Contract Section -->
                         <div>
-                            <h4 class="text-sm font-bold text-purple-700 uppercase tracking-wide mb-3 pb-2 border-b-2 border-purple-200">Contract</h4>
+                            <h4
+                                class="text-sm font-bold text-purple-700 uppercase tracking-wide mb-3 pb-2 border-b-2 border-purple-200">
+                                Contract</h4>
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Contract No.</label>
-                                    <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default" value="{{ $clients->ContractNumber }}" readonly />
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->ContractNumber }}" readonly />
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Package</label>
-                                    <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default" value="{{ $clients->Package }}" readonly />
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->Package }}" readonly />
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Term</label>
-                                    <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default" value="{{ $clients->Term . ' ( ₱ ' . number_format($clients->Price, 2) . ' )' }}" readonly />
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->Term . ' ( ₱ ' . number_format($clients->Price, 2) . ' )' }}"
+                                        readonly />
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Region</label>
-                                    <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default" value="{{ $clients->RegionName }}" readonly />
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->RegionName }}" readonly />
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Branch</label>
-                                    <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default" value="{{ $clients->BranchName }}" readonly />
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->BranchName }}" readonly />
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Best place to collect</label>
-                                    <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default" value="{{ $clients->BestPlaceToCollect }}" readonly />
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Best place to
+                                        collect</label>
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->BestPlaceToCollect }}" readonly />
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Best time to collect</label>
-                                    <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default" value="{{ $clients->BestTimeToCollect }}" readonly />
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->BestTimeToCollect }}" readonly />
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                                    <div class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 flex items-center h-[42px] cursor-default">
+                                    <div
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 flex items-center h-[42px] cursor-default">
                                         @if($clients->Status == '1')
-                                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-gray-200 text-gray-700">Pending</span>
+                                            <span
+                                                class="px-3 py-1 rounded-full text-xs font-semibold bg-gray-200 text-gray-700">Pending</span>
                                         @elseif($clients->Status == '2')
-                                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-200 text-blue-700">Verified</span>
+                                            <span
+                                                class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-200 text-blue-700">Verified</span>
                                         @elseif($clients->Status == '3')
-                                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-200 text-green-700">Approved</span>
+                                            <span
+                                                class="px-3 py-1 rounded-full text-xs font-semibold bg-green-200 text-green-700">Approved</span>
                                         @endif
                                     </div>
                                 </div>
@@ -332,13 +354,16 @@
                                 @endphp
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Payment Status</label>
-                                    <div class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 flex items-center h-[42px] cursor-default">
-                                        <span class="px-3 py-1 rounded-full text-xs font-semibold {{ $statusClass }}">{{ $paymentStatus }}</span>
+                                    <div
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 flex items-center h-[42px] cursor-default">
+                                        <span
+                                            class="px-3 py-1 rounded-full text-xs font-semibold {{ $statusClass }}">{{ $paymentStatus }}</span>
                                     </div>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">FSA</label>
-                                    <div class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 flex items-center h-[42px] overflow-hidden cursor-default">
+                                    <div
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 flex items-center h-[42px] overflow-hidden cursor-default">
                                         <span class="text-gray-900 truncate">
                                             @if($clients->FSALastName)
                                                 {{ $clients->FSALastName . ', ' . $clients->FSAFirstName . ' ' . ($clients->FSAMiddleName ?? '') }}
@@ -353,99 +378,147 @@
 
                         <!-- Personal Section -->
                         <div>
-                            <h4 class="text-sm font-bold text-purple-700 uppercase tracking-wide mb-3 pb-2 border-b-2 border-purple-200">Personal</h4>
+                            <h4
+                                class="text-sm font-bold text-purple-700 uppercase tracking-wide mb-3 pb-2 border-b-2 border-purple-200">
+                                Personal</h4>
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                                <div class="md:col-span-2 lg:col-span-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                <div
+                                    class="md:col-span-2 lg:col-span-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                                     <div class="lg:col-span-2">
                                         <label class="block text-sm font-medium text-gray-700 mb-2">Name</label>
-                                        <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default" value="{{ $clients->LastName . ', ' . $clients->FirstName . " " . $clients->MiddleName }}" readonly />
+                                        <input type="text"
+                                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                            value="{{ $clients->LastName . ', ' . $clients->FirstName . " " . $clients->MiddleName }}"
+                                            readonly />
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-2">Birth Date</label>
-                                        <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default" value="{{ $clients->BirthDate }}" readonly />
+                                        <input type="text"
+                                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                            value="{{ $clients->BirthDate }}" readonly />
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-2">Age</label>
-                                        <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default" value="{{ $clients->Age }}" readonly />
+                                        <input type="text"
+                                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                            value="{{ $clients->Age }}" readonly />
                                     </div>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Gender</label>
-                                    <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default" value="{{ $clients->Gender }}" readonly />
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->Gender }}" readonly />
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Civil Status</label>
-                                    <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default" value="{{ $clients->CivilStatus }}" readonly />
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->CivilStatus }}" readonly />
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Occupation</label>
-                                    <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default" value="{{ $clients->Occupation }}" readonly />
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->Occupation }}" readonly />
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Birth Place</label>
-                                    <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default" value="{{ $clients->BirthPlace }}" readonly />
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->BirthPlace }}" readonly />
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Province</label>
-                                    <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default" value="{{ $clients->ProvinceDisplay ?? $clients->Province }}" readonly />
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->ProvinceDisplay ?? $clients->Province }}" readonly />
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">City</label>
-                                    <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default" value="{{ $clients->CityDisplay ?? $clients->City }}" readonly />
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->CityDisplay ?? $clients->City }}" readonly />
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Barangay</label>
-                                    <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default" value="{{ $clients->BarangayDisplay ?? $clients->Barangay }}" readonly />
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->BarangayDisplay ?? $clients->Barangay }}" readonly />
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Zipcode</label>
-                                    <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default" value="{{ $clients->ZipCode }}" readonly />
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->ZipCode }}" readonly />
                                 </div>
                                 <div class="lg:col-span-4">
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Street</label>
-                                    <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default" value="{{ $clients->Street }}" readonly />
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->Street }}" readonly />
                                 </div>
                             </div>
                         </div>
 
                         <!-- Home Address Section -->
                         <div>
-                            <h4 class="text-sm font-bold text-purple-700 uppercase tracking-wide mb-3 pb-2 border-b-2 border-purple-200">Home Address</h4>
+                            <h4
+                                class="text-sm font-bold text-purple-700 uppercase tracking-wide mb-3 pb-2 border-b-2 border-purple-200">
+                                Home Address</h4>
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Province</label>
-                                    <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default" value="{{ $clients->HomeProvinceDisplay ?? $clients->HomeProvince ?? '-' }}" readonly />
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->HomeProvinceDisplay ?? $clients->HomeProvince ?? '-' }}"
+                                        readonly />
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">City</label>
-                                    <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default" value="{{ $clients->HomeCityDisplay ?? $clients->HomeCity ?? '-' }}" readonly />
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->HomeCityDisplay ?? $clients->HomeCity ?? '-' }}" readonly />
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Barangay</label>
-                                    <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default" value="{{ $clients->HomeBarangayDisplay ?? $clients->HomeBarangay ?? '-' }}" readonly />
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->HomeBarangayDisplay ?? $clients->HomeBarangay ?? '-' }}"
+                                        readonly />
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Zipcode</label>
-                                    <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default" value="{{ $clients->HomeZipCode ?? '-' }}" readonly />
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->HomeZipCode ?? '-' }}" readonly />
                                 </div>
                                 <div class="lg:col-span-4">
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Street</label>
-                                    <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default" value="{{ $clients->HomeStreet ?? '-' }}" readonly />
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->HomeStreet ?? '-' }}" readonly />
                                 </div>
                             </div>
                         </div>
 
                         <!-- Contact Section -->
                         <div>
-                            <h4 class="text-sm font-bold text-purple-700 uppercase tracking-wide mb-3 pb-2 border-b-2 border-purple-200">Contact</h4>
+                            <h4
+                                class="text-sm font-bold text-purple-700 uppercase tracking-wide mb-3 pb-2 border-b-2 border-purple-200">
+                                Contact</h4>
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Home No.</label>
-                                    <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default" value="{{ $clients->HomeNumber }}" readonly />
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->HomeNumber }}" readonly />
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Mobile No.</label>
-                                    <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default" value="{{ $clients->MobileNumber }}" readonly />
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->MobileNumber }}" readonly />
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
@@ -456,34 +529,166 @@
                                             $displayEmail = '';
                                         }
                                     @endphp
-                                    <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default" value="{{ $displayEmail }}" readonly />
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $displayEmail }}" readonly />
                                 </div>
                             </div>
                         </div>
 
                         <!-- Beneficiaries Section -->
                         <div>
-                            <h4 class="text-sm font-bold text-purple-700 uppercase tracking-wide mb-3 pb-2 border-b-2 border-purple-200">Beneficiaries</h4>
+                            <h4
+                                class="text-sm font-bold text-purple-700 uppercase tracking-wide mb-3 pb-2 border-b-2 border-purple-200">
+                                Beneficiaries</h4>
+
+                            <!-- Principal Details -->
+                            <div class="mb-5 bg-purple-50 rounded-lg p-4 border border-purple-100">
+                                <h5
+                                    class="text-xs font-bold text-purple-800 uppercase tracking-wider mb-3 flex items-center">
+                                    <svg class="w-4 h-4 mr-1.5 text-purple-600" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                    </svg>
+                                    Principal Beneficiary
+                                </h5>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-600 mb-1">Name (Age)</label>
+                                        <input type="text"
+                                            class="w-full px-4 py-2 border border-purple-200 rounded-lg bg-white text-gray-900 cursor-default"
+                                            value="{{ $clients->PrincipalBeneficiaryName . ' (' . $clients->PrincipalBeneficiaryAge . ')'}}"
+                                            readonly />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-600 mb-1">Relationship</label>
+                                        <input type="text"
+                                            class="w-full px-4 py-2 border border-purple-200 rounded-lg bg-white text-gray-900 cursor-default"
+                                            value="{{ $clients->principalbeneficiaryrelation ?? 'Not Specified' }}"
+                                            readonly />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-600 mb-1">Valid ID</label>
+                                        @if(!empty($clients->principalbeneficiaryid_path))
+                                            <button type="button" onclick="openIdModal()"
+                                                class="inline-flex items-center justify-center w-full px-4 py-2 border border-purple-300 text-purple-700 bg-purple-100 hover:bg-purple-200 rounded-lg transition duration-150 font-medium text-sm">
+                                                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                </svg>
+                                                View ID Document
+                                            </button>
+
+                                            <!-- Valid ID Modal -->
+                                            <div id="validIdModal" class="fixed inset-0 z-50 hidden overflow-y-auto"
+                                                aria-labelledby="modal-title" role="dialog" aria-modal="true">
+                                                <div
+                                                    class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                                                    <!-- Background overlay -->
+                                                    <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity"
+                                                        aria-hidden="true" onclick="closeIdModal()"></div>
+
+                                                    <span class="hidden sm:inline-block sm:align-middle sm:h-screen"
+                                                        aria-hidden="true">&#8203;</span>
+
+                                                    <!-- Modal panel -->
+                                                    <div
+                                                        class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full">
+                                                        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 relative">
+                                                            <div class="flex justify-between items-center mb-4">
+                                                                <h3 class="text-lg leading-6 font-medium text-gray-900"
+                                                                    id="modal-title">
+                                                                    Principal Beneficiary ID
+                                                                </h3>
+                                                                <button type="button" onclick="closeIdModal()"
+                                                                    class="text-gray-400 hover:text-gray-500 focus:outline-none focus:text-gray-500 transition ease-in-out duration-150">
+                                                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                                                        stroke="currentColor">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                                            stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                                    </svg>
+                                                                </button>
+                                                            </div>
+                                                            <div
+                                                                class="mt-2 flex justify-center bg-gray-100 rounded-lg p-2 min-h-[300px]">
+                                                                <img src="{{ asset('storage/' . $clients->principalbeneficiaryid_path) }}"
+                                                                    alt="Beneficiary ID"
+                                                                    class="max-w-full max-h-[70vh] object-contain rounded shadow-sm">
+                                                            </div>
+                                                        </div>
+                                                        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                                            <button type="button" onclick="closeIdModal()"
+                                                                class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-purple-600 text-base font-medium text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 sm:ml-3 sm:w-auto sm:text-sm">
+                                                                Close
+                                                            </button>
+                                                            <a href="{{ asset('storage/' . $clients->principalbeneficiaryid_path) }}"
+                                                                target="_blank"
+                                                                class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                                                                Open in New Tab
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <script>
+                                                        function openIdModal() {
+                                                            document.getElementById('validIdModal').classList.remove('hidden');
+                                                            document.body.classList.add('overflow-hidden');
+                                                        }
+                                                        function closeIdModal() {
+                                                            document.getElementById('validIdModal').classList.add('hidden');
+                                                            document.body.classList.remove('overflow-hidden');
+                                                        }
+                                            </script>
+                                        @else
+                                            <div
+                                                class="w-full px-4 py-2 border border-purple-200 rounded-lg bg-gray-50 text-gray-500 italic flex items-center justify-center text-sm">
+                                                <svg class="w-4 h-4 mr-1.5 opacity-50" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                No ID Uploaded
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Other Beneficiaries -->
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Principal (Age)</label>
-                                    <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default" value="{{ $clients->PrincipalBeneficiaryName . ' (' . $clients->PrincipalBeneficiaryAge . ')'}}" readonly />
-                                </div>
-                                <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Beneficiary 1 (Age)</label>
-                                    <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default" value="{{ $clients->Secondary1Name . ' (' . $clients->Secondary1Age . ')'}}" readonly />
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->Secondary1Name . ' (' . $clients->Secondary1Age . ')'}}"
+                                        readonly />
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Beneficiary 2 (Age)</label>
-                                    <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default" value="{{ $clients->Secondary2Name . ' (' . $clients->Secondary2Age . ')'}}" readonly />
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->Secondary2Name . ' (' . $clients->Secondary2Age . ')'}}"
+                                        readonly />
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Beneficiary 3 (Age)</label>
-                                    <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default" value="{{ $clients->Secondary3Name . ' (' . $clients->Secondary3Age . ')'}}" readonly />
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->Secondary3Name . ' (' . $clients->Secondary3Age . ')'}}"
+                                        readonly />
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Beneficiary 4 (Age)</label>
-                                    <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default" value="{{ $clients->Secondary4Name . ' (' . $clients->Secondary4Age . ')'}}" readonly />
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->Secondary4Name . ' (' . $clients->Secondary4Age . ')'}}"
+                                        readonly />
                                 </div>
                             </div>
                         </div>
@@ -1364,47 +1569,47 @@
     </style>
     <script src="{{ asset('js/client-view.js') }}"></script>
     <script>
-        // Custom tab switching (more reliable than Bootstrap)
-        document.addEventListener('DOMContentLoaded', function () {
-            @if(request('status'))
-                localStorage.setItem('clientStatusFilter', '{{ request('status') }}');
-            @endif
-                                        const tabs = document.querySelectorAll('#clientTabs button[data-bs-toggle="tab"]');
-            const tabPanes = document.querySelectorAll('.tab-pane');
+            // Custom tab switching (more reliable than Bootstrap)
+            document.addEventListener('DOMContentLoaded', function () {
+                @if(request('status'))
+                    localStorage.setItem('clientStatusFilter', '{{ request('status') }}');
+                @endif
+                                                const tabs = document.querySelectorAll('#clientTabs button[data-bs-toggle="tab"]');
+                const tabPanes = document.querySelectorAll('.tab-pane');
 
-            tabs.forEach(tab => {
-                tab.addEventListener('click', function (e) {
-                    e.preventDefault();
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', function (e) {
+                        e.preventDefault();
 
-                    // Get target pane
-                    const targetId = this.getAttribute('data-bs-target');
-                    const targetPane = document.querySelector(targetId);
+                        // Get target pane
+                        const targetId = this.getAttribute('data-bs-target');
+                        const targetPane = document.querySelector(targetId);
 
-                    if (!targetPane) return;
+                        if (!targetPane) return;
 
-                    // Remove active classes from all tabs
-                    tabs.forEach(t => {
-                        t.classList.remove('text-purple-600', 'border-b-2', 'border-purple-600', 'font-semibold');
-                        t.classList.add('text-gray-500');
-                        t.setAttribute('aria-selected', 'false');
+                        // Remove active classes from all tabs
+                        tabs.forEach(t => {
+                            t.classList.remove('text-purple-600', 'border-b-2', 'border-purple-600', 'font-semibold');
+             t.classList.add('text-gray-500');
+                            t.setAttribute('aria-selected', 'false');
+                        });
+
+                        // Add active classes to clicked tab
+                        this.classList.remove('text-gray-500');
+                        this.classList.add('text-purple-600', 'border-b-2', 'border-purple-600', 'font-semibold');
+                        this.setAttribute('aria-selected', 'true');
+
+                        // Hide all tab panes
+                        tabPanes.forEach(pane => {
+                            pane.classList.remove('active');
+                        });
+
+                        // Show target pane
+                        targetPane.classList.add('active');
                     });
-
-                    // Add active classes to clicked tab
-                    this.classList.remove('text-gray-500');
-                    this.classList.add('text-purple-600', 'border-b-2', 'border-purple-600', 'font-semibold');
-                    this.setAttribute('aria-selected', 'true');
-
-                    // Hide all tab panes
-                    tabPanes.forEach(pane => {
-                        pane.classList.remove('active');
-                    });
-
-                    // Show target pane
-                    targetPane.classList.add('active');
                 });
-            });
 
-            console.log('✅ Custom tabs initialized:', tabs.length, 'tabs found');
-        });
+                console.log('✅ Custom tabs initialized:', tabs.length, 'tabs found');
+            });
     </script>
 @endsection

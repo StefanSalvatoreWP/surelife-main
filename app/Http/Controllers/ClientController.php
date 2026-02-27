@@ -794,6 +794,8 @@ class ClientController extends Controller
             'emailaddress' => 'required',
             'principalbeneficiary' => 'nullable',
             'principalbeneficiaryage' => 'nullable',
+            'principalbeneficiaryrelation' => 'nullable',
+            'principalbeneficiaryid' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048',
             'beneficiary1' => 'nullable',
             'beneficiary1age' => 'nullable',
             'beneficiary2' => 'nullable',
@@ -859,6 +861,13 @@ class ClientController extends Controller
         $emailAddress = strip_tags($validatedData['emailaddress']);
         $principalBeneficiary = strip_tags($validatedData['principalbeneficiary'] ?? '');
         $principalBeneficiaryAge = strip_tags($validatedData['principalbeneficiaryage'] ?? '');
+        $principalBeneficiaryRelation = strip_tags($validatedData['principalbeneficiaryrelation'] ?? '');
+
+        $principalBeneficiaryIdPath = null;
+        if ($request->hasFile('principalbeneficiaryid')) {
+            $principalBeneficiaryIdPath = $request->file('principalbeneficiaryid')->store('beneficiary_ids', 'public');
+        }
+
         $beneficiary1 = strip_tags($validatedData['beneficiary1'] ?? '');
         $beneficiary1Age = strip_tags($validatedData['beneficiary1age'] ?? '');
         $beneficiary2 = strip_tags($validatedData['beneficiary2'] ?? '');
@@ -965,6 +974,8 @@ class ClientController extends Controller
                         'emailaddress' => $emailcomplete,
                         'principalbeneficiaryname' => $principalBeneficiary,
                         'principalbeneficiaryage' => $principalBeneficiaryAge,
+                        'principalbeneficiaryrelation' => $principalBeneficiaryRelation,
+                        'principalbeneficiaryid_path' => $principalBeneficiaryIdPath,
                         'secondary1name' => $beneficiary1,
                         'secondary1age' => $beneficiary1Age,
                         'secondary2name' => $beneficiary2,
@@ -1112,6 +1123,8 @@ class ClientController extends Controller
             'emailaddress' => 'required',
             'principalbeneficiary' => 'nullable',
             'principalbeneficiaryage' => 'nullable',
+            'principalbeneficiaryrelation' => 'nullable',
+            'principalbeneficiaryid' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048',
             'beneficiary1' => 'nullable',
             'beneficiary1age' => 'nullable',
             'beneficiary2' => 'nullable',
@@ -1169,6 +1182,13 @@ class ClientController extends Controller
             $emailAddress = strip_tags($validatedData['emailaddress']);
             $principalBeneficiary = strip_tags($validatedData['principalbeneficiary'] ?? '');
             $principalBeneficiaryAge = strip_tags($validatedData['principalbeneficiaryage'] ?? '');
+            $principalBeneficiaryRelation = strip_tags($validatedData['principalbeneficiaryrelation'] ?? '');
+
+            $principalBeneficiaryIdPath = null;
+            if ($request->hasFile('principalbeneficiaryid')) {
+                $principalBeneficiaryIdPath = $request->file('principalbeneficiaryid')->store('beneficiary_ids', 'public');
+            }
+
             $beneficiary1 = strip_tags($validatedData['beneficiary1'] ?? '');
             $beneficiary1Age = strip_tags($validatedData['beneficiary1age'] ?? '');
             $beneficiary2 = strip_tags($validatedData['beneficiary2'] ?? '');
@@ -1255,6 +1275,8 @@ class ClientController extends Controller
                             'emailaddress' => $emailcomplete,
                             'principalbeneficiaryname' => $principalBeneficiary,
                             'principalbeneficiaryage' => $principalBeneficiaryAge,
+                            'principalbeneficiaryrelation' => $principalBeneficiaryRelation,
+                            'principalbeneficiaryid_path' => $principalBeneficiaryIdPath,
                             'secondary1name' => $beneficiary1,
                             'secondary1age' => $beneficiary1Age,
                             'secondary2name' => $beneficiary2,
@@ -1420,12 +1442,8 @@ class ClientController extends Controller
                 'packageprice.required' => 'This field is required.',
                 'paymentterm.required' => 'This field is required.',
                 'termamount.required' => 'This field is required.',
-                'region.required' => 'This field is required.',
                 'branch.required' => 'This field is required.',
-                'recruitedby.required' => 'This field is required.',
-                'recruitedby.not_in' => 'This field is required.',
                 'paymentamount.required' => 'This field is required.',
-                'orseriescode.required' => 'This field is required.',
                 'ornumber.required' => 'This field is required.',
                 'paymentdate.required' => 'This field is required.',
                 'lastname.required' => 'This field is required.',
@@ -1461,7 +1479,7 @@ class ClientController extends Controller
                 'termamount' => 'required',
                 'region' => 'required',
                 'branch' => 'required',
-                'recruitedby' => 'required|not_in:0',
+                'recruitedby' => 'nullable',
                 'downpaymenttype' => 'nullable',
                 'paymentamount' => 'required',
                 'orseriescode' => 'required',
@@ -1492,6 +1510,8 @@ class ClientController extends Controller
                 'emailaddress' => 'required',
                 'principalbeneficiary' => 'nullable',
                 'principalbeneficiaryage' => 'nullable',
+                'principalbeneficiaryrelation' => 'nullable',
+                'principalbeneficiaryid' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048',
                 'beneficiary1' => 'nullable',
                 'beneficiary1age' => 'nullable',
                 'beneficiary2' => 'nullable',
@@ -1565,6 +1585,13 @@ class ClientController extends Controller
             $emailAddress = strip_tags($validatedData['emailaddress']);
             $principalBeneficiary = strip_tags($validatedData['principalbeneficiary'] ?? '');
             $principalBeneficiaryAge = strip_tags($validatedData['principalbeneficiaryage'] ?? '');
+            $principalBeneficiaryRelation = strip_tags($validatedData['principalbeneficiaryrelation'] ?? '');
+
+            $principalBeneficiaryIdPath = null;
+            if ($request->hasFile('principalbeneficiaryid')) {
+                $principalBeneficiaryIdPath = $request->file('principalbeneficiaryid')->store('beneficiary_ids', 'public');
+            }
+
             $beneficiary1 = strip_tags($validatedData['beneficiary1'] ?? '');
             $beneficiary1Age = strip_tags($validatedData['beneficiary1age'] ?? '');
             $beneficiary2 = strip_tags($validatedData['beneficiary2'] ?? '');
@@ -1608,20 +1635,67 @@ class ClientController extends Controller
             Log::info('Downpayment Type: ' . $downpaymentType);
 
             // check if contract no is available
-            $availableContract = '1';
             Log::info('Checking contract availability...');
-            $contractExists = ContractBatch::select('tblcontractbatch.*', 'tblcontract.id as contractid')
-                ->leftJoin('tblcontract', 'tblcontractbatch.id', '=', 'tblcontract.contractbatchid')
-                ->where('ContractNumber', $contractNo)
-                ->where('RegionId', $regionId)
-                ->where('BranchId', $branchId)
-                ->where('Status', $availableContract)
-                ->first();
+
+            Log::info('DEBUG - Comparing Contract values:');
+            Log::info('DB Contract: [' . $client->ContractNumber . '] vs Form: [' . $contractNo . ']');
+            Log::info('DB Region: [' . $client->RegionId . '] vs Form: [' . $regionId . ']');
+            Log::info('DB Branch: [' . $client->BranchId . '] vs Form: [' . $branchId . ']');
+
+            // Check if the client is keeping their existing contract
+            $isSameContract = (
+                (string) $client->ContractNumber === (string) $contractNo &&
+                (string) $client->RegionId === (string) $regionId &&
+                (string) $client->BranchId === (string) $branchId
+            );
+
+            Log::info('DEBUG - isSameContract evaluated to: ' . ($isSameContract ? 'TRUE' : 'FALSE'));
+
+            if ($isSameContract) {
+                Log::info('DEBUG - Client kept original contract. Bypassing ContractBatch Region/Branch validation to prevent data anomaly errors.');
+                // Just find their existing contract ID directly
+                $existingContract = \App\Models\Contract::where('contractnumber', $contractNo)
+                    ->first();
+
+                if ($existingContract) {
+                    $contractExists = true;
+                    $searchedContractId = $existingContract->id;
+                    Log::info('✅ Existing Contract fetched directly without client ID filter. ID: ' . $searchedContractId);
+                } else {
+                    // Fallback if somehow it's not even linked to them in tblcontract
+                    $contractExists = false;
+                    Log::error('❌ FAILED: Client kept contract but ContractNumber ' . $contractNo . ' was not found in tblcontract!');
+                }
+            } else {
+                $contractQuery = ContractBatch::select('tblcontractbatch.*', 'tblcontract.id as contractid')
+                    ->leftJoin('tblcontract', 'tblcontractbatch.id', '=', 'tblcontract.contractbatchid')
+                    ->where('ContractNumber', $contractNo)
+                    ->where('RegionId', $regionId)
+                    ->where('BranchId', $branchId);
+
+                // If it's a new contract being assigned, it must be available
+                $availableContract = '1';
+                $contractQuery->where('Status', $availableContract);
+                Log::info('DEBUG - Contract changed. Added Status = 1 condition.');
+
+                \Illuminate\Support\Facades\DB::enableQueryLog();
+
+                $contractExistsResult = $contractQuery->first();
+
+                $queries = \Illuminate\Support\Facades\DB::getQueryLog();
+                Log::info('RAW CONTRACT QUERY EXECUTED: ', $queries);
+
+                if ($contractExistsResult) {
+                    $contractExists = true;
+                    $searchedContractId = $contractExistsResult->contractid;
+                    Log::info('✅ New Contract is available. ID: ' . $searchedContractId);
+                } else {
+                    $contractExists = false;
+                    Log::info('CONTRACT EXISTS RESULT: NULL');
+                }
+            }
 
             if ($contractExists) {
-                Log::info('✅ Contract is available');
-                Log::info('Contract ID: ' . $contractExists->contractid);
-                $searchedContractId = $contractExists->contractid;
 
                 // check if OR no is available
                 $availableOR = '1';
@@ -1686,6 +1760,7 @@ class ClientController extends Controller
                             'emailaddress' => $emailcomplete,
                             'principalbeneficiaryname' => $principalBeneficiary,
                             'principalbeneficiaryage' => $principalBeneficiaryAge,
+                            'principalbeneficiaryrelation' => $principalBeneficiaryRelation,
                             'secondary1name' => $beneficiary1,
                             'secondary1age' => $beneficiary1Age,
                             'secondary2name' => $beneficiary2,
@@ -1702,6 +1777,10 @@ class ClientController extends Controller
                             'homestreet' => $homeStreet,
                             'datecreated' => date("Y-m-d")
                         ];
+
+                        if ($principalBeneficiaryIdPath) {
+                            $updateClientData['principalbeneficiaryid_path'] = $principalBeneficiaryIdPath;
+                        }
 
                         Log::info('Updating client record...');
                         Log::info('Client ID: ' . $client->Id);
@@ -1808,10 +1887,7 @@ class ClientController extends Controller
                 'packageprice.required' => 'This field is required.',
                 'paymentterm.required' => 'This field is required.',
                 'termamount.required' => 'This field is required.',
-                'region.required' => 'This field is required.',
                 'branch.required' => 'This field is required.',
-                'recruitedby.required' => 'This field is required.',
-                'recruitedby.not_in' => 'This field is required.',
                 'lastname.required' => 'This field is required.',
                 'lastname.min' => 'Name is too short.',
                 'lastname.max' => 'Name is too long.',
@@ -1845,7 +1921,7 @@ class ClientController extends Controller
                 'termamount' => 'required',
                 'region' => 'required',
                 'branch' => 'required',
-                'recruitedby' => 'required|not_in:0',
+                'recruitedby' => 'nullable',
                 'lastname' => 'required|min:1|max:30',
                 'firstname' => 'required|min:1|max:30',
                 'middlename' => 'nullable',
@@ -1970,7 +2046,20 @@ class ClientController extends Controller
             $mobilenumber = '0' . $mobileNetwork . $mobileNo;
             $emailcomplete = $email . '@' . $emailAddress;
 
-            if ($client->ContractNumber == $contractNo) {
+            Log::info('--- Checking Contract For Approved Client ---');
+            Log::info('DB Contract: [' . $client->ContractNumber . '] vs Form: [' . $contractNo . ']');
+            Log::info('DB Region: [' . $client->RegionId . '] vs Form: [' . $regionId . ']');
+            Log::info('DB Branch: [' . $client->BranchId . '] vs Form: [' . $branchId . ']');
+
+            $isSameContract = (
+                (string) $client->ContractNumber === (string) $contractNo &&
+                (string) $client->RegionId === (string) $regionId &&
+                (string) $client->BranchId === (string) $branchId
+            );
+
+            Log::info('isSameContract evaluated to: ' . ($isSameContract ? 'TRUE' : 'FALSE'));
+
+            if ($isSameContract) {
 
                 // update client
                 try {
@@ -2040,93 +2129,8 @@ class ClientController extends Controller
                     return redirect('/client-view/' . $client->Id)->with('error', 'An error occured while updating the selected client.');
                 }
             } else {
-
-                // check if contract no is available
-                $availableContract = '1';
-                $contractExists = ContractBatch::select('tblcontractbatch.*', 'tblcontract.id as contractid')
-                    ->leftJoin('tblcontract', 'tblcontractbatch.id', '=', 'tblcontract.contractbatchid')
-                    ->where('ContractNumber', $contractNo)
-                    ->where('RegionId', $regionId)
-                    ->where('BranchId', $branchId)
-                    ->where('Status', $availableContract)
-                    ->first();
-
-                if ($contractExists) {
-
-                    $searchedContractId = $contractExists->contractid;
-
-                    // update client
-                    try {
-
-                        $updateClientData = [
-                            'contractnumber' => $contractNo,
-                            'packageid' => $packageId,
-                            'packageprice' => $packagePrice,
-                            'paymenttermid' => $termId,
-                            'paymenttermamount' => $termAmount,
-                            'regionid' => $regionId,
-                            'branchid' => $branchId,
-                            'recruitedby' => $recruitedById,
-                            'lastname' => $lastName,
-                            'firstname' => $firstName,
-                            'middlename' => $middleName,
-                            'gender' => $gender,
-                            'birthdate' => $birthDate,
-                            'age' => $age,
-                            'birthplace' => $birthPlace,
-                            'civilstatus' => $civilStatus,
-                            'religion' => $religion,
-                            'occupation' => $occupation,
-                            'bestplacetocollect' => $bestPlaceToCollect,
-                            'besttimetocollect' => $bestTimeToCollect,
-                            'province' => $province,
-                            'city' => $city,
-                            'barangay' => $barangay,
-                            'zipcode' => $zipcode,
-                            'street' => $street,
-                            'homenumber' => $telephone,
-                            'mobilenumber' => $mobilenumber,
-                            'emailaddress' => $emailcomplete,
-                            'principalbeneficiaryname' => $principalBeneficiary,
-                            'principalbeneficiaryage' => $principalBeneficiaryAge,
-                            'secondary1name' => $beneficiary1,
-                            'secondary1age' => $beneficiary1Age,
-                            'secondary2name' => $beneficiary2,
-                            'secondary2age' => $beneficiary2Age,
-                            'secondary3name' => $beneficiary3,
-                            'secondary3age' => $beneficiary3Age,
-                            'secondary4name' => $beneficiary4,
-                            'secondary4age' => $beneficiary4Age,
-                            'homeregion' => $homeRegion,
-                            'homeprovince' => $homeProvince,
-                            'homecity' => $homeCity,
-                            'homebarangay' => $homeBarangay,
-                            'homezipcode' => $homeZipcode,
-                            'homestreet' => $homeStreet
-                        ];
-
-                        Client::where('id', $client->Id)->update($updateClientData);
-                        Log::channel('activity')->info('[StaffID] ' . session('user_id') . ' [Menu] Client ' . '[Action] Update ' . '[Target] ' . $client->Id);
-
-                        // update contract status
-                        $usedContract = '2';
-                        $updateContractData = [
-                            'status' => $usedContract,
-                            'clientid' => $client->Id
-                        ];
-
-                        Contract::where('id', $searchedContractId)
-                            ->where('contractnumber', $contractNo)
-                            ->update($updateContractData);
-                        Log::channel('activity')->info('[StaffID] ' . session('user_id') . ' [Menu] Client ' . '[Action] Update Contract ' . '[Target] ' . $client->Id);
-
-                        return redirect('/client-view/' . $client->Id)->with('success', 'Successfully updated the selected client!');
-                    } catch (\Exception $e) {
-                        return redirect('/client-view/' . $client->Id)->with('error', 'An error occured while updating the selected client.');
-                    }
-                } else {
-                    return redirect()->back()->with('duplicate', 'Contract is already assigned to another client.')->withInput();
-                }
+                Log::warning('❌ Attempted to change contract details for an Approved client');
+                return redirect()->back()->with('error', 'Approved clients cannot change their contract number, region, or branch.')->withInput();
             }
         }
     }

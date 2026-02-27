@@ -34,7 +34,7 @@
                 </div>
             @endif
         </div>
-        <form action="/submit-client-transfer-insert/{{ $client->Id }}" method="POST">
+        <form action="/submit-client-transfer-insert/{{ $client->Id }}" method="POST" enctype="multipart/form-data">
             @csrf
             <!-- CONTRACT SECTION -->
             <div class="bg-white rounded-xl shadow-lg p-6 mb-6 hover:shadow-xl transition-shadow duration-300">
@@ -547,20 +547,49 @@
                     </h2>
                 </div>
                 <div>
-                        <div class="row">
-                            <div class="col-sm-4">
-                                @php
-                                    $prevPrincipalBeneficiary = old('principalbeneficiary');
-                                    $prevPrincipalBeneficiaryAge = old('principalbeneficiaryage');
-                                @endphp
-                                <label for="principalBeneficiary" class="block text-sm font-semibold text-gray-700 mb-2">Principal Beneficiary (Age)</label>
-                                <div class="input-group">
-                                    <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200" id="principalBeneficiary" name="principalbeneficiary" value="{{ $prevPrincipalBeneficiary }}" />
-                                    <label for="principalBeneficiaryAge" class="block text-sm font-semibold text-gray-700 mb-2"></label>
-                                    <input type="number" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200" id="principalBeneficiaryAge" name="principalbeneficiaryage" maxlength="3" value="{{ $prevPrincipalBeneficiaryAge }}" />
+                        <div class="mb-6 bg-purple-50/50 p-5 rounded-xl border border-purple-100">
+                            <h4 class="text-sm font-bold text-gray-800 mb-3 flex items-center">
+                                <svg class="w-4 h-4 mr-1.5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                Principal Beneficiary Details
+                            </h4>
+                            <div class="row">
+                                <div class="col-sm-6 mb-4">
+                                    @php
+                                        $prevPrincipalBeneficiary = old('principalbeneficiary');
+                                        $prevPrincipalBeneficiaryAge = old('principalbeneficiaryage');
+                                        $prevPrincipalBeneficiaryRelation = old('principalbeneficiaryrelation');
+                                    @endphp
+                                    <label for="principalBeneficiary" class="block text-xs font-medium text-gray-700 mb-1">Full Name & Age</label>
+                                    <div class="flex gap-2">
+                                        <input type="text" class="flex-1 px-4 py-2 border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200 bg-white" id="principalBeneficiary" name="principalbeneficiary" value="{{ $prevPrincipalBeneficiary }}" placeholder="Full Name" />
+                                        <input type="number" class="w-20 px-4 py-2 border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200 bg-white" id="principalBeneficiaryAge" name="principalbeneficiaryage" maxlength="3" value="{{ $prevPrincipalBeneficiaryAge }}" placeholder="Age" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 mb-4">
+                                    <label for="principalBeneficiaryRelation" class="block text-xs font-medium text-gray-700 mb-1">Relationship</label>
+                                    <select class="w-full px-4 py-2 border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200 bg-white" id="principalBeneficiaryRelation" name="principalbeneficiaryrelation">
+                                        <option value="">Select Relationship</option>
+                                        <option value="Spouse" {{ $prevPrincipalBeneficiaryRelation == 'Spouse' ? 'selected' : '' }}>Spouse</option>
+                                        <option value="Parent" {{ $prevPrincipalBeneficiaryRelation == 'Parent' ? 'selected' : '' }}>Parent</option>
+                                        <option value="Child" {{ $prevPrincipalBeneficiaryRelation == 'Child' ? 'selected' : '' }}>Child</option>
+                                        <option value="Sibling" {{ $prevPrincipalBeneficiaryRelation == 'Sibling' ? 'selected' : '' }}>Sibling</option>
+                                        <option value="Other Relative" {{ $prevPrincipalBeneficiaryRelation == 'Other Relative' ? 'selected' : '' }}>Other Relative</option>
+                                        <option value="Non-Relative" {{ $prevPrincipalBeneficiaryRelation == 'Non-Relative' ? 'selected' : '' }}>Non-Relative</option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-12">
+                                    <label for="principalBeneficiaryId" class="block text-xs font-medium text-gray-700 mb-1">Upload Valid ID (Optional)</label>
+                                    <input type="file" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 transition duration-200" id="principalBeneficiaryId" name="principalbeneficiaryid" accept="image/jpeg,image/png,application/pdf" />
+                                    <p class="text-xs text-gray-400 mt-1">Accepted formats: JPG, PNG, PDF. Max size: 2MB.</p>
+                                    @error('principalbeneficiaryid')
+                                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                    @enderror
                                 </div>
                             </div>
-                            <div class="col-sm-4">
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-6">
                                 @php
                                     $prevBeneficiary1 = old('beneficiary1');
                                     $prevBeneficiary1Age = old('beneficiary1age');
@@ -572,7 +601,7 @@
                                     <input type="number" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200" id="beneficiary1age" name="beneficiary1age" maxlength="3" value="{{ $prevBeneficiary1Age }}" />
                                 </div>
                             </div>
-                            <div class="col-sm-4">
+                            <div class="col-sm-6">
                                 @php
                                     $prevBeneficiary2 = old('beneficiary2');
                                     $prevBeneficiary2Age = old('beneficiary2age');
@@ -586,7 +615,7 @@
                             </div>
                         </div>
                         <div class="row mt-4">
-                            <div class="col-sm-4">
+                            <div class="col-sm-6">
                                 @php
                                     $prevBeneficiary3 = old('beneficiary3');
                                     $prevBeneficiary3Age = old('beneficiary3age');
@@ -598,7 +627,7 @@
                                     <input type="number" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200" id="beneficiary3age" name="beneficiary3age" maxlength="3" value="{{ $prevBeneficiary3Age }}" />
                                 </div>
                             </div>
-                            <div class="col-sm-4">
+                            <div class="col-sm-6">
                                 @php
                                     $prevBeneficiary4 = old('beneficiary4');
                                     $prevBeneficiary4Age = old('beneficiary4age');

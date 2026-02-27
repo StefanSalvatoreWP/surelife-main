@@ -8,12 +8,15 @@ use App\Models\Branch;
 use App\Models\Client;
 use App\Models\Payment;
 use App\Models\Expenses;
+use App\Models\ClientTransfer;
+use App\Exports\StatusReportExport;
 use Nette\Utils\DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Exception;
 
@@ -29,10 +32,12 @@ class ReportController extends Controller
         $year_list = range(2011, $currentYear);
 
         $reportType = ['New Sales', 'Collections', 'Expenses', 'FSA List'];
+        $statusReportTypes = ['Transfer', 'Completed', 'Active', 'Lapse'];
 
         return view('pages.reports.report', [
             'year_list' => $year_list,
             'report_types' => $reportType,
+            'status_report_types' => $statusReportTypes,
             'branch_list' => $branch,
             'mcpr_list' => $mcpr
         ]);
@@ -709,5 +714,323 @@ class ReportController extends Controller
     {
         // For now, redirect to daily reports with a message
         return redirect('/reports')->with('info', 'Annual reports feature is coming soon. Please use daily reports for now.');
+    }
+
+    // ─── Client Status Reports (Transfer / Completed / Active / Lapse) ───────────
+
+    public function searchStatusReport(Request $request)
+    {
+        $messages = [
+            'statusreporttype.not_in' => 'Please select a report type.',
+            'statusbranch.not_in' => 'Please select a branch.',
+        ];
+
+        $fields = Validator::make($request->all(), [
+            'statusreporttype' => 'not_in:0',
+            'statusbranch' => 'not_in:0',
+            'statusdatefrom' => 'nullable|date',
+            'statusdateto' => 'nullable|date|after_or_equal:statusdatefrom',
+        ], $messages);
+
+        if ($fields->fails()) {
+            return redirect()->back()->withErrors($fields)->withInput();
+        }
+
+        $validated = $fields->validated();
+        $reportType = strip_tags($validated['statusreporttype']);
+        $branchId = strip_tags($validated['statusbranch']);
+        $dateFrom = $validated['statusdatefrom'] ?? null;
+        $dateTo = $validated['statusdateto'] ?? null;
+
+        $branch = Branch::query()->where('Id', $branchId)->first();
+        $branchName = $branch ? $branch->BranchName : 'All';
+        $data = $this->getStatusReportData($reportType, $branchId, $dateFrom, $dateTo);
+        $headers = $this->getStatusReportHeaders($reportType);
+
+        if (empty($data)) {
+            return redirect('/reports')->with('error', 'No data found for the selected criteria.');
+        }
+
+        $fileName = 'status_report_' . strtolower($reportType) . '_' . date('Y-m-d') . '.xlsx';
+
+        return Excel::download(
+            new StatusReportExport($reportType, $data, $headers, $branchName),
+            $fileName
+        );
+    }
+
+
+    public function searchStatusReportPDF(Request $request)
+    {
+        $messages = [
+            'statusreporttype.not_in' => 'Please select a report type.',
+            'statusbranch.not_in' => 'Please select a branch.',
+        ];
+
+        $fields = Validator::make($request->all(), [
+            'statusreporttype' => 'not_in:0',
+            'statusbranch' => 'not_in:0',
+            'statusdatefrom' => 'nullable|date',
+            'statusdateto' => 'nullable|date|after_or_equal:statusdatefrom',
+        ], $messages);
+
+        if ($fields->fails()) {
+            return redirect()->back()->withErrors($fields)->withInput();
+        }
+
+        $validated = $fields->validated();
+        $reportType = strip_tags($validated['statusreporttype']);
+        $branchId = strip_tags($validated['statusbranch']);
+        $dateFrom = $validated['statusdatefrom'] ?? null;
+        $dateTo = $validated['statusdateto'] ?? null;
+
+        $branch = Branch::query()->where('Id', $branchId)->first();
+        $data = $this->getStatusReportData($reportType, $branchId, $dateFrom, $dateTo);
+        $headers = $this->getStatusReportHeaders($reportType);
+
+        if (empty($data)) {
+            return redirect('/reports')->with('error', 'No data found for the selected criteria.');
+        }
+
+        // PDF rendering (DomPDF) cannot handle thousands of rows — hard cap at 500.
+        // For large datasets like Lapse/Active, the Excel export handles any size.
+        $pdfRowLimit = 500;
+        if (count($data) > $pdfRowLimit) {
+            return redirect('/reports')->with(
+                'warning',
+                $reportType . ' report has ' . count($data) . ' records — too large to render as PDF (limit: ' . $pdfRowLimit . '). ' .
+                'Please use the Excel export instead, which handles any number of records.'
+            );
+        }
+
+        try {
+            // Raise memory limit for large PDF renders (Lapse/Active can have thousands of rows)
+            ini_set('memory_limit', '1G');
+
+            $pdf = Pdf::loadView('pages.reports.status-report-pdf', [
+                'reportType' => $reportType,
+                'branch' => $branch,
+                'dateFrom' => $dateFrom,
+                'dateTo' => $dateTo,
+                'headers' => $headers,
+                'reportData' => $data,
+            ])
+                ->setPaper('a4', 'landscape')
+                ->setOptions([
+                    'defaultFont' => 'sans-serif',
+                    'isHtml5ParserEnabled' => true,
+                    'isRemoteEnabled' => false,
+                    'isFontSubsettingEnabled' => false,
+                ]);
+
+            $fileName = 'status_report_' . strtolower($reportType) . '_' . date('Y-m-d') . '.pdf';
+            return $pdf->download($fileName);
+        } catch (Exception $e) {
+            Log::error('Status report PDF failed: ' . $e->getMessage());
+
+            $errorMsg = str_contains($e->getMessage(), 'memory') || str_contains($e->getMessage(), 'Allowed memory')
+                ? 'PDF export failed — the ' . $reportType . ' report has too many records to render as PDF. Please use the Excel export instead.'
+                : 'PDF generation failed: ' . $e->getMessage();
+
+            return redirect('/reports')->with('error', $errorMsg);
+        }
+    }
+
+    private function getStatusReportData($reportType, $branchId, $dateFrom, $dateTo)
+    {
+        switch ($reportType) {
+            case 'Transfer':
+                return $this->getTransferReportData($branchId, $dateFrom, $dateTo);
+            case 'Completed':
+                return $this->getCompletedReportData($branchId, $dateFrom, $dateTo);
+            case 'Active':
+                return $this->getActiveReportData($branchId);
+            case 'Lapse':
+                return $this->getLapseReportData($branchId);
+            default:
+                return [];
+        }
+    }
+
+    private function getStatusReportHeaders($reportType)
+    {
+        $base = ['No.', 'Client Name', 'Contract No.', 'Branch', 'FSA'];
+        switch ($reportType) {
+            case 'Transfer':
+                return array_merge($base, ['Transferred To (Client Name)', 'Transferred To (Contract No.)', 'Date Transferred']);
+            case 'Completed':
+                return array_merge($base, ['Date Accomplished', 'Package', 'Payment Term']);
+            case 'Active':
+                return array_merge($base, ['Package', 'Payment Term', 'Last Payment Date', 'Outstanding Balance']);
+            case 'Lapse':
+                return array_merge($base, ['Package', 'Payment Term', 'Last Payment Date', 'Outstanding Balance']);
+            default:
+                return $base;
+        }
+    }
+
+    private function getTransferReportData($branchId, $dateFrom, $dateTo)
+    {
+        $query = DB::table('tblclienttransfer as ct')
+            ->join('tblclient as orig', 'ct.clientid', '=', 'orig.id')
+            ->leftJoin('tblclient as trans', 'ct.transferclientid', '=', 'trans.id')
+            ->leftJoin('tblbranch as b', 'orig.branchid', '=', 'b.id')
+            ->leftJoin('tblstaff as s', 'orig.recruitedby', '=', 's.id')
+            ->where('orig.branchid', $branchId)
+            ->select(
+                DB::raw("CONCAT(orig.lastname, ', ', orig.firstname, ' ', COALESCE(orig.middlename,'')) as client_name"),
+                'orig.contractnumber as contract_no',
+                'b.BranchName as branch',
+                DB::raw("CONCAT(s.LastName, ', ', s.FirstName, ' ', COALESCE(s.MiddleName,'')) as fsa"),
+                DB::raw("CONCAT(trans.lastname, ', ', trans.firstname, ' ', COALESCE(trans.middlename,'')) as transferred_to_name"),
+                'trans.contractnumber as transferred_to_contract',
+                'ct.datecreated as date_transferred' // DateTransferred is NULL in DB, fallback to datecreated
+            );
+
+        if ($dateFrom) {
+            $query->where('ct.datecreated', '>=', $dateFrom);
+        }
+        if ($dateTo) {
+            $query->where('ct.datecreated', '<=', $dateTo);
+        }
+
+        return $query->orderBy('ct.datecreated', 'desc')->get()->map(fn($r) => (array) $r)->toArray();
+    }
+
+    private function getCompletedReportData($branchId, $dateFrom, $dateTo)
+    {
+        $query = DB::table('tblclient as c')
+            ->leftJoin('tblbranch as b', 'c.branchid', '=', 'b.id')
+            ->leftJoin('tblstaff as s', 'c.recruitedby', '=', 's.id')
+            ->leftJoin('tblpackage as p', 'c.packageid', '=', 'p.id')
+            ->leftJoin('tblpaymentterm as pt', 'c.paymenttermid', '=', 'pt.id')
+            ->where('c.branchid', $branchId)
+            ->where('c.status', '3')
+            ->whereNotNull('c.dateaccomplished')
+            ->select(
+                DB::raw("CONCAT(c.lastname, ', ', c.firstname, ' ', COALESCE(c.middlename,'')) as client_name"),
+                'c.contractnumber as contract_no',
+                'b.BranchName as branch',
+                DB::raw("CONCAT(s.LastName, ', ', s.FirstName, ' ', COALESCE(s.MiddleName,'')) as fsa"),
+                'c.dateaccomplished as date_accomplished',
+                'p.Package as package',
+                'pt.Term as payment_term'
+            );
+
+        if ($dateFrom) {
+            $query->where('c.dateaccomplished', '>=', $dateFrom);
+        }
+        if ($dateTo) {
+            $query->where('c.dateaccomplished', '<=', $dateTo);
+        }
+
+        return $query->orderBy('c.dateaccomplished', 'desc')->get()->map(fn($r) => (array) $r)->toArray();
+    }
+
+    private function getActiveReportData($branchId)
+    {
+        $threeMonthsAgo = Carbon::now()->subMonths(3)->format('Y-m-d');
+
+        return DB::table('tblclient as c')
+            ->leftJoin('tblbranch as b', 'c.branchid', '=', 'b.id')
+            ->leftJoin('tblstaff as s', 'c.recruitedby', '=', 's.id')
+            ->leftJoin('tblpackage as p', 'c.packageid', '=', 'p.id')
+            ->leftJoin('tblpaymentterm as pt', 'c.paymenttermid', '=', 'pt.id')
+            ->leftJoin(DB::raw("(
+                SELECT clientid,
+                       SUM(AmountPaid) as total_paid,
+                       MAX(Date)       as last_payment_date
+                FROM tblpayment
+                WHERE VoidStatus != '1'
+                AND (Remarks IS NULL OR Remarks IN ('Standard','Partial','Custom'))
+                GROUP BY clientid
+            ) as ps"), 'c.id', '=', 'ps.clientid')
+            ->where('c.branchid', $branchId)
+            ->where('c.status', '3')
+            ->where('ps.last_payment_date', '>=', $threeMonthsAgo)
+            ->whereRaw("COALESCE(ps.total_paid, 0) < (
+                CASE
+                    WHEN pt.Term = 'Spotcash'    THEN pt.Price
+                    WHEN pt.Term = 'Annual'      THEN pt.Price * 5
+                    WHEN pt.Term = 'Semi-Annual' THEN pt.Price * 10
+                    WHEN pt.Term = 'Quarterly'   THEN pt.Price * 20
+                    WHEN pt.Term = 'Monthly'     THEN pt.Price * 60
+                    ELSE pt.Price * 60
+                END
+            )")
+            ->select(
+                DB::raw("CONCAT(c.lastname, ', ', c.firstname, ' ', COALESCE(c.middlename,'')) as client_name"),
+                'c.contractnumber as contract_no',
+                'b.BranchName as branch',
+                DB::raw("CONCAT(s.LastName, ', ', s.FirstName, ' ', COALESCE(s.MiddleName,'')) as fsa"),
+                'p.Package as package',
+                'pt.Term as payment_term',
+                'ps.last_payment_date',
+                DB::raw("(CASE
+                    WHEN pt.Term = 'Spotcash'    THEN pt.Price
+                    WHEN pt.Term = 'Annual'      THEN pt.Price * 5
+                    WHEN pt.Term = 'Semi-Annual' THEN pt.Price * 10
+                    WHEN pt.Term = 'Quarterly'   THEN pt.Price * 20
+                    WHEN pt.Term = 'Monthly'     THEN pt.Price * 60
+                    ELSE pt.Price * 60
+                END) - COALESCE(ps.total_paid, 0) as outstanding_balance")
+            )
+            ->orderBy('c.lastname')
+            ->get()->map(fn($r) => (array) $r)->toArray();
+    }
+
+    private function getLapseReportData($branchId)
+    {
+        $threeMonthsAgo = Carbon::now()->subMonths(3)->format('Y-m-d');
+
+        return DB::table('tblclient as c')
+            ->leftJoin('tblbranch as b', 'c.branchid', '=', 'b.id')
+            ->leftJoin('tblstaff as s', 'c.recruitedby', '=', 's.id')
+            ->leftJoin('tblpackage as p', 'c.packageid', '=', 'p.id')
+            ->leftJoin('tblpaymentterm as pt', 'c.paymenttermid', '=', 'pt.id')
+            ->leftJoin(DB::raw("(
+                SELECT clientid,
+                       SUM(AmountPaid) as total_paid,
+                       MAX(Date)       as last_payment_date
+                FROM tblpayment
+                WHERE VoidStatus != '1'
+                AND (Remarks IS NULL OR Remarks IN ('Standard','Partial','Custom'))
+                GROUP BY clientid
+            ) as ps"), 'c.id', '=', 'ps.clientid')
+            ->where('c.branchid', $branchId)
+            ->where('c.status', '3')
+            ->where(function ($q) use ($threeMonthsAgo) {
+                $q->where('ps.last_payment_date', '<', $threeMonthsAgo)
+                    ->orWhereNull('ps.last_payment_date');
+            })
+            ->whereRaw("COALESCE(ps.total_paid, 0) < (
+                CASE
+                    WHEN pt.Term = 'Spotcash'    THEN pt.Price
+                    WHEN pt.Term = 'Annual'      THEN pt.Price * 5
+                    WHEN pt.Term = 'Semi-Annual' THEN pt.Price * 10
+                    WHEN pt.Term = 'Quarterly'   THEN pt.Price * 20
+                    WHEN pt.Term = 'Monthly'     THEN pt.Price * 60
+                    ELSE pt.Price * 60
+                END
+            )")
+            ->select(
+                DB::raw("CONCAT(c.lastname, ', ', c.firstname, ' ', COALESCE(c.middlename,'')) as client_name"),
+                'c.contractnumber as contract_no',
+                'b.BranchName as branch',
+                DB::raw("CONCAT(s.LastName, ', ', s.FirstName, ' ', COALESCE(s.MiddleName,'')) as fsa"),
+                'p.Package as package',
+                'pt.Term as payment_term',
+                'ps.last_payment_date',
+                DB::raw("(CASE
+                    WHEN pt.Term = 'Spotcash'    THEN pt.Price
+                    WHEN pt.Term = 'Annual'      THEN pt.Price * 5
+                    WHEN pt.Term = 'Semi-Annual' THEN pt.Price * 10
+                    WHEN pt.Term = 'Quarterly'   THEN pt.Price * 20
+                    WHEN pt.Term = 'Monthly'     THEN pt.Price * 60
+                    ELSE pt.Price * 60
+                END) - COALESCE(ps.total_paid, 0) as outstanding_balance")
+            )
+            ->orderBy('c.lastname')
+            ->get()->map(fn($r) => (array) $r)->toArray();
     }
 }

@@ -43,6 +43,8 @@ class Client extends Model
         'occupation',
         'principalbeneficiaryname',
         'principalbeneficiaryage',
+        'principalbeneficiaryrelation',
+        'principalbeneficiaryid_path',
         'secondary1name',
         'secondary1age',
         'secondary2name',
