@@ -36,6 +36,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Schema;
 
 /* 2023 SilverDust) S. Maceren */
 
@@ -701,7 +702,7 @@ class ClientController extends Controller
 
         // Handle mobile number splitting - the form sends mobilenumber but validation expects mobilenetwork and mobileno
         if ($request->has('mobilenumber') && !$request->has('mobilenetwork')) {
-            $mobileNumber = $request->input('mobilenumber');
+            $mobileNumber = preg_replace('/\s+/', '', $request->input('mobilenumber')); // Remove spaces
             Log::info('Processing mobile number in createClient: ' . $mobileNumber);
 
             // Extract network prefix (first 3 digits) and mobile number (last 7 digits)
@@ -747,10 +748,8 @@ class ClientController extends Controller
             'province.required' => 'This field is required.',
             'city.required' => 'This field is required.',
             'barangay.required' => 'This field is required.',
-            'mobilenetwork.required' => 'This field is required.',
-            'mobileno.required' => 'This field is required.',
-            'mobileno.min' => 'Invalid number.',
-            'mobileno.max' => 'Invalid number.',
+            'mobilenumber.required_without' => 'This field is required.',
+            'telephone.required_without' => 'This field is required.',
             'email.required' => 'This field is required.',
             'emailaddress.required' => 'This field is required.'
         ];
@@ -787,9 +786,10 @@ class ClientController extends Controller
             'barangay' => 'required',
             'zipcode' => 'nullable',
             'street' => 'nullable',
-            'telephone' => 'nullable',
-            'mobilenetwork' => 'required',
-            'mobileno' => 'required|min:7|max:7',
+            'telephone' => 'nullable|required_without:mobilenumber',
+            'mobilenumber' => 'nullable|required_without:telephone',
+            'mobilenetwork' => 'nullable',
+            'mobileno' => 'nullable',
             'email' => 'required',
             'emailaddress' => 'required',
             'principalbeneficiary' => 'nullable',
@@ -814,6 +814,20 @@ class ClientController extends Controller
         ], $messages);
 
         if ($fields->fails()) {
+            Log::error('=== VALIDATION FAILED (createClient) ===');
+            Log::error('Validation Errors: ', $fields->errors()->toArray());
+            Log::error('Failed Fields: ' . implode(', ', array_keys($fields->errors()->toArray())));
+            Log::info('=== END VALIDATION DEBUG (createClient) ===');
+
+            // Return JSON for AJAX requests
+            if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') == 'XMLHttpRequest') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $fields->errors()
+                ], 422);
+            }
+            
             return redirect()
                 ->back()
                 ->withErrors($fields)
@@ -825,7 +839,8 @@ class ClientController extends Controller
 
         $contractNo = strip_tags($validatedData['contractno']);
         $packageId = strip_tags($validatedData['package']);
-        $packagePrice = strip_tags($validatedData['packageprice']);
+        $packagePriceRaw = strip_tags($validatedData['packageprice']);
+        $packagePrice = (float) preg_replace('/[^0-9.]/', '', $packagePriceRaw);
         $termId = strip_tags($validatedData['paymentterm']);
         $termAmount = strip_tags($validatedData['termamount']);
         $regionId = strip_tags($validatedData['region']);
@@ -854,9 +869,11 @@ class ClientController extends Controller
         $barangay = strip_tags($validatedData['barangay']);
         $zipcode = strip_tags($validatedData['zipcode'] ?? '');
         $street = strip_tags($validatedData['street'] ?? '');
-        $telephone = strip_tags($validatedData['telephone'] ?? '');
-        $mobileNetwork = strip_tags($validatedData['mobilenetwork']);
-        $mobileNo = strip_tags($validatedData['mobileno']);
+        $telephoneRaw = strip_tags($validatedData['telephone'] ?? '');
+        $telephone = preg_replace('/\s+/', '', (string) $telephoneRaw);
+        $mobileNetwork = strip_tags($validatedData['mobilenetwork'] ?? '');
+        $mobileNo = strip_tags($validatedData['mobileno'] ?? '');
+        $mobileNumberInput = preg_replace('/\s+/', '', (string) ($validatedData['mobilenumber'] ?? ''));
         $email = strip_tags($validatedData['email']);
         $emailAddress = strip_tags($validatedData['emailaddress']);
         $principalBeneficiary = strip_tags($validatedData['principalbeneficiary'] ?? '');
@@ -895,7 +912,15 @@ class ClientController extends Controller
             $homeStreet = strip_tags($request->input('home_street', ''));
         }
 
-        $mobilenumber = '0' . $mobileNetwork . $mobileNo;
+        $mobilenumber = null;
+        if (!empty($mobileNumberInput)) {
+            $mobilenumber = $mobileNumberInput;
+            if (strlen($mobilenumber) === 10 && str_starts_with($mobilenumber, '9')) {
+                $mobilenumber = '0' . $mobilenumber;
+            }
+        } else if (!empty($mobileNetwork) && !empty($mobileNo)) {
+            $mobilenumber = '0' . $mobileNetwork . $mobileNo;
+        }
         $emailcomplete = $email . '@' . $emailAddress;
 
         $status = '1';
@@ -946,9 +971,8 @@ class ClientController extends Controller
                     $insertClientData = [
                         'contractnumber' => $contractNo,
                         'packageid' => $packageId,
-                        'packageprice' => $packagePrice,
                         'paymenttermid' => $termId,
-                        'paymenttermamount' => $termAmount,
+                        'paymenttermamount' => (float) preg_replace('/[^0-9.]/', '', (string) $termAmount),
                         'regionid' => $regionId,
                         'branchid' => $branchId,
                         'recruitedby' => $recruitedById,
@@ -974,8 +998,6 @@ class ClientController extends Controller
                         'emailaddress' => $emailcomplete,
                         'principalbeneficiaryname' => $principalBeneficiary,
                         'principalbeneficiaryage' => $principalBeneficiaryAge,
-                        'principalbeneficiaryrelation' => $principalBeneficiaryRelation,
-                        'principalbeneficiaryid_path' => $principalBeneficiaryIdPath,
                         'secondary1name' => $beneficiary1,
                         'secondary1age' => $beneficiary1Age,
                         'secondary2name' => $beneficiary2,
@@ -984,16 +1006,52 @@ class ClientController extends Controller
                         'secondary3age' => $beneficiary3Age,
                         'secondary4name' => $beneficiary4,
                         'secondary4age' => $beneficiary4Age,
-                        'homeregion' => $homeRegion,
-                        'homeprovince' => $homeProvince,
-                        'homecity' => $homeCity,
-                        'homebarangay' => $homeBarangay,
-                        'homezipcode' => $homeZipcode,
-                        'homestreet' => $homeStreet,
                         'status' => $status,
                         'remarks' => $remarks,
                         'fsacomsrem' => $fsaComsRem
                     ];
+
+                    Log::info('createClient tblclient schema check', [
+                        'db_connection' => DB::getDefaultConnection(),
+                        'db_database' => DB::connection()->getDatabaseName(),
+                        'tblclient_has_packageprice' => Schema::hasColumn('tblclient', 'packageprice') ? 1 : 0,
+                    ]);
+
+                    if (Schema::hasColumn('tblclient', 'principalbeneficiaryrelation')) {
+                        $insertClientData['principalbeneficiaryrelation'] = $principalBeneficiaryRelation;
+                    }
+
+                    if (Schema::hasColumn('tblclient', 'principalbeneficiaryid_path')) {
+                        $insertClientData['principalbeneficiaryid_path'] = $principalBeneficiaryIdPath;
+                    }
+
+                    if (Schema::hasColumn('tblclient', 'packageprice')) {
+                        $insertClientData['packageprice'] = (float) preg_replace('/[^0-9.]/', '', (string) $packagePrice);
+                    }
+
+                    if (Schema::hasColumn('tblclient', 'homeregion')) {
+                        $insertClientData['homeregion'] = $homeRegion;
+                    }
+
+                    if (Schema::hasColumn('tblclient', 'homeprovince')) {
+                        $insertClientData['homeprovince'] = $homeProvince;
+                    }
+
+                    if (Schema::hasColumn('tblclient', 'homecity')) {
+                        $insertClientData['homecity'] = $homeCity;
+                    }
+
+                    if (Schema::hasColumn('tblclient', 'homebarangay')) {
+                        $insertClientData['homebarangay'] = $homeBarangay;
+                    }
+
+                    if (Schema::hasColumn('tblclient', 'homezipcode')) {
+                        $insertClientData['homezipcode'] = $homeZipcode;
+                    }
+
+                    if (Schema::hasColumn('tblclient', 'homestreet')) {
+                        $insertClientData['homestreet'] = $homeStreet;
+                    }
 
                     $clientId = Client::insertGetId($insertClientData);
                     Log::channel('activity')->info('[StaffID] ' . session('user_id') . ' [Menu] Client ' . '[Action] Insert ' . '[Target] ' . $contractNo);
@@ -1018,7 +1076,7 @@ class ClientController extends Controller
                         'orno' => $orNo,
                         'clientid' => $clientId,
                         'orid' => $searchedOfficialReceiptId,
-                        'amountpaid' => $paymentAmount,
+                        'amountpaid' => (float) preg_replace('/[^0-9.]/', '', (string) $paymentAmount),
                         'installment' => $current_installment,
                         'comsmultiplier' => $comsMultiplier,
                         'date' => $paymentDate,
@@ -1030,16 +1088,51 @@ class ClientController extends Controller
                     Payment::insert($insertPaymentData);
                     Log::channel('activity')->info('[StaffID] ' . session('user_id') . ' [Menu] Client ' . '[Action] Insert Payment' . '[Target] ' . $clientId);
 
+                    // Check if request is AJAX
+                    if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') == 'XMLHttpRequest') {
+                        return response()->json([
+                            'success' => true,
+                            'message' => 'Client created successfully',
+                            'client_id' => $clientId,
+                            'redirect' => '/client'
+                        ]);
+                    }
+
                     return redirect('/client')->with('success', 'Added new client!');
                 } catch (\Exception $e) {
                     Log::error('Error creating client: ' . $e->getMessage());
                     Log::error($e->getTraceAsString());
+                    
+                    // Check if request is AJAX
+                    if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') == 'XMLHttpRequest') {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'An error occurred while creating the client: ' . $e->getMessage()
+                        ], 500);
+                    }
+                    
                     return redirect('/client')->with('error', 'An error occured while creating a new client: ' . $e->getMessage());
                 }
             } else {
+                // Check if request is AJAX
+                if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') == 'XMLHttpRequest') {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'O.R not available'
+                    ], 422);
+                }
+                
                 return redirect()->back()->with('duplicate', 'O.R not available.')->withInput();
             }
         } else {
+            // Check if request is AJAX
+            if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') == 'XMLHttpRequest') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Contract is not available or does not belong to the selected Region'
+                ], 422);
+            }
+            
             return redirect()->back()->with('duplicate', 'Contract is not available or does not belong to the selected Region.')->withInput();
         }
     }
@@ -1146,7 +1239,8 @@ class ClientController extends Controller
 
             $contractNo = strip_tags($validatedData['contractno']);
             $packageId = strip_tags($validatedData['package']);
-            $packagePrice = strip_tags($validatedData['packageprice']);
+            $packagePriceRaw = strip_tags($validatedData['packageprice']);
+            $packagePrice = (float) preg_replace('/[^0-9.]/', '', $packagePriceRaw);
             $termId = strip_tags($validatedData['paymentterm']);
             $termAmount = strip_tags($validatedData['termamount']);
             $regionId = strip_tags($validatedData['region']);
@@ -1247,9 +1341,8 @@ class ClientController extends Controller
                         $insertClientData = [
                             'contractnumber' => $contractNo,
                             'packageid' => $packageId,
-                            'packageprice' => $packagePrice,
                             'paymenttermid' => $termId,
-                            'paymenttermamount' => $termAmount,
+                            'paymenttermamount' => (float) preg_replace('/[^0-9.]/', '', (string) $termAmount),
                             'regionid' => $regionId,
                             'branchid' => $branchId,
                             'recruitedby' => $recruitedById,
@@ -1275,8 +1368,6 @@ class ClientController extends Controller
                             'emailaddress' => $emailcomplete,
                             'principalbeneficiaryname' => $principalBeneficiary,
                             'principalbeneficiaryage' => $principalBeneficiaryAge,
-                            'principalbeneficiaryrelation' => $principalBeneficiaryRelation,
-                            'principalbeneficiaryid_path' => $principalBeneficiaryIdPath,
                             'secondary1name' => $beneficiary1,
                             'secondary1age' => $beneficiary1Age,
                             'secondary2name' => $beneficiary2,
@@ -1290,6 +1381,18 @@ class ClientController extends Controller
                             'fsacomsrem' => $fsaComsRem,
                             'datecreated' => date("Y-m-d")
                         ];
+
+                        if (Schema::hasColumn('tblclient', 'principalbeneficiaryrelation')) {
+                            $insertClientData['principalbeneficiaryrelation'] = $principalBeneficiaryRelation;
+                        }
+
+                        if (Schema::hasColumn('tblclient', 'principalbeneficiaryid_path')) {
+                            $insertClientData['principalbeneficiaryid_path'] = $principalBeneficiaryIdPath;
+                        }
+
+                        if (Schema::hasColumn('tblclient', 'packageprice')) {
+                            $insertClientData['packageprice'] = (float) preg_replace('/[^0-9.]/', '', (string) $packagePrice);
+                        }
 
                         $clientId = Client::insertGetId($insertClientData);
                         Log::channel('activity')->info('[StaffID] ' . session('user_id') . ' [Menu] Transfer Client ' . '[Action] Insert ' . '[Target] ' . $contractNo);
@@ -1354,7 +1457,7 @@ class ClientController extends Controller
                             'orno' => $orNo,
                             'clientid' => $clientId,
                             'orid' => $searchedOfficialReceiptId,
-                            'amountpaid' => $paymentAmount,
+                            'amountpaid' => (float) preg_replace('/[^0-9.]/', '', (string) $paymentAmount),
                             'installment' => $current_installment,
                             'comsmultiplier' => $comsMultiplier,
                             'date' => $paymentDate,
@@ -1549,7 +1652,8 @@ class ClientController extends Controller
 
             $contractNo = strip_tags($validatedData['contractno']);
             $packageId = strip_tags($validatedData['package']);
-            $packagePrice = strip_tags($validatedData['packageprice']);
+            $packagePriceRaw = strip_tags($validatedData['packageprice']);
+            $packagePrice = (float) preg_replace('/[^0-9.]/', '', $packagePriceRaw);
             $termId = strip_tags($validatedData['paymentterm']);
             $termAmount = strip_tags($validatedData['termamount']);
             $regionId = strip_tags($validatedData['region']);
@@ -1732,9 +1836,8 @@ class ClientController extends Controller
                         $updateClientData = [
                             'contractnumber' => $contractNo,
                             'packageid' => $packageId,
-                            'packageprice' => $packagePrice,
                             'paymenttermid' => $termId,
-                            'paymenttermamount' => $termAmount,
+                            'paymenttermamount' => (float) preg_replace('/[^0-9.]/', '', (string) $termAmount),
                             'regionid' => $regionId,
                             'branchid' => $branchId,
                             'recruitedby' => $recruitedById,
@@ -1760,7 +1863,6 @@ class ClientController extends Controller
                             'emailaddress' => $emailcomplete,
                             'principalbeneficiaryname' => $principalBeneficiary,
                             'principalbeneficiaryage' => $principalBeneficiaryAge,
-                            'principalbeneficiaryrelation' => $principalBeneficiaryRelation,
                             'secondary1name' => $beneficiary1,
                             'secondary1age' => $beneficiary1Age,
                             'secondary2name' => $beneficiary2,
@@ -1769,17 +1871,43 @@ class ClientController extends Controller
                             'secondary3age' => $beneficiary3Age,
                             'secondary4name' => $beneficiary4,
                             'secondary4age' => $beneficiary4Age,
-                            'homeregion' => $homeRegion,
-                            'homeprovince' => $homeProvince,
-                            'homecity' => $homeCity,
-                            'homebarangay' => $homeBarangay,
-                            'homezipcode' => $homeZipcode,
-                            'homestreet' => $homeStreet,
                             'datecreated' => date("Y-m-d")
                         ];
 
-                        if ($principalBeneficiaryIdPath) {
+                        if (Schema::hasColumn('tblclient', 'principalbeneficiaryrelation')) {
+                            $updateClientData['principalbeneficiaryrelation'] = $principalBeneficiaryRelation;
+                        }
+
+                        if ($principalBeneficiaryIdPath && Schema::hasColumn('tblclient', 'principalbeneficiaryid_path')) {
                             $updateClientData['principalbeneficiaryid_path'] = $principalBeneficiaryIdPath;
+                        }
+
+                        if (Schema::hasColumn('tblclient', 'packageprice')) {
+                            $updateClientData['packageprice'] = (float) preg_replace('/[^0-9.]/', '', (string) $packagePrice);
+                        }
+
+                        if (Schema::hasColumn('tblclient', 'homeregion')) {
+                            $updateClientData['homeregion'] = $homeRegion;
+                        }
+
+                        if (Schema::hasColumn('tblclient', 'homeprovince')) {
+                            $updateClientData['homeprovince'] = $homeProvince;
+                        }
+
+                        if (Schema::hasColumn('tblclient', 'homecity')) {
+                            $updateClientData['homecity'] = $homeCity;
+                        }
+
+                        if (Schema::hasColumn('tblclient', 'homebarangay')) {
+                            $updateClientData['homebarangay'] = $homeBarangay;
+                        }
+
+                        if (Schema::hasColumn('tblclient', 'homezipcode')) {
+                            $updateClientData['homezipcode'] = $homeZipcode;
+                        }
+
+                        if (Schema::hasColumn('tblclient', 'homestreet')) {
+                            $updateClientData['homestreet'] = $homeStreet;
                         }
 
                         Log::info('Updating client record...');
@@ -1984,7 +2112,8 @@ class ClientController extends Controller
 
             $contractNo = strip_tags($validatedData['contractno']);
             $packageId = strip_tags($validatedData['package']);
-            $packagePrice = strip_tags($validatedData['packageprice']);
+            $packagePriceRaw = strip_tags($validatedData['packageprice']);
+            $packagePrice = (float) preg_replace('/[^0-9.]/', '', $packagePriceRaw);
             $termId = strip_tags($validatedData['paymentterm']);
             $termAmount = strip_tags($validatedData['termamount']);
             $regionId = strip_tags($validatedData['region']);
@@ -2076,7 +2205,6 @@ class ClientController extends Controller
                     $updateClientData = [
                         'contractnumber' => $contractNo,
                         'packageid' => $packageId,
-                        'packageprice' => $packagePrice,
                         'paymenttermid' => $termId,
                         'paymenttermamount' => $termAmount,
                         'regionid' => $regionId,
@@ -2112,14 +2240,44 @@ class ClientController extends Controller
                         'secondary3age' => $beneficiary3Age,
                         'secondary4name' => $beneficiary4,
                         'secondary4age' => $beneficiary4Age,
-                        'homeregion' => $homeRegion,
-                        'homeprovince' => $homeProvince,
-                        'homecity' => $homeCity,
-                        'homebarangay' => $homeBarangay,
-                        'homezipcode' => $homeZipcode,
-                        'homestreet' => $homeStreet,
                         'appliedchangemode' => $appliedChangeMode
                     ];
+
+                    if (Schema::hasColumn('tblclient', 'principalbeneficiaryrelation')) {
+                        $updateClientData['principalbeneficiaryrelation'] = $principalBeneficiaryRelation;
+                    }
+
+                    if ($principalBeneficiaryIdPath && Schema::hasColumn('tblclient', 'principalbeneficiaryid_path')) {
+                        $updateClientData['principalbeneficiaryid_path'] = $principalBeneficiaryIdPath;
+                    }
+
+                    if (Schema::hasColumn('tblclient', 'packageprice')) {
+                        $updateClientData['packageprice'] = $packagePrice;
+                    }
+
+                    if (Schema::hasColumn('tblclient', 'homeregion')) {
+                        $updateClientData['homeregion'] = $homeRegion;
+                    }
+
+                    if (Schema::hasColumn('tblclient', 'homeprovince')) {
+                        $updateClientData['homeprovince'] = $homeProvince;
+                    }
+
+                    if (Schema::hasColumn('tblclient', 'homecity')) {
+                        $updateClientData['homecity'] = $homeCity;
+                    }
+
+                    if (Schema::hasColumn('tblclient', 'homebarangay')) {
+                        $updateClientData['homebarangay'] = $homeBarangay;
+                    }
+
+                    if (Schema::hasColumn('tblclient', 'homezipcode')) {
+                        $updateClientData['homezipcode'] = $homeZipcode;
+                    }
+
+                    if (Schema::hasColumn('tblclient', 'homestreet')) {
+                        $updateClientData['homestreet'] = $homeStreet;
+                    }
 
                     Client::where('id', $client->Id)->update($updateClientData);
                     Log::channel('activity')->info('[StaffID] ' . session('user_id') . ' [Menu] Client ' . '[Action] Update ' . '[Target] ' . $client->Id);
@@ -3882,7 +4040,6 @@ class ClientController extends Controller
                     $insertClientData = [
                         'contractnumber' => $contractNo,
                         'packageid' => $packageId,
-                        'packageprice' => $packagePrice,
                         'paymenttermid' => $termId,
                         'paymenttermamount' => $termAmount,
                         'regionid' => $regionId,
@@ -3923,6 +4080,10 @@ class ClientController extends Controller
                         'fsacomsrem' => $fsaComsRem,
                         'datecreated' => date("Y-m-d")
                     ];
+
+                    if (Schema::hasColumn('tblclient', 'packageprice')) {
+                        $insertClientData['packageprice'] = $packagePrice;
+                    }
 
                     $clientId = Client::insertGetId($insertClientData);
 
@@ -4072,7 +4233,6 @@ class ClientController extends Controller
                     $updateClientData = [
                         'contractnumber' => $contractNo,
                         'packageid' => $packageId,
-                        'packageprice' => $packagePrice,
                         'paymenttermid' => $termId,
                         'paymenttermamount' => $termAmount,
                         'regionid' => $regionId,
@@ -4109,6 +4269,10 @@ class ClientController extends Controller
                         'secondary4name' => $beneficiary4,
                         'secondary4age' => $beneficiary4Age
                     ];
+
+                    if (Schema::hasColumn('tblclient', 'packageprice')) {
+                        $updateClientData['packageprice'] = $packagePrice;
+                    }
 
                     Client::where('id', $client_id)->update($updateClientData);
 

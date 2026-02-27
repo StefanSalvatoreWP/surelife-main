@@ -8,6 +8,11 @@ $(document).ready(function() {
     
     // Initialize address cascading system
     initializeAddressCascading();
+
+    function setLoadedState($select) {
+        $select.prop('disabled', false);
+        $select.removeAttr('data-loading');
+    }
     
     function initializeAddressCascading() {
         // Get stored values for form reloading - use hidden inputs for reliable access
@@ -166,12 +171,16 @@ $(document).ready(function() {
                         loadCities($provinceSelect.val(), selectedCityFromHidden);
                     }
                 }
+
+                setLoadedState($provinceSelect);
             },
             error: function(xhr, status, error) {
                 console.error('Error loading provinces:', error);
                 $provinceSelect.empty();
                 $provinceSelect.append('<option value="">Error loading provinces</option>');
                 showAddressError('Failed to load provinces. Please try again.');
+
+                setLoadedState($provinceSelect);
             }
         });
     }
@@ -243,12 +252,16 @@ $(document).ready(function() {
                         loadBarangays($citySelect.val(), selectedBarangayFromHidden);
                     }
                 }
+
+                setLoadedState($citySelect);
             },
             error: function(xhr, status, error) {
                 console.error('Error loading cities:', error);
                 $citySelect.empty();
                 $citySelect.append('<option value="">Error loading cities</option>');
                 showAddressError('Failed to load cities. Please try again.');
+
+                setLoadedState($citySelect);
             }
         });
     }
@@ -314,12 +327,16 @@ $(document).ready(function() {
                         console.log('Barangay not found:', selectedBarangay, '- leaving dropdown unselected');
                     }
                 }
+
+                setLoadedState($barangaySelect);
             },
             error: function(xhr, status, error) {
                 console.error('Error loading barangays:', error);
                 $barangaySelect.empty();
                 $barangaySelect.append('<option value="">Error loading barangays</option>');
                 showAddressError('Failed to load barangays. Please try again.');
+
+                setLoadedState($barangaySelect);
             }
         });
     }
@@ -378,11 +395,8 @@ $(document).ready(function() {
     function setLoadingState($select, message) {
         $select.empty().append(`<option value="">${message}</option>`);
         $select.prop('disabled', true);
-        
-        // Re-enable after a short delay
-        setTimeout(() => {
-            $select.prop('disabled', false);
-        }, 500);
+
+        $select.attr('data-loading', '1');
     }
     
     // Helper function to show error messages
@@ -454,6 +468,27 @@ $(document).ready(function() {
     
     // Add form validation on submit
     $('#clientForm').on('submit', function(e) {
+        const $citySelect = $('#addressCity');
+        const $barangaySelect = $('#addressBarangay');
+
+        const cityIsLoading = $citySelect.prop('disabled') || $citySelect.attr('data-loading') === '1';
+        const barangayIsLoading = $barangaySelect.prop('disabled') || $barangaySelect.attr('data-loading') === '1';
+
+        if (cityIsLoading || barangayIsLoading) {
+            e.preventDefault();
+            showAddressError('Please wait for City/Barangay to finish loading before submitting.');
+
+            const $addressInfo = $('.address-information');
+            const offset = $addressInfo.length ? $addressInfo.offset() : null;
+            if (offset && typeof offset.top === 'number') {
+                $('html, body').animate({
+                    scrollTop: offset.top - 100
+                }, 500);
+            }
+
+            return false;
+        }
+
         const validation = validateAddressSelection();
         
         if (!validation.isValid) {
@@ -461,9 +496,13 @@ $(document).ready(function() {
             showAddressError('Please complete all address fields: ' + validation.errors.join(', '));
             
             // Scroll to address section
-            $('html, body').animate({
-                scrollTop: $('.address-information').offset().top - 100
-            }, 500);
+            const $addressInfo = $('.address-information');
+            const offset = $addressInfo.length ? $addressInfo.offset() : null;
+            if (offset && typeof offset.top === 'number') {
+                $('html, body').animate({
+                    scrollTop: offset.top - 100
+                }, 500);
+            }
             
             return false;
         }

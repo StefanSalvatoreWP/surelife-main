@@ -1,5 +1,6 @@
 <!-- 2023 SilverDust) S. Maceren --> 
-<!-- UPDATED: Force recompile --> 
+<!-- UPDATED: Force recompile - 2026-02-27 22:15:00 -->
+<!-- Cache-busting: Timestamp updated to force browser reload --> 
 @extends('layouts.main')
 
 @section('content')
@@ -16,6 +17,20 @@
                 <p class="text-red-700 font-medium">{{ session('duplicate') }}</p>
             </div>
         @endif
+
+        <!-- Swift-Style Modal -->
+        <div id="swiftModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity duration-300">
+            <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform scale-100 transition-transform duration-300 overflow-hidden">
+                <div id="swiftModalHeader" class="px-6 pt-6 pb-4 text-center">
+                    <div id="swiftModalIcon" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"></div>
+                    <h3 id="swiftModalTitle" class="text-xl font-semibold text-gray-900 mb-2"></h3>
+                </div>
+                <div id="swiftModalBody" class="px-6 pb-6 text-center">
+                    <p id="swiftModalMessage" class="text-gray-600 text-sm leading-relaxed"></p>
+                </div>
+                <div id="swiftModalActions" class="px-6 pb-6 flex flex-col gap-2"></div>
+            </div>
+        </div>
 
         <!-- Return Button -->
         <div class="mb-6">
@@ -75,7 +90,7 @@
                                 <div class="searchable-dropdown" id="contractNoWrapper">
                                     <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" 
                                            id="contractNoSearch" placeholder="Type or select Contract No." autocomplete="off" value="{{ $prevContractNo }}" />
-                                    <input type="hidden" id="contractNo" name="contractno" value="{{ $prevContractNo }}" />
+                                    <input type="hidden" id="contractno" name="contractno" value="{{ $prevContractNo }}" />
                                     <div class="dropdown-list" id="contractNoList"></div>
                                 </div>
                                 <input type="hidden" id="prevContractNo" value="{{ $prevContractNo }}" />
@@ -361,9 +376,33 @@
                             <div>
                                 @php
                                     $prevReligion = old('religion');
+                                    $prevReligionOther = old('religion_other');
                                 @endphp
                                 <label for="religion" class="block text-sm font-medium text-gray-700 mb-2">Religion</label>
-                                <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="religion" name="religion" value="{{ $prevReligion }}" />
+                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="religion" name="religion">
+                                    <option value="">Select Religion</option>
+                                    <option value="Roman Catholic" {{ $prevReligion === 'Roman Catholic' ? 'selected' : '' }}>Roman Catholic</option>
+                                    <option value="Islam" {{ $prevReligion === 'Islam' ? 'selected' : '' }}>Islam</option>
+                                    <option value="Iglesia ni Cristo" {{ $prevReligion === 'Iglesia ni Cristo' ? 'selected' : '' }}>Iglesia ni Cristo</option>
+                                    <option value="Protestant" {{ $prevReligion === 'Protestant' ? 'selected' : '' }}>Protestant</option>
+                                    <option value="Born Again" {{ $prevReligion === 'Born Again' ? 'selected' : '' }}>Born Again</option>
+                                    <option value="Seventh-day Adventist" {{ $prevReligion === 'Seventh-day Adventist' ? 'selected' : '' }}>Seventh-day Adventist</option>
+                                    <option value="Jehovah's Witness" {{ $prevReligion === 'Jehovah\'s Witness' ? 'selected' : '' }}>Jehovah's Witness</option>
+                                    <option value="Buddhist" {{ $prevReligion === 'Buddhist' ? 'selected' : '' }}>Buddhist</option>
+                                    <option value="Hindu" {{ $prevReligion === 'Hindu' ? 'selected' : '' }}>Hindu</option>
+                                    <option value="Other" {{ $prevReligion === 'Other' ? 'selected' : '' }}>Other (please specify)</option>
+                                </select>
+                                @error('religion')
+                                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                                
+                                <!-- Custom religion input (shown when "Other" is selected) -->
+                                <div id="religionOtherDiv" class="mt-2 {{ $prevReligion !== 'Other' ? 'hidden' : '' }}">
+                                    <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="religionOther" name="religion_other" placeholder="Please specify your religion" value="{{ $prevReligionOther }}" />
+                                    @error('religion_other')
+                                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
                             </div>
                             <div>
                                 @php
@@ -613,21 +652,18 @@
                                     }
                                 @endphp
                                 <input type="tel" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="mobileNumber" name="mobilenumber" placeholder="912 345 6789" maxlength="12" value="{{ $fullMobileNumber }}" inputmode="numeric" onkeypress="var c=event.charCode;return c===0||(c>=48&&c<=57);" oninput="formatMobile(this);" />
-                                @error('mobilenumber')
-                                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                                @enderror
                             </div>
                             <div>
                                 <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                                <div class="flex gap-2">
+                                <div class="flex flex-wrap items-center gap-2">
                                     @php 
                                         $selectedEmail = old('email'); 
                                         $selectedEmailAddress = old('emailaddress');
                                         $customEmailDomain = old('customemaildomain');
                                     @endphp
-                                    <input type="text" class="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="email" name="email" maxlength="30" value="{{ $selectedEmail }}" placeholder="juan.santos" />
-                                    <span class="flex items-center px-3 border border-gray-300 bg-gray-50 rounded-lg text-gray-600">@</span>
-                                    <select class="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="emailDomainSelect" name="emailaddress" onchange="toggleCustomEmailDomain()">
+                                    <input type="text" class="flex-1 min-w-[120px] px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="email" name="email" maxlength="30" value="{{ $selectedEmail }}" placeholder="juan.santos" />
+                                    <span class="flex items-center px-2 border border-gray-300 bg-gray-50 rounded-lg text-gray-600 whitespace-nowrap text-sm">@</span>
+                                    <select class="flex-1 min-w-[100px] px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 text-sm" id="emailDomainSelect" name="emailaddress" onchange="toggleCustomEmailDomain()">
                                         @foreach($emails as $email)
                                             <option value="{{ $email->Email }}" {{ $selectedEmailAddress == $email->Email ? 'selected' : '' }}>
                                                 {{ $email->Email }}
@@ -649,6 +685,7 @@
                         </div>
                     </div>
                 </div>
+
             
             <!-- BENEFICIARIES Section -->
             <div class="bg-white rounded-xl shadow-lg mb-6">
@@ -856,7 +893,7 @@
 
             // Required fields configuration
             const requiredFields = [
-                { id: 'contractNo', name: 'Contract No.', section: 'CONTRACT' },
+                { id: 'contractno', name: 'Contract No.', section: 'CONTRACT' },
                 { id: 'package', name: 'Package', section: 'CONTRACT' },
                 { id: 'paymentTerm', name: 'Payment Term', section: 'CONTRACT' },
                 { id: 'region', name: 'Region', section: 'CONTRACT' },
@@ -874,8 +911,8 @@
                 { id: 'birthDate', name: 'Birth Date', section: 'PERSONAL' },
                 { id: 'addressProvince', name: 'Province', section: 'PERSONAL' },
                 { id: 'addressCity', name: 'City', section: 'PERSONAL' },
-                { id: 'addressBarangay', name: 'Barangay', section: 'PERSONAL' },
-                { id: 'mobileNumber', name: 'Mobile Number', section: 'CONTACT' }
+                { id: 'addressBarangay', name: 'Barangay', section: 'PERSONAL' }
+                // mobileNumber removed from required fields - handled by contact validation
             ];
 
             // Form submission handler
@@ -885,6 +922,14 @@
                 console.log('Form element:', form);
                 console.log('Form action:', form.action);
                 console.log('Form method:', form.method);
+                
+                // Validate contact information first
+                const contactValidation = validateContactInfo();
+                if (!contactValidation.isValid) {
+                    e.preventDefault();
+                    showSwiftModal('Contact Information Required', contactValidation.errorMessage, 'warning');
+                    return false;
+                }
                 
                 const errors = [];
                 const formData = new FormData(form);
@@ -900,8 +945,8 @@
 
                 console.log('\n--- OR VALIDATION FIELDS ANALYSIS ---');
                 const contractNo = document.getElementById('contractno')?.value;
-                const orSeriesCode = document.getElementById('orseriescode')?.value;
-                const orNumber = document.getElementById('ornumber')?.value;
+                const orSeriesCode = document.getElementById('orSeriesCode')?.value;
+                const orNumber = document.getElementById('orNumber')?.value;
                 const paymentType = document.querySelector('input[name="downpaymenttype"]:checked')?.value;
                 const region = document.getElementById('region')?.value;
                 const branch = document.getElementById('branch')?.value;
@@ -993,7 +1038,7 @@
                         // Add error styling
                         element.classList.add('border-red-500', 'ring-2', 'ring-red-500');
                     } else {
-                        console.log(`  ✓ VALIDATION PASSED`);
+                        console.log(`  VALIDATION PASSED`);
                     }
                 });
 
@@ -1004,11 +1049,16 @@
                     console.log(`\n--- Mobile Number Validation ---`);
                     console.log(`  Value: "${mobileValue}"`);
                     console.log(`  Length: ${mobileValue.length}`);
-                    console.log(`  Starts with 9: ${mobileValue.charAt(0) === '9'}`);
-                    console.log(`  Is all digits: ${/^\d+$/.test(mobileValue)}`);
-                    console.log(`  Regex test (^9\\d{9}$): ${/^9\d{9}$/.test(mobileValue)}`);
                     
-                    if (mobileValue && (mobileValue.length !== 10 || !/^9\d{9}$/.test(mobileValue))) {
+                    // Remove spaces for validation
+                    const cleanMobileValue = mobileValue.replace(/\s/g, '');
+                    console.log(`  Cleaned Value: "${cleanMobileValue}"`);
+                    console.log(`  Cleaned Length: ${cleanMobileValue.length}`);
+                    console.log(`  Starts with 9: ${cleanMobileValue.charAt(0) === '9'}`);
+                    console.log(`  Is all digits: ${/^\d+$/.test(cleanMobileValue)}`);
+                    console.log(`  Regex test (^9\\d{9}$): ${/^9\d{9}$/.test(cleanMobileValue)}`);
+                    
+                    if (mobileValue && (cleanMobileValue.length !== 10 || !/^9\d{9}$/.test(cleanMobileValue))) {
                         errors.push({
                             field: 'Mobile Number',
                             section: 'CONTACT',
@@ -1017,9 +1067,9 @@
                             value: mobileValue
                         });
                         mobileNumber.classList.add('border-red-500', 'ring-2', 'ring-red-500');
-                        console.log(`  ❌ INVALID FORMAT`);
+                        console.log(`  INVALID FORMAT`);
                     } else if (mobileValue) {
-                        console.log(`  ✓ VALID FORMAT`);
+                        console.log(`  VALID FORMAT`);
                     }
                 }
 
@@ -1048,9 +1098,25 @@
                     console.log('\n✓✓✓ ALL VALIDATIONS PASSED ✓✓✓');
                     console.log('Form is being submitted to:', form.action);
                     
+                    // Show loading state
+                    const submitBtn = document.getElementById('submitBtn');
+                    const originalText = submitBtn.innerHTML;
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<span class="flex items-center justify-center"><svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Submitting...</span>';
+
+                    // Normalize key fields before building FormData for submission
+                    const mobileNumberEl = document.getElementById('mobileNumber');
+                    if (mobileNumberEl && mobileNumberEl.value) {
+                        mobileNumberEl.value = mobileNumberEl.value.replace(/\s/g, '');
+                    }
+                    if (typeof normalizeCustomEmail === 'function') {
+                        normalizeCustomEmail();
+                    }
+                    
                     // Convert FormData to JSON object
                     const formDataObj = {};
-                    for (let [key, value] of formData.entries()) {
+                    const submitFormData = new FormData(form);
+                    for (let [key, value] of submitFormData.entries()) {
                         formDataObj[key] = value;
                     }
                     
@@ -1059,18 +1125,186 @@
                     
                     console.log('\n=== FORM DATA (LIST FORMAT) ===');
                     let fieldCount = 0;
-                    for (let [key, value] of formData.entries()) {
+                    for (let [key, value] of submitFormData.entries()) {
                         fieldCount++;
                         console.log(`${fieldCount}. ${key}: "${value}"`);
                     }
                     console.log(`\nTotal fields being submitted: ${fieldCount}`);
                     console.log('=== FORM WILL NOW SUBMIT ===\n');
                     
-                    // TEMPORARY: Uncomment the line below to PREVENT submission and keep console logs visible
-                    // e.preventDefault(); 
-                    // console.log('⚠️ FORM SUBMISSION PREVENTED FOR DEBUGGING');
+                    // Handle form submission with fetch for better error handling
+                    e.preventDefault();
                     
-                    // Form will submit naturally here
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: submitFormData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || document.querySelector('input[name="_token"]')?.value
+                        }
+                    })
+                    .then(response => {
+                        console.log('Response status:', response.status);
+                        console.log('Response headers:', response.headers.get('content-type'));
+                        
+                        // Check content-type before parsing
+                        const contentType = response.headers.get('content-type');
+                        
+                        if (contentType && contentType.includes('application/json')) {
+                            return response.json().then(data => {
+                                if (!response.ok) {
+                                    // Handle validation errors from JSON response
+                                    throw { data: data, status: response.status };
+                                }
+                                return data;
+                            });
+                        } else {
+                            // Server returned HTML (likely validation redirect or error)
+                            return response.text().then(text => {
+                                console.log('Server returned HTML:', text.substring(0, 500));
+                                throw new Error('Server returned HTML instead of JSON. This usually means a validation error or session issue.');
+                            });
+                        }
+                    })
+                    .then(data => {
+                        // Success
+                        clearFormData();
+                        showSwiftModal('Success!', 'Client information submitted successfully!\n\nYour submission has been received and is now pending approval.', 'success');
+                        
+                        // Optionally redirect to a success page
+                        if (data.redirect) {
+                            window.location.href = data.redirect;
+                        } else {
+                            // Reset form or redirect as needed
+                            form.reset();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Submission error:', error);
+                        
+                        let errorMessage = 'An unexpected error occurred.';
+                        let firstErrorField = null;
+                        
+                        // Handle different error types
+                        if (error.data) {
+                            // Server returned JSON with validation errors
+                            if (error.data.message) {
+                                errorMessage = error.data.message;
+                            } else if (error.data.errors) {
+                                // Laravel validation errors
+                                const fieldLabels = {
+                                    contractno: 'Contract No',
+                                    package: 'Package',
+                                    packageprice: 'Package Price',
+                                    paymentterm: 'Payment Term',
+                                    termamount: 'Term Amount',
+                                    region: 'Region',
+                                    branch: 'Branch',
+                                    recruitedby: 'Recruited By',
+                                    downpaymenttype: 'Downpayment Type',
+                                    paymentamount: 'Payment Amount',
+                                    orseriescode: 'OR Series Code',
+                                    ornumber: 'OR Number',
+                                    paymentdate: 'Payment Date',
+                                    lastname: 'Last Name',
+                                    firstname: 'First Name',
+                                    gender: 'Gender',
+                                    birthdate: 'Birth Date',
+                                    age: 'Age',
+                                    bestplacetocollect: 'Best Place To Collect',
+                                    besttimetocollect: 'Best Time To Collect',
+                                    province: 'Province',
+                                    city: 'City',
+                                    barangay: 'Barangay',
+                                    mobilenumber: 'Mobile Number',
+                                    mobilenetwork: 'Mobile Network',
+                                    mobileno: 'Mobile No',
+                                    email: 'Email',
+                                    emailaddress: 'Email Domain',
+                                    customemaildomain: 'Custom Email Domain',
+                                };
+
+                                const lines = [];
+                                Object.entries(error.data.errors).forEach(([field, messages]) => {
+                                    if (!firstErrorField) firstErrorField = field;
+                                    const label = fieldLabels[field] || field;
+                                    (messages || []).forEach(msg => {
+                                        lines.push(`${label}: ${msg}`);
+                                    });
+                                });
+
+                                errorMessage = lines.length
+                                    ? 'Validation errors:\n' + lines.join('\n')
+                                    : 'Validation failed.';
+                            }
+                        } else if (error.message) {
+                            if (error.message.includes('Unexpected token') || error.message.includes('is not valid JSON')) {
+                                errorMessage = 'The server returned an unexpected response. Please try again or contact support.';
+                            } else if (error.message.includes('HTML instead of JSON')) {
+                                errorMessage = 'Session expired or validation failed. Please refresh the page and try again.';
+                            } else {
+                                errorMessage = error.message;
+                            }
+                        }
+                        
+                        showSwiftModal('Submission Failed', 
+                            'Please check your input and try again.\n\n' + errorMessage, 
+                            'error');
+
+                        if (firstErrorField) {
+                            const fieldSelectors = {
+                                contractno: '#contractno',
+                                package: '#package',
+                                packageprice: '#packagePrice',
+                                paymentterm: '#paymentTerm',
+                                termamount: '#termAmount',
+                                region: '#region',
+                                branch: '#branch',
+                                recruitedby: '#recruitedBy',
+                                downpaymenttype: '#downpaymentType',
+                                paymentamount: '#paymentAmount',
+                                orseriescode: '#orSeriesCode',
+                                ornumber: '#orNumber',
+                                paymentdate: '#paymentDate',
+                                lastname: '#lastName',
+                                firstname: '#firstName',
+                                gender: '#gender',
+                                birthdate: '#birthDate',
+                                age: '#age',
+                                bestplacetocollect: '#bestPlaceToCollect',
+                                besttimetocollect: '#bestTimeToCollect',
+                                province: '#addressProvince',
+                                city: '#addressCity',
+                                barangay: '#addressBarangay',
+                                mobilenumber: '#mobileNumber',
+                                email: '#email',
+                                emailaddress: '#emailDomainSelect',
+                                customemaildomain: '#customEmailDomain',
+                            };
+
+                            const selector = fieldSelectors[firstErrorField];
+                            const el = selector ? document.querySelector(selector) : null;
+                            if (el) {
+                                el.classList.add('border-red-500', 'ring-2', 'ring-red-500');
+                                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                setTimeout(() => {
+                                    try { el.focus(); } catch (e) {}
+                                }, 500);
+                            }
+                        }
+                        
+                        // Restore button state
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalText;
+                    })
+                    .finally(() => {
+                        // Restore button state if not redirected
+                        setTimeout(() => {
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = originalText;
+                        }, 2000);
+                    });
                 }
             });
 
@@ -1153,6 +1387,64 @@
             customDomainInput.value = domainPart;
         }
 
+        // Swift-Style Modal Functions
+        function showSwiftModal(title, message, type = 'error', buttons = []) {
+            const modal = document.getElementById('swiftModal');
+            const iconDiv = document.getElementById('swiftModalIcon');
+            const titleEl = document.getElementById('swiftModalTitle');
+            const messageEl = document.getElementById('swiftModalMessage');
+            const actionsEl = document.getElementById('swiftModalActions');
+
+            // Set icon based on type
+            const icons = {
+                error: `<svg class="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>`,
+                success: `<svg class="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>`,
+                warning: `<svg class="w-10 h-10 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>`,
+                info: `<svg class="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>`
+            };
+
+            iconDiv.innerHTML = icons[type] || icons.error;
+            titleEl.textContent = title;
+            messageEl.textContent = message;
+
+            // Default OK button if no custom buttons provided
+            if (buttons.length === 0) {
+                actionsEl.innerHTML = `
+                    <button onclick="hideSwiftModal()" class="w-full py-3 px-6 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold rounded-xl transition duration-200">
+                        OK
+                    </button>
+                `;
+            } else {
+                actionsEl.innerHTML = buttons.map(btn => `
+                    <button onclick="${btn.action}; hideSwiftModal();" class="w-full py-3 px-6 ${btn.class} font-semibold rounded-xl transition duration-200">
+                        ${btn.text}
+                    </button>
+                `).join('');
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function hideSwiftModal() {
+            const modal = document.getElementById('swiftModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // Close modal on backdrop click
+        document.getElementById('swiftModal')?.addEventListener('click', function(e) {
+            if (e.target === this) hideSwiftModal();
+        });
+
         // Enhanced email domain event listeners
         document.addEventListener('DOMContentLoaded', function () {
             const emailDomainSelect = document.getElementById('emailDomainSelect');
@@ -1187,11 +1479,17 @@
                 }
 
                 _setupEvents() {
+                    // Guard against null elements
+                    if (!this.searchInput || !this.hiddenInput || !this.wrapper || !this.list) {
+                        console.warn('⚠️ [SearchableDropdown] Required elements not found, skipping event setup');
+                        return;
+                    }
+                    
                     // Open on focus - clear the search text so all items show
                     this.searchInput.addEventListener('focus', () => {
-                        console.log(`🔍 [Dropdown Focus] ${this.hiddenInput.id} | Current Value: ${this.hiddenInput.value}`);
+                        console.log(`🔍 [Dropdown Focus] ${this.hiddenInput?.id || 'unknown'} | Current Value: ${this.hiddenInput?.value || ''}`);
                         // If a value was previously selected, clear the text to show all options
-                        if (this.hiddenInput.value) {
+                        if (this.hiddenInput?.value) {
                             this.searchInput.value = '';
                         }
                         this.wrapper.classList.add('open');
@@ -1201,13 +1499,13 @@
                     // On blur, restore selected value text if user didn't pick a new one
                     this.searchInput.addEventListener('blur', () => {
                         setTimeout(() => {
-                            if (!this.wrapper.classList.contains('open')) {
-                                const currentValue = this.hiddenInput.value;
+                            if (!this.wrapper?.classList?.contains('open')) {
+                                const currentValue = this.hiddenInput?.value;
                                 if (currentValue) {
                                     const item = this.items.find(i => String(i.value) === String(currentValue));
                                     if (item) {
                                         this.searchInput.value = item.label;
-                                        console.log(`🔄 [Dropdown Blur] Restored label for ${this.hiddenInput.id}: ${item.label}`);
+                                        console.log(`🔄 [Dropdown Blur] Restored label for ${this.hiddenInput?.id || 'unknown'}: ${item.label}`);
                                     }
                                 } else {
                                     this.searchInput.value = '';
@@ -1220,7 +1518,7 @@
                     // Only clear it if the user explicitly clears the search input (optional)
                     // The hidden value should only change when an item is CLICKED
                     this.searchInput.addEventListener('input', () => {
-                        console.log(`⌨️ [Dropdown Input] ${this.hiddenInput.id} | Search: ${this.searchInput.value}`);
+                        console.log(`⌨️ [Dropdown Input] ${this.hiddenInput?.id || 'unknown'} | Search: ${this.searchInput.value}`);
                         this._render(this.searchInput.value);
                     });
 
@@ -1239,18 +1537,20 @@
                 }
 
                 setLoading() {
-                    this.list.innerHTML = '<div class="dropdown-item-loading">Loading...</div>';
-                    this.wrapper.classList.add('open');
+                    if (this.list) this.list.innerHTML = '<div class="dropdown-item-loading">Loading...</div>';
+                    if (this.wrapper) this.wrapper.classList.add('open');
                 }
 
                 setValue(val) {
+                    if (!this.hiddenInput || !this.searchInput) return;
                     this.hiddenInput.value = val || '';
                     const item = this.items.find(i => String(i.value) === String(val));
                     if (item) {
                         this.searchInput.value = item.label;
+                        console.log(`✅ [Dropdown] Set value for ${this.hiddenInput?.id || 'unknown'}: "${item.label}" -> hidden field: "${val}"`);
                     } else if (val && this.items.length > 0) {
                         // Items are loaded but value not found — clear to avoid stale display
-                        console.warn(`⚠️ [Dropdown] Value "${val}" not found in items list for ${this.hiddenInput.id}.`);
+                        console.warn(`⚠️ [Dropdown] Value "${val}" not found in items list for ${this.hiddenInput?.id || 'unknown'}.`);
                         this.searchInput.value = '';
                         this.hiddenInput.value = '';
                     }
@@ -1258,13 +1558,14 @@
                 }
 
                 clear() {
-                    this.hiddenInput.value = '';
-                    this.searchInput.value = '';
+                    if (this.hiddenInput) this.hiddenInput.value = '';
+                    if (this.searchInput) this.searchInput.value = '';
                     this.items = [];
-                    this.list.innerHTML = '';
+                    if (this.list) this.list.innerHTML = '';
                 }
 
                 _render(filter) {
+                    if (!this.list) return;
                     const q = (filter || '').toLowerCase();
                     const filtered = this.items.filter(i => i.label.toLowerCase().includes(q));
                     this.list.innerHTML = '';
@@ -1285,9 +1586,10 @@
                         div.innerHTML = html;
 
                         div.addEventListener('click', () => {
-                            this.searchInput.value = item.label;
-                            this.hiddenInput.value = item.value;
-                            this.wrapper.classList.remove('open');
+                            if (this.searchInput) this.searchInput.value = item.label;
+                            if (this.hiddenInput) this.hiddenInput.value = item.value;
+                            if (this.wrapper) this.wrapper.classList.remove('open');
+                            console.log(`✅ [Dropdown] Selected: "${item.label}" -> hidden field "${this.hiddenInput?.id || 'unknown'}" = "${item.value}"`);
                             if (this.onSelect) this.onSelect(item.value, item);
                         });
 
@@ -1304,7 +1606,7 @@
             const prevOrSeriesCode = document.getElementById('prevOrSeriesCode').value;
             const prevOrNumber = document.getElementById('prevOrNumber').value;
 
-            const contractDropdown = new SearchableDropdown('contractNoWrapper', 'contractNoSearch', 'contractNo', 'contractNoList', 'Type or select Contract No.');
+            const contractDropdown = new SearchableDropdown('contractNoWrapper', 'contractNoSearch', 'contractno', 'contractNoList', 'Type or select Contract No.');
             const orSeriesDropdown = new SearchableDropdown('orSeriesWrapper', 'orSeriesSearch', 'orSeriesCode', 'orSeriesList', 'Type or select O.R Series Code');
             const orNumberDropdown = new SearchableDropdown('orNumberWrapper', 'orNumberSearch', 'orNumber', 'orNumberList', 'Type or select O.R Number');
 
@@ -1318,8 +1620,8 @@
             let contractRawData = [];
 
             function fetchContracts(regionId, branchId = null, selectedContract = null) {
-                const selectedRegionText = regionSelect ? regionSelect.options[regionSelect.selectedIndex].text : 'N/A';
-                const selectedBranchText = branchSelect ? branchSelect.options[branchSelect.selectedIndex].text : 'All Branches';
+                const selectedRegionText = regionSelect && regionSelect.options[regionSelect.selectedIndex] ? regionSelect.options[regionSelect.selectedIndex].text : 'N/A';
+                const selectedBranchText = branchSelect && branchSelect.options[branchSelect.selectedIndex] ? branchSelect.options[branchSelect.selectedIndex].text : 'All Branches';
                 console.log('📋 [fetchContracts] === Contract Fetch ===');
                 console.log(`📋 [fetchContracts] Region: ${selectedRegionText} (ID: ${regionId})`);
                 console.log(`📋 [fetchContracts] Branch: ${selectedBranchText} (ID: ${branchId || 'N/A'})`);
@@ -1331,6 +1633,8 @@
                 fetch(url)
                     .then(r => r.json())
                     .then(data => {
+                        console.log('📋 [fetchContracts] Raw API response:', data);
+                        console.log(`📋 [fetchContracts] Total contracts found: ${data.length}`);
                         contractRawData = data; // Store for lookup
                         
                         const items = data.map(c => {
@@ -1345,10 +1649,11 @@
                                 badge: badge
                             };
                         });
+                        console.log(`📋 [fetchContracts] Setting ${items.length} items to dropdown`);
                         contractDropdown.setItems(items);
 
                         // Sync logic: Force validate the current or requested value
-                        const valueToValidate = selectedContract || contractDropdown.hiddenInput.value;
+                        const valueToValidate = selectedContract || (contractDropdown.hiddenInput?.value || '');
                         if (valueToValidate) {
                             const found = data.find(c => String(c.ContractNumber) === String(valueToValidate));
                             if (found) {
@@ -1356,10 +1661,15 @@
                             } else {
                                 // Contract not found in available list — keep text visible so user
                                 // can see what they had, but clear the hidden value so it's not submitted
-                                contractDropdown.hiddenInput.value = '';
+                                if (contractDropdown.hiddenInput) contractDropdown.hiddenInput.value = '';
                                 // Keep searchInput text as-is (already set from old() value)
                                 console.warn('⚠️ [fetchContracts] Previously selected contract not found in available list:', valueToValidate);
                             }
+                        } else if (items.length > 0) {
+                            // Auto-select first contract if none selected
+                            const firstContract = items[0].value;
+                            contractDropdown.setValue(firstContract);
+                            console.log(`✅ [fetchContracts] Auto-selected first contract: ${firstContract}`);
                         }
                     })
                     .catch(err => {
@@ -1375,7 +1685,8 @@
                 const paymentType = downpaymentTypeSelect ? downpaymentTypeSelect.value : 'Partial';
                 const selectedRegionText = regionSelect ? regionSelect.options[regionSelect.selectedIndex].text : 'N/A';
                 const selectedBranchText = branchSelect ? branchSelect.options[branchSelect.selectedIndex].text : 'N/A';
-                const contractNo = document.getElementById('contractNo').value;
+                const contractNoElement = document.getElementById('contractno');
+                const contractNo = contractNoElement ? contractNoElement.value : '';
 
                 console.log('🔖 [fetchOrSeries] === O.R. Series Fetch ===');
                 console.log(`🔖 [fetchOrSeries] Region: ${selectedRegionText} (ID: ${regionId})`);
@@ -1439,6 +1750,7 @@
 
                 console.log('🔢 [fetchOrNumbers] === O.R. Numbers Fetch ===');
                 console.log(`🔢 [fetchOrNumbers] Series Code: ${seriesCode}`);
+                console.log(`🔢 [fetchOrNumbers] selectedNumber: "${selectedNumber}" | Type: ${typeof selectedNumber} | Empty: ${selectedNumber === ''}`);
                 console.log(`🔢 [fetchOrNumbers] RegionId: ${regionId}, BranchId: ${branchId}, PaymentType: ${paymentType}`);
 
                 if (!seriesCode) {
@@ -1462,7 +1774,14 @@
                             badge: 'available'
                         }));
                         orNumberDropdown.setItems(items);
-                        if (selectedNumber) orNumberDropdown.setValue(selectedNumber);
+                        if (selectedNumber) {
+                            orNumberDropdown.setValue(selectedNumber);
+                        } else if (items.length > 0) {
+                            // Auto-select first O.R. Number if none selected
+                            const firstNumber = items[0].value;
+                            orNumberDropdown.setValue(firstNumber);
+                            console.log(`✅ [fetchOrNumbers] Auto-selected first O.R. Number: ${firstNumber}`);
+                        }
                     })
                     .catch(err => {
                         console.error('❌ [fetchOrNumbers] Error:', err);
@@ -1891,6 +2210,293 @@
                 termField.value = formatCurrency(amount);
             }
         }
+        
+        // Religion dropdown toggle function
+        function toggleReligionOther() {
+            const religionSelect = document.getElementById('religion');
+            const religionOtherDiv = document.getElementById('religionOtherDiv');
+            
+            if (religionSelect.value === 'Other') {
+                religionOtherDiv.classList.remove('hidden');
+            } else {
+                religionOtherDiv.classList.add('hidden');
+                // Clear the custom input when hiding
+                document.getElementById('religionOther').value = '';
+            }
+        }
+
+        // Add event listeners for auto-capitalization
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-capitalize name fields
+            const lastNameInput = document.getElementById('lastName');
+            const firstNameInput = document.getElementById('firstName');
+            const middleNameInput = document.getElementById('middleName');
+            const birthPlaceInput = document.getElementById('birthPlace');
+            const occupationInput = document.getElementById('occupation');
+            const bestPlaceToCollectInput = document.getElementById('bestPlaceToCollect');
+            
+            if (lastNameInput) {
+                lastNameInput.addEventListener('input', function() {
+                    capitalizeName(this);
+                });
+                lastNameInput.addEventListener('blur', function() {
+                    capitalizeName(this);
+                });
+            }
+            
+            if (firstNameInput) {
+                firstNameInput.addEventListener('input', function() {
+                    capitalizeName(this);
+                });
+                firstNameInput.addEventListener('blur', function() {
+                    capitalizeName(this);
+                });
+            }
+            
+            if (middleNameInput) {
+                middleNameInput.addEventListener('input', function() {
+                    capitalizeName(this);
+                });
+                middleNameInput.addEventListener('blur', function() {
+                    capitalizeName(this);
+                });
+            }
+            
+            if (birthPlaceInput) {
+                birthPlaceInput.addEventListener('input', function() {
+                    capitalizeName(this);
+                });
+                birthPlaceInput.addEventListener('blur', function() {
+                    capitalizeName(this);
+                });
+            }
+            
+            if (occupationInput) {
+                occupationInput.addEventListener('input', function() {
+                    capitalizeName(this);
+                });
+                occupationInput.addEventListener('blur', function() {
+                    capitalizeName(this);
+                });
+            }
+            
+            if (bestPlaceToCollectInput) {
+                bestPlaceToCollectInput.addEventListener('input', function() {
+                    capitalizeName(this);
+                });
+                bestPlaceToCollectInput.addEventListener('blur', function() {
+                    capitalizeName(this);
+                });
+            }
+            
+            // Religion dropdown toggle
+            const religionSelect = document.getElementById('religion');
+            if (religionSelect) {
+                religionSelect.addEventListener('change', toggleReligionOther);
+                // Initialize on page load
+                toggleReligionOther();
+            }
+        });
+
+        // Form persistence functions
+        function saveFormData() {
+            const form = document.getElementById('clientForm');
+            if (!form) return;
+            
+            const formData = new FormData(form);
+            const data = {};
+            
+            // Save all form fields except sensitive data
+            for (let [key, value] of formData.entries()) {
+                // Skip sensitive fields and file inputs
+                if (key !== '_token' && key !== 'principalbeneficiaryid') {
+                    data[key] = value;
+                }
+            }
+            
+            localStorage.setItem('clientFormData', JSON.stringify(data));
+            console.log('Form data saved to localStorage');
+        }
+        
+        function loadFormData() {
+            const savedData = localStorage.getItem('clientFormData');
+            if (!savedData) return;
+            
+            try {
+                const data = JSON.parse(savedData);
+                const form = document.getElementById('clientForm');
+                if (!form) return;
+                
+                // Restore form fields
+                Object.keys(data).forEach(key => {
+                    const element = form.querySelector(`[name="${key}"]`);
+                    if (element) {
+                        if (element.type === 'checkbox') {
+                            element.checked = data[key] === 'on';
+                        } else if (element.type === 'radio') {
+                            const radio = form.querySelector(`[name="${key}"][value="${data[key]}"]`);
+                            if (radio) radio.checked = true;
+                        } else {
+                            element.value = data[key];
+                        }
+                        
+                        // Trigger change events for dropdowns
+                        if (element.tagName === 'SELECT') {
+                            element.dispatchEvent(new Event('change'));
+                        }
+                    }
+                });
+                
+                console.log('Form data restored from localStorage');
+            } catch (error) {
+                console.error('Error loading form data:', error);
+            }
+        }
+        
+        function clearFormData() {
+            localStorage.removeItem('clientFormData');
+            console.log('Form data cleared from localStorage');
+        }
+
+        // Auto-save form data on input
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('clientForm');
+            if (form) {
+                // Load saved data on page load
+                loadFormData();
+                
+                // Auto-save on any input change
+                form.addEventListener('input', function() {
+                    saveFormData();
+                });
+                
+                form.addEventListener('change', function() {
+                    saveFormData();
+                });
+            }
+        });
+
+        // Contact validation function
+        function validateContactInfo() {
+            const mobileNumber = document.getElementById('mobileNumber');
+            const telephone = document.getElementById('telephone');
+            const email = document.getElementById('email');
+            
+            let isValid = true;
+            let errorMessage = '';
+            
+            // Check if at least one phone number is provided
+            const mobileValue = mobileNumber ? mobileNumber.value.trim() : '';
+            const telephoneValue = telephone ? telephone.value.trim() : '';
+            
+            if (!mobileValue && !telephoneValue) {
+                errorMessage = 'Please provide either a mobile number or telephone number';
+                isValid = false;
+                
+                // Add error styling
+                if (mobileNumber) mobileNumber.classList.add('border-red-500', 'ring-2', 'ring-red-500');
+                if (telephone) telephone.classList.add('border-red-500', 'ring-2', 'ring-red-500');
+            } else {
+                // Remove error styling if validation passes
+                if (mobileNumber) mobileNumber.classList.remove('border-red-500', 'ring-2', 'ring-red-500');
+                if (telephone) telephone.classList.remove('border-red-500', 'ring-2', 'ring-red-500');
+                
+                // Show "N/A" for empty fields
+                if (mobileNumber && !mobileValue) {
+                    mobileNumber.placeholder = 'N/A';
+                }
+                if (telephone && !telephoneValue) {
+                    telephone.placeholder = 'N/A';
+                }
+            }
+            
+            // Validate email format if provided
+            if (email && email.value.trim()) {
+                const emailValue = email.value.trim();
+                const emailDomainSelect = document.getElementById('emailDomainSelect');
+                const customEmailDomain = document.getElementById('customEmailDomain');
+                
+                let fullEmail = emailValue;
+                if (emailDomainSelect) {
+                    if (emailDomainSelect.value === 'others' && customEmailDomain) {
+                        fullEmail += '@' + customEmailDomain.value.trim();
+                    } else if (emailDomainSelect.value !== 'others') {
+                        fullEmail += '@' + emailDomainSelect.value;
+                    }
+                }
+                
+                // Basic email validation
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(fullEmail)) {
+                    errorMessage += (errorMessage ? '\n' : '') + 'Please enter a valid email address';
+                    isValid = false;
+                    if (email) email.classList.add('border-red-500', 'ring-2', 'ring-red-500');
+                } else {
+                    if (email) email.classList.remove('border-red-500', 'ring-2', 'ring-red-500');
+                }
+            } else {
+                // Show "N/A" for empty email field
+                if (email && !email.value.trim()) {
+                    email.placeholder = 'N/A';
+                    if (email) email.classList.remove('border-red-500', 'ring-2', 'ring-red-500');
+                }
+            }
+            
+            return { isValid, errorMessage };
+        }
+
+        // Initialize N/A placeholders on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileNumber = document.getElementById('mobileNumber');
+            const telephone = document.getElementById('telephone');
+            const email = document.getElementById('email');
+            
+            // Set initial N/A placeholders for empty fields
+            if (mobileNumber && !mobileNumber.value.trim()) {
+                mobileNumber.placeholder = 'N/A';
+            }
+            if (telephone && !telephone.value.trim()) {
+                telephone.placeholder = 'N/A';
+            }
+            if (email && !email.value.trim()) {
+                email.placeholder = 'N/A';
+            }
+            
+            // Clear N/A placeholder when user starts typing
+            [mobileNumber, telephone, email].forEach(element => {
+                if (element) {
+                    element.addEventListener('focus', function() {
+                        if (this.placeholder === 'N/A') {
+                            this.placeholder = '';
+                        }
+                    });
+                    
+                    element.addEventListener('blur', function() {
+                        if (!this.value.trim()) {
+                            this.placeholder = 'N/A';
+                        }
+                    });
+                }
+            });
+        });
+
+        // Add event listeners for contact validation
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileNumber = document.getElementById('mobileNumber');
+            const telephone = document.getElementById('telephone');
+            
+            if (mobileNumber) {
+                mobileNumber.addEventListener('blur', function() {
+                    validateContactInfo();
+                });
+            }
+            
+            if (telephone) {
+                telephone.addEventListener('blur', function() {
+                    validateContactInfo();
+                });
+            }
+        });
 
         // Phone number formatting functions
         function formatMobile(input) {
