@@ -1019,6 +1019,36 @@ $(document).ready(function () {
             if (errorEl) errorEl.classList.add('hidden');
         }
     });
+
+    // Same as Current Address functionality
+    $('#sameAsCurrentAddress').on('change', function() {
+        if ($(this).is(':checked')) {
+            // Copy current address values to home address
+            $('#homeRegion').val($('#addressRegion').val());
+            $('#homeProvince').val($('#addressProvince').val());
+            $('#homeCity').val($('#addressCity').val());
+            $('#homeBarangay').val($('#addressBarangay').val());
+            $('#homeZipcode').val($('#zipcode').val());
+            $('#homeStreet').val($('#street').val());
+            
+            // Trigger change events to load cascading dropdowns
+            $('#homeRegion').trigger('change');
+            setTimeout(function() {
+                $('#homeProvince').trigger('change');
+                setTimeout(function() {
+                    $('#homeCity').trigger('change');
+                }, 200);
+            }, 200);
+        } else {
+            // Clear home address fields
+            $('#homeRegion').val('');
+            $('#homeProvince').val('');
+            $('#homeCity').val('');
+            $('#homeBarangay').val('');
+            $('#homeZipcode').val('');
+            $('#homeStreet').val('');
+        }
+    });
 });
 
 // Toggle custom email domain input

@@ -12,10 +12,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Test data seeders
+        // Address data seeder - runs first to populate Philippine address data
         $this->call([
-            TestClientSeeder::class,
-            TestUsersSeeder::class,
+            AddressSeeder::class,
         ]);
+        
+        // Test data seeders (optional - only for development/testing)
+        // Uncomment below if you need test data
+        // $this->call([
+        //     TestClientSeeder::class,
+        //     TestUsersSeeder::class,
+        // ]);
     }
 }

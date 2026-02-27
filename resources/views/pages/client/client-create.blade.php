@@ -660,12 +660,12 @@
                     </h3>
                 </div>
                 <div class="p-6">
-                        <div class="mb-6 bg-blue-50/50 p-5 rounded-xl border border-blue-100">
+                        <div class="mb-6 bg-blue-50/50 p-6 rounded-xl border border-blue-100">
                             <h4 class="text-sm font-bold text-gray-800 mb-3 flex items-center">
                                 <svg class="w-4 h-4 mr-1.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                                 Principal Beneficiary Details
                             </h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     @php
                                         $prevPrincipalBeneficiary = old('principalbeneficiary');
@@ -673,7 +673,7 @@
                                         $prevPrincipalBeneficiaryRelation = old('principalbeneficiaryrelation');
                                     @endphp
                                     <label for="principalBeneficiary" class="block text-xs font-medium text-gray-700 mb-1">Full Name & Age</label>
-                                    <div class="flex gap-2">
+                                    <div class="flex gap-3">
                                         <input type="text" class="flex-1 px-4 py-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 bg-white" id="principalBeneficiary" name="principalbeneficiary" value="{{ $prevPrincipalBeneficiary }}" placeholder="Full Name" />
                                         <input type="number" class="w-20 px-4 py-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 bg-white" id="principalBeneficiaryAge" name="principalbeneficiaryage" maxlength="3" value="{{ $prevPrincipalBeneficiaryAge }}" placeholder="Age" />
                                     </div>
@@ -700,14 +700,14 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
                             <div>
                                 @php
                                     $prevBeneficiary1 = old('beneficiary1');
                                     $prevBeneficiary1Age = old('beneficiary1age');
                                 @endphp
                                 <label for="beneficiary1" class="block text-sm font-medium text-gray-700 mb-2">Beneficiary 1 (Age)</label>
-                                <div class="flex gap-2">
+                                <div class="flex gap-3">
                                     <input type="text" class="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="beneficiary1" name="beneficiary1" value="{{ $prevBeneficiary1 }}" />
                                     <input type="number" class="w-20 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="beneficiary1age" name="beneficiary1age" maxlength="3" value="{{ $prevBeneficiary1Age }}" placeholder="Age" />
                                 </div>
@@ -718,20 +718,20 @@
                                     $prevBeneficiary2Age = old('beneficiary2age');
                                 @endphp
                                 <label for="beneficiary2" class="block text-sm font-medium text-gray-700 mb-2">Beneficiary 2 (Age)</label>
-                                <div class="flex gap-2">
+                                <div class="flex gap-3">
                                     <input type="text" class="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="beneficiary2" name="beneficiary2" value="{{ $prevBeneficiary2 }}" />
                                     <input type="number" class="w-20 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="beneficiary2age" name="beneficiary2age" maxlength="3" value="{{ $prevBeneficiary2Age }}" placeholder="Age" />
                                 </div>
                             </div>
                         </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 mt-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mt-6">
                             <div>
                                 @php
                                     $prevBeneficiary3 = old('beneficiary3');
                                     $prevBeneficiary3Age = old('beneficiary3age');
                                 @endphp
                                 <label for="beneficiary3" class="block text-sm font-medium text-gray-700 mb-2">Beneficiary 3 (Age)</label>
-                                <div class="flex gap-2">
+                                <div class="flex gap-3">
                                     <input type="text" class="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="beneficiary3" name="beneficiary3" value="{{ $prevBeneficiary3 }}" />
                                     <input type="number" class="w-20 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="beneficiary3age" name="beneficiary3age" maxlength="3" value="{{ $prevBeneficiary3Age }}" placeholder="Age" />
                                 </div>
@@ -742,7 +742,7 @@
                                     $prevBeneficiary4Age = old('beneficiary4age');
                                 @endphp
                                 <label for="beneficiary4" class="block text-sm font-medium text-gray-700 mb-2">Beneficiary 4 (Age)</label>
-                                <div class="flex gap-2">
+                                <div class="flex gap-3">
                                     <input type="text" class="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="beneficiary4" name="beneficiary4" value="{{ $prevBeneficiary4 }}" />
                                     <input type="number" class="w-20 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="beneficiary4age" name="beneficiary4age" maxlength="3" value="{{ $prevBeneficiary4Age }}" placeholder="Age" />
                                 </div>
