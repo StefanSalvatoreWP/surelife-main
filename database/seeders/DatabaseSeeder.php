@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
         // Address data seeder - runs first to populate Philippine address data
         $this->call([
             AddressSeeder::class,
+            ReferenceTablesSeeder::class, // Ensure reference tables are always populated
         ]);
         
         // Test data seeders (optional - only for development/testing)
