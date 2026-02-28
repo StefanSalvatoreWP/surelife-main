@@ -509,7 +509,7 @@
                                 Contact</h4>
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Home No.</label>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Telephone</label>
                                     <input type="text"
                                         class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
                                         value="{{ $clients->HomeNumber }}" readonly />
