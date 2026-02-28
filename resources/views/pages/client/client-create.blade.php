@@ -18,20 +18,6 @@
             </div>
         @endif
 
-        <!-- Swift-Style Modal -->
-        <div id="swiftModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity duration-300">
-            <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform scale-100 transition-transform duration-300 overflow-hidden">
-                <div id="swiftModalHeader" class="px-6 pt-6 pb-4 text-center">
-                    <div id="swiftModalIcon" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"></div>
-                    <h3 id="swiftModalTitle" class="text-xl font-semibold text-gray-900 mb-2"></h3>
-                </div>
-                <div id="swiftModalBody" class="px-6 pb-6 text-center">
-                    <p id="swiftModalMessage" class="text-gray-600 text-sm leading-relaxed"></p>
-                </div>
-                <div id="swiftModalActions" class="px-6 pb-6 flex flex-col gap-2"></div>
-            </div>
-        </div>
-
         <!-- Return Button -->
         <div class="mb-6">
             <a href="/client" class="inline-flex items-center px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-lg transition duration-200 ease-in-out">Return</a>
@@ -916,7 +902,17 @@
             ];
 
             // Form submission handler
+            let isSubmitting = false; // Submission lock to prevent double-submit
+            
             form.addEventListener('submit', function(e) {
+                // Prevent double submission
+                if (isSubmitting) {
+                    console.log('⚠️ Submission already in progress, ignoring duplicate request');
+                    e.preventDefault();
+                    return false;
+                }
+                
+                isSubmitting = true; // Lock submission
                 console.log('=== FORM SUBMISSION STARTED ===');
                 console.log('Timestamp:', new Date().toISOString());
                 console.log('Form element:', form);
@@ -1078,6 +1074,7 @@
                 
                 if (errors.length > 0) {
                     e.preventDefault();
+                    isSubmitting = false; // Reset submission lock so user can retry
                     console.log('\n❌ FORM SUBMISSION BLOCKED');
                     console.log('\n--- DETAILED ERROR LIST ---');
                     errors.forEach((err, index) => {
@@ -1094,6 +1091,7 @@
                             errors[0].element.focus();
                         }, 500);
                     }
+                    return false;
                 } else {
                     console.log('\n✓✓✓ ALL VALIDATIONS PASSED ✓✓✓');
                     console.log('Form is being submitted to:', form.action);
@@ -1168,17 +1166,25 @@
                         }
                     })
                     .then(data => {
-                        // Success
+                        // Success - show modal with OK button, don't auto-redirect
                         clearFormData();
-                        showSwiftModal('Success!', 'Client information submitted successfully!\n\nYour submission has been received and is now pending approval.', 'success');
                         
-                        // Optionally redirect to a success page
-                        if (data.redirect) {
-                            window.location.href = data.redirect;
-                        } else {
-                            // Reset form or redirect as needed
-                            form.reset();
-                        }
+                        // Build redirect URL
+                        const redirectUrl = data.redirect || '/client';
+                        
+                        // Show success modal with OK button that triggers redirect
+                        showSwiftModal(
+                            'Success!', 
+                            (data.message || 'Client created successfully!') + '\n\nClick OK to continue.',
+                            'success',
+                            [
+                                {
+                                    text: 'OK',
+                                    class: 'bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg',
+                                    action: 'window.location.href = "' + redirectUrl + '"'
+                                }
+                            ]
+                        );
                     })
                     .catch(error => {
                         console.error('Submission error:', error);
@@ -1301,8 +1307,10 @@
                     .finally(() => {
                         // Restore button state if not redirected
                         setTimeout(() => {
-                            submitBtn.disabled = false;
-                            submitBtn.innerHTML = originalText;
+                            if (!isSubmitting) {
+                                submitBtn.disabled = false;
+                                submitBtn.innerHTML = originalText;
+                            }
                         }, 2000);
                     });
                 }
@@ -1386,64 +1394,6 @@
             emailInput.value = localPart;
             customDomainInput.value = domainPart;
         }
-
-        // Swift-Style Modal Functions
-        function showSwiftModal(title, message, type = 'error', buttons = []) {
-            const modal = document.getElementById('swiftModal');
-            const iconDiv = document.getElementById('swiftModalIcon');
-            const titleEl = document.getElementById('swiftModalTitle');
-            const messageEl = document.getElementById('swiftModalMessage');
-            const actionsEl = document.getElementById('swiftModalActions');
-
-            // Set icon based on type
-            const icons = {
-                error: `<svg class="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>`,
-                success: `<svg class="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>`,
-                warning: `<svg class="w-10 h-10 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                </svg>`,
-                info: `<svg class="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>`
-            };
-
-            iconDiv.innerHTML = icons[type] || icons.error;
-            titleEl.textContent = title;
-            messageEl.textContent = message;
-
-            // Default OK button if no custom buttons provided
-            if (buttons.length === 0) {
-                actionsEl.innerHTML = `
-                    <button onclick="hideSwiftModal()" class="w-full py-3 px-6 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold rounded-xl transition duration-200">
-                        OK
-                    </button>
-                `;
-            } else {
-                actionsEl.innerHTML = buttons.map(btn => `
-                    <button onclick="${btn.action}; hideSwiftModal();" class="w-full py-3 px-6 ${btn.class} font-semibold rounded-xl transition duration-200">
-                        ${btn.text}
-                    </button>
-                `).join('');
-            }
-
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        }
-
-        function hideSwiftModal() {
-            const modal = document.getElementById('swiftModal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        }
-
-        // Close modal on backdrop click
-        document.getElementById('swiftModal')?.addEventListener('click', function(e) {
-            if (e.target === this) hideSwiftModal();
-        });
 
         // Enhanced email domain event listeners
         document.addEventListener('DOMContentLoaded', function () {
@@ -2531,239 +2481,81 @@
             input.value = value;
         }
 
-        // ============================================
-        // AJAX FORM SUBMISSION WITH VALIDATION
-        // ============================================
-        document.addEventListener('DOMContentLoaded', function() {
+        // Helper functions for form error handling
+        function clearAllErrors() {
             const form = document.getElementById('clientForm');
+            if (!form) return;
+            form.querySelectorAll('input, select, textarea').forEach(field => {
+                field.classList.remove('border-red-500', 'ring-2', 'ring-red-500');
+            });
+            form.querySelectorAll('.field-error-message').forEach(el => el.remove());
+            const alert = document.getElementById('validationAlert');
+            if (alert) alert.remove();
+        }
+        
+        function displayFieldErrors(errors) {
+            clearAllErrors();
+            let errorList = [];
+            let firstErrorField = null;
             
-            // Function to clear all errors
-            function clearAllErrors() {
-                form.querySelectorAll('input, select, textarea').forEach(field => {
-                    field.classList.remove('border-red-500', 'ring-2', 'ring-red-500');
-                });
-                form.querySelectorAll('.field-error-message').forEach(el => el.remove());
-                const alert = document.getElementById('validationAlert');
-                if (alert) alert.remove();
-            }
+            const fieldMap = {
+                'contractno': ['contractno', 'contractNoSearch'],
+                'package': ['package'],
+                'paymentterm': ['paymentTerm'],
+                'region': ['region'],
+                'branch': ['branch'],
+                'paymentamount': ['paymentAmount'],
+                'orseriescode': ['orSeriesCode', 'orSeriesSearch'],
+                'ornumber': ['orNumber', 'orNumberSearch'],
+                'paymentdate': ['paymentDate'],
+                'lastname': ['lastName'],
+                'firstname': ['firstName'],
+                'gender': ['gender'],
+                'birthdate': ['birthDate'],
+                'province': ['province', 'addressProvince'],
+                'city': ['city', 'addressCity'],
+                'barangay': ['barangay', 'addressBarangay'],
+                'mobilenumber': ['mobileNumber'],
+                'telephone': ['telephone'],
+                'email': ['email']
+            };
             
-            // Function to display field errors (without alert banner)
-            function displayFieldErrors(errors) {
-                clearAllErrors();
-                let errorList = [];
-                let firstErrorField = null;
-                
-                const fieldMap = {
-                    'contractno': ['contractno', 'contractNoSearch'],
-                    'package': ['package'],
-                    'packageprice': ['packagePrice'],
-                    'paymentterm': ['paymentTerm'],
-                    'termamount': ['termAmount'],
-                    'region': ['region'],
-                    'branch': ['branch'],
-                    'paymentamount': ['paymentAmount'],
-                    'orseriescode': ['orSeriesCode', 'orSeriesSearch'],
-                    'ornumber': ['orNumber', 'orNumberSearch'],
-                    'paymentdate': ['paymentDate'],
-                    'lastname': ['lastName'],
-                    'firstname': ['firstName'],
-                    'gender': ['gender'],
-                    'birthdate': ['birthDate'],
-                    'age': ['age'],
-                    'bestplacetocollect': ['bestPlaceToCollect'],
-                    'besttimetocollect': ['bestTimeToCollect'],
-                    'province': ['province', 'addressProvince'],
-                    'city': ['city', 'addressCity'],
-                    'barangay': ['barangay', 'addressBarangay'],
-                    'mobilenumber': ['mobileNumber'],
-                    'telephone': ['telephone'],
-                    'email': ['email'],
-                    'emailaddress': ['emailDomainSelect', 'customEmailDomain']
-                };
-                
-                // Process errors object
-                for (let fieldName in errors) {
-                    if (errors.hasOwnProperty(fieldName)) {
-                        let messages = errors[fieldName];
-                        let fieldIds = fieldMap[fieldName] || [fieldName];
-                        let field = document.getElementById(fieldIds[0]);
-                        
-                        if (field && !firstErrorField) {
-                            firstErrorField = field;
-                        }
-                        
-                        // Add error styling to field
-                        if (field) {
-                            field.classList.add('border-red-500', 'ring-2', 'ring-red-500');
-                            let parent = field.closest('div');
-                            if (parent) {
-                                let errorEl = document.createElement('p');
-                                errorEl.className = 'field-error-message text-red-600 text-sm mt-1';
-                                
-                                // Handle both array and string error messages
-                                let errorText = '';
-                                if (Array.isArray(messages)) {
-                                    errorText = messages[0];
-                                } else if (typeof messages === 'string') {
-                                    errorText = messages;
-                                } else {
-                                    errorText = String(messages);
-                                }
-                                
-                                errorEl.textContent = errorText;
-                                parent.appendChild(errorEl);
-                            }
-                        }
-                        
-                        // Build error list for modal - ensure it's a string
-                        let errorMsg = '';
-                        if (Array.isArray(messages)) {
-                            errorMsg = messages[0];
-                        } else if (typeof messages === 'string') {
-                            errorMsg = messages;
-                        } else {
-                            errorMsg = String(messages);
-                        }
-                        errorList.push(errorMsg);
-                    }
-                }
-                
-                // Show error modal with OK button (no alert banner)
-                if (errorList.length > 0 && typeof showSwiftModal === 'function') {
-                    let errorMessageText = 'Please check the highlighted fields and correct them before submitting.\n\nMissing fields:\n' + errorList.map(err => '• ' + err).join('\n');
-                    showSwiftModal('Validation Failed', errorMessageText, 'error');
-                }
-                
-                // Scroll to first error field
-                if (firstErrorField) {
-                    firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-            }
-            
-            // Handle form submission
-            if (form) {
-                form.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    clearAllErrors();
+            for (let fieldName in errors) {
+                if (errors.hasOwnProperty(fieldName)) {
+                    let messages = errors[fieldName];
+                    let fieldIds = fieldMap[fieldName] || [fieldName];
+                    let field = document.getElementById(fieldIds[0]);
                     
-                    // Validate contact info - at least one required
-                    const mobileNumber = document.getElementById('mobileNumber');
-                    const telephone = document.getElementById('telephone');
-                    const mobileValue = mobileNumber ? mobileNumber.value.trim() : '';
-                    const telephoneValue = telephone ? telephone.value.trim() : '';
-                    
-                    if (!mobileValue && !telephoneValue) {
-                        // Show error for both fields
-                        if (mobileNumber) {
-                            mobileNumber.classList.add('border-red-500', 'ring-2', 'ring-red-500');
-                            let parent = mobileNumber.closest('div');
-                            if (parent && !parent.querySelector('.field-error-message')) {
-                                let errorEl = document.createElement('p');
-                                errorEl.className = 'field-error-message text-red-600 text-sm mt-1';
-                                errorEl.textContent = 'Please provide either a Mobile Number or Telephone Number.';
-                                parent.appendChild(errorEl);
-                            }
-                        }
-                        if (telephone) {
-                            telephone.classList.add('border-red-500', 'ring-2', 'ring-red-500');
-                            let parent = telephone.closest('div');
-                            if (parent && !parent.querySelector('.field-error-message')) {
-                                let errorEl = document.createElement('p');
-                                errorEl.className = 'field-error-message text-red-600 text-sm mt-1';
-                                errorEl.textContent = 'Please provide either a Mobile Number or Telephone Number.';
-                                parent.appendChild(errorEl);
-                            }
-                        }
-                        
-                        // Show error modal
-                        if (typeof showSwiftModal === 'function') {
-                            showSwiftModal('Validation Failed', 'Please provide at least one contact number (Mobile or Telephone).', 'error');
-                        }
-                        
-                        // Scroll to first contact field
-                        if (mobileNumber) {
-                            mobileNumber.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        }
-                        return false;
+                    if (field && !firstErrorField) {
+                        firstErrorField = field;
                     }
                     
-                    let submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
-                    let originalBtnText = submitBtn ? submitBtn.innerHTML : '';
-                    if (submitBtn) {
-                        submitBtn.disabled = true;
-                        submitBtn.innerHTML = '<span class="inline-flex items-center"><svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Submitting...</span>';
-                    }
-                    
-                    let formData = new FormData(form);
-                    
-                    fetch(form.action, {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest'
-                        }
-                    })
-                    .then(response => {
-                        if (response.status === 422) {
-                            return response.json().then(data => {
-                                if (data.errors) {
-                                    displayFieldErrors(data.errors);
-                                    if (typeof showSwiftModal === 'function') {
-                                        showSwiftModal('Validation Failed', 'Please check the highlighted fields and correct them before submitting.', 'error');
-                                    }
-                                }
-                                throw new Error('Validation failed');
-                            });
-                        }
-                        if (!response.ok) {
-                            throw new Error('Server error');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.success) {
-                            localStorage.removeItem('clientFormData');
-                            if (typeof showSwiftModal === 'function') {
-                                showSwiftModal('Success!', (data.message || 'Client created successfully!') + '\n\nClick OK to continue.', 'success', [
-                                    {
-                                        text: 'OK',
-                                        class: 'bg-green-500 hover:bg-green-600 text-white',
-                                        action: 'window.location.href = "' + (data.redirect || '/client') + '"'
-                                    }
-                                ]);
-                            } else {
-                                // Fallback if modal doesn't work
-                                window.location.href = data.redirect || '/client';
-                            }
-                        }
-                    })
-                    .catch(error => {
-                        if (error.message !== 'Validation failed') {
-                            if (typeof showSwiftModal === 'function') {
-                                showSwiftModal('Error', 'An error occurred while submitting the form. Please try again.', 'error');
-                            }
-                        }
-                    })
-                    .finally(() => {
-                        if (submitBtn) {
-                            submitBtn.disabled = false;
-                            submitBtn.innerHTML = originalBtnText;
-                        }
-                    });
-                });
-                
-                // Real-time error clearing
-                form.addEventListener('input', function(e) {
-                    if (e.target.classList.contains('border-red-500')) {
-                        e.target.classList.remove('border-red-500', 'ring-2', 'ring-red-500');
-                        let parent = e.target.closest('div');
+                    if (field) {
+                        field.classList.add('border-red-500', 'ring-2', 'ring-red-500');
+                        let parent = field.closest('div');
                         if (parent) {
-                            let errorMsg = parent.querySelector('.field-error-message');
-                            if (errorMsg) errorMsg.remove();
+                            let errorEl = document.createElement('p');
+                            errorEl.className = 'field-error-message text-red-600 text-sm mt-1';
+                            let errorText = Array.isArray(messages) ? messages[0] : (typeof messages === 'string' ? messages : String(messages));
+                            errorEl.textContent = errorText;
+                            parent.appendChild(errorEl);
                         }
                     }
-                });
+                    
+                    let errorMsg = Array.isArray(messages) ? messages[0] : (typeof messages === 'string' ? messages : String(messages));
+                    errorList.push(errorMsg);
+                }
             }
-        });
+            
+            if (errorList.length > 0 && typeof showSwiftModal === 'function') {
+                let errorMessageText = 'Please check the highlighted fields:\n' + errorList.map(err => '• ' + err).join('\n');
+                showSwiftModal('Validation Failed', errorMessageText, 'error');
+            }
+            
+            if (firstErrorField) {
+                firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
     </script>
 @endsection

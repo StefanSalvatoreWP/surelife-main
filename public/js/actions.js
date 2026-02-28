@@ -30,10 +30,7 @@ $(document).ready(function() {
                                 </svg>
                                 Update
                             </a>
-                            <a data-bs-toggle="modal" 
-                               data-bs-target="#actionDeleteModal" 
-                               data-action-id="${data.id}" 
-                               data-action-name="${data.action}" 
+                            <a onclick="showDeleteActionModal(${data.id}, '${data.action}')" 
                                role="button"
                                class="inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-red-50 to-red-100 hover:from-red-100 hover:to-red-200 text-red-900 text-xs font-semibold rounded-lg shadow-sm hover:shadow-md transform hover:scale-105 transition duration-200 ease-in-out cursor-pointer">
                                 <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -63,20 +60,32 @@ $(document).ready(function() {
         loadedTable.search(this.value).draw();
     });
 
-    /* MODALS */
-    $('#actionDeleteModal').on('show.bs.modal', function(event) {
+    /* Swift-Style Modal Functions */
+    function showDeleteActionModal(actionId, actionName) {
+        showSwiftModal('Confirm Deletion', `Delete selected action "${actionName}"?\n\nThis action cannot be undone. The action privilege will be permanently removed from the system.`, 'warning', [
+            {text: 'Delete Action', class: 'bg-red-500 hover:bg-red-600 text-white', action: `submitDeleteAction(${actionId})`},
+            {text: 'Cancel', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+        ]);
+    }
 
-        let button = $(event.relatedTarget);
-        let actionId = button.data('action-id');
-        let actionName = button.data('action-name');
+    function submitDeleteAction(actionId) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/submit-action-delete/' + actionId;
         
-        let modal = $(this);
-        modal.find('#actionToDelete').text(actionName);
-        modal.find('#confirmDelete').click(function() {
-            
-            let deleteForm = $('#deleteForm');
-            deleteForm.attr('action', '/submit-action-delete/' + actionId);
-            deleteForm.submit();
-        });
-    });
+        const csrfToken = document.createElement('input');
+        csrfToken.type = 'hidden';
+        csrfToken.name = '_token';
+        csrfToken.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        
+        const method = document.createElement('input');
+        method.type = 'hidden';
+        method.name = '_method';
+        method.value = 'DELETE';
+        
+        form.appendChild(csrfToken);
+        form.appendChild(method);
+        document.body.appendChild(form);
+        form.submit();
+    }
 });

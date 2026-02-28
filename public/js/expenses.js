@@ -51,7 +51,7 @@ $(document).ready(function(){
                     
                     var noteLink;
                     if(data.note != null && data.note != ""){
-                        noteLink = '<a href="#" data-expense-note="' + data.note + '" class="action-btn action-btn-note">' +
+                        noteLink = '<a onclick="showExpenseNoteModal(\'' + data.note.replace(/'/g, "\\'") + '\')" class="action-btn action-btn-note">' +
                             '<svg class="action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
                             '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>' +
                             '</svg>' +
@@ -73,7 +73,7 @@ $(document).ready(function(){
                         'Update' +
                         '</a>';
                     
-                    var deleteLink = '<a href="#" data-expense-id="' + data.exid + '" data-expense-description="' + data.description + '" class="action-btn action-btn-delete">' +
+                    var deleteLink = '<a onclick="showDeleteExpenseModal(' + data.exid + ', \'' + (data.description || 'N/A').replace(/'/g, "\\'") + '\')" class="action-btn action-btn-delete">' +
                         '<svg class="action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
                         '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>' +
                         '</svg>' +
@@ -105,46 +105,39 @@ $(document).ready(function(){
         loadedTable.ajax.reload();
     });
 
-    /* MODALS - Use event delegation */
-    $(document).on('click', '.action-btn-note', function(e) {
-        e.preventDefault();
-        let expenseNote = $(this).data('expense-note');
-        $('#expenseNote').text(expenseNote);
-        
-        let modal = $('#expenseNoteModal');
-        if (typeof bootstrap !== 'undefined') {
-            let bsModal = new bootstrap.Modal(modal[0], { backdrop: false });
-            bsModal.show();
-        } else {
-            modal.addClass('show').css('display', 'flex');
-        }
-    });
-
-    $(document).on('click', '.action-btn-delete', function(e) {
-        e.preventDefault();
-        
-        let expenseId = $(this).data('expense-id');
-        let description = $(this).data('expense-description');
-        
-        $('#expenseToDelete').text(description);
-        $('#confirmDelete').off('click');
-        
-        $('#confirmDelete').on('click', function() {
-            let deleteForm = $('#deleteForm');
-            deleteForm.attr('action', '/submit-expense-delete/' + expenseId);
-            deleteForm.submit();
-        });
-        
-        let modal = $('#expenseDeleteModal');
-        if (typeof bootstrap !== 'undefined') {
-            let bsModal = new bootstrap.Modal(modal[0], { backdrop: false });
-            bsModal.show();
-        } else {
-            modal.addClass('show').css('display', 'flex');
-        }
-    });
-    
-    $(document).on('click', '[data-bs-dismiss="modal"]', function() {
-        $('#expenseNoteModal, #expenseDeleteModal').removeClass('show').css('display', 'none');
-    });
 });
+
+/* Swift-Style Modal Functions */
+function showExpenseNoteModal(note) {
+    showSwiftModal('Expense Note', note, 'info', [
+        {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+    ]);
+}
+
+function showDeleteExpenseModal(expenseId, description) {
+    showSwiftModal('Confirm Deletion', `Delete selected expense "${description}"?\n\nThis action cannot be undone. The expense record will be permanently removed from the system.`, 'warning', [
+        {text: 'Delete Expense', class: 'bg-red-500 hover:bg-red-600 text-white', action: `submitDeleteExpense(${expenseId})`},
+        {text: 'Cancel', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+    ]);
+}
+
+function submitDeleteExpense(expenseId) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/submit-expense-delete/' + expenseId;
+    
+    const csrfToken = document.createElement('input');
+    csrfToken.type = 'hidden';
+    csrfToken.name = '_token';
+    csrfToken.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    
+    const method = document.createElement('input');
+    method.type = 'hidden';
+    method.name = '_method';
+    method.value = 'DELETE';
+    
+    form.appendChild(csrfToken);
+    form.appendChild(method);
+    document.body.appendChild(form);
+    form.submit();
+}

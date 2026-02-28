@@ -24,9 +24,9 @@
             <div class="d-flex">
                 <a href="/req-loans" class="btn btn-outline-secondary btn-sm" role="button">Return</a>
                 @if($loanRequestDetails->Status == 'Pending')
-                    <a class="btn btn-success btn-sm ms-1" data-bs-toggle="modal" data-bs-target="#showLoanRequestModal" data-loan-req-id="{{ $loanRequestDetails->Id }}" role="button">Verify</a>       
+                    <a class="btn btn-success btn-sm ms-1" onclick="showLoanRequestModal('{{ $loanRequestDetails->Id }}', 'verify')" role="button">Verify</a>       
                 @elseif($loanRequestDetails->Status == 'Verified')
-                    <a class="btn btn-success btn-sm ms-1" data-bs-toggle="modal" data-bs-target="#showLoanRequestModal" data-loan-req-id="{{ $loanRequestDetails->Id }}" role="button">Approve</a>       
+                    <a class="btn btn-success btn-sm ms-1" onclick="showLoanRequestModal('{{ $loanRequestDetails->Id }}', 'approve')" role="button">Approve</a>       
                 @endif
             </div>
         </div>
@@ -270,42 +270,36 @@
                 </div>
             </div>
         </div>
-        <!-- MODAL APPROVAL FOR LOAN REQUEST -->
-        <div class="modal fade" id="showLoanRequestModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title text-dark fw-bold" id="staticBackdropLabel">Confirmation</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            @php
-                                $status = 'Pending';
-                                switch($loanRequestDetails->Status){
-                                    case 'Pending';
-                                        $status = 'verify';
-                                        break;
-                                    case 'Verified';
-                                        $status = 'approve';
-                                        break;      
-                                }
-                            @endphp
-                            <p>You are going to {{ $status }} this loan request.</p>
-                            <p class="fw-bold text-danger">You cannot undo this action. Continue? </p>                       
-                         </div>
-                    </div>
-                    <form id="loanRequestForm" method="POST">
-                        @csrf
-                        @method('PUT')
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary btn-sm w-25" data-bs-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-success btn-sm w-25" id="loanReqApproval">Submit</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
     </div>
     <script src="{{ asset('js/req-loan.js') }}"></script>
+    <script>
+        function showLoanRequestModal(loanReqId, action) {
+            const actionText = action === 'verify' ? 'verify' : 'approve';
+            showSwiftModal('Confirmation', `You are going to ${actionText} this loan request.\n\nYou cannot undo this action. Continue?`, 'warning', [
+                {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitLoanRequest(' + loanReqId + ')'},
+                {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+            ]);
+        }
+        
+        function submitLoanRequest(loanReqId) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/submit-loan-request-approval/' + loanReqId;
+            
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = '_token';
+            csrfToken.value = '{{ csrf_token() }}';
+            
+            const method = document.createElement('input');
+            method.type = 'hidden';
+            method.name = '_method';
+            method.value = 'PUT';
+            
+            form.appendChild(csrfToken);
+            form.appendChild(method);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    </script>
 @endsection

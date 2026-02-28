@@ -416,7 +416,7 @@
                                             </td>
                                             @if(session('user_roleid') != 7)
                                                 <td>
-                                                    <a data-bs-toggle="modal" data-bs-target="#paymentVoidModal" data-payment-id="{{ $paymentIndex->Id }}" data-payment-orno="{{ $paymentIndex->ORNo }}" role="button">
+                                                    <a onclick="showPaymentVoidModal('{{ $paymentIndex->Id }}', '{{ $paymentIndex->ORNo }}')" role="button">
                                                         <span class="badge bg-danger">Void</span>
                                                     </a>
                                                 </td>
@@ -515,5 +515,38 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+// Swift-Style Modal Functions
+let currentPaymentId = null;
+function showPaymentVoidModal(paymentId, orNo) {
+    currentPaymentId = paymentId;
+    showSwiftModal('Void Payment', `You are going to void the selected payment with OR No. ${orNo}\n\nYou cannot undo this action. Continue?`, 'warning', [
+        {text: 'Confirm', class: 'bg-red-500 hover:bg-red-600 text-white', action: 'submitPaymentVoid()'},
+        {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+    ]);
+}
+
+function submitPaymentVoid() {
+    if (!currentPaymentId) return;
+    
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/submit-void-payment/' + currentPaymentId;
+    
+    const csrfToken = document.createElement('input');
+    csrfToken.type = 'hidden';
+    csrfToken.name = '_token';
+    csrfToken.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    
+    const method = document.createElement('input');
+    method.type = 'hidden';
+    method.name = '_method';
+    method.value = 'PUT';
+    
+    form.appendChild(csrfToken);
+    form.appendChild(method);
+    document.body.appendChild(form);
+    form.submit();
+}
 </script>
 @endsection

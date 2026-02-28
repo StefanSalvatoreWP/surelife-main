@@ -2514,7 +2514,7 @@ class ClientController extends Controller
         }
     }
     // delete client
-    public function deleteClient(Client $client)
+    public function deleteClient(Client $client, Request $request)
     {
 
         try {
@@ -2527,11 +2527,33 @@ class ClientController extends Controller
                 Payment::where('clientid', $client->Id)->delete();
 
                 Log::channel('activity')->info('[StaffID] ' . session('user_id') . ' [Menu] Client ' . '[Action] Delete ' . '[Target] ' . $client->Id);
+                
+                // Return JSON for AJAX requests
+                if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') == 'XMLHttpRequest') {
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Client deleted successfully',
+                        'redirect' => '/client'
+                    ]);
+                }
+                
                 return redirect('/client')->with('warning', 'Selected client has been deleted!');
             } else {
+                if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') == 'XMLHttpRequest') {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'You do not have access to this function'
+                    ], 403);
+                }
                 return redirect()->back()->with('error', 'You do not have access to this function.');
             }
         } catch (\Exception $e) {
+            if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') == 'XMLHttpRequest') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'An error occurred while deleting the client'
+                ], 500);
+            }
             return redirect('/client')->with('error', 'An error occurred while deleting the selected client.');
         }
     }

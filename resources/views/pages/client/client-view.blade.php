@@ -170,9 +170,11 @@
             </a>
             <input type="hidden" id="clientid" value="{{ $clients->cid }}" />
             @if($clients->Status == '1')
-                <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-                    data-bs-toggle="modal" data-bs-target="#clientStatusModal" data-client-id="{{ $clients->cid }}"
-                    data-client-name="{{ $clients->LastName . ', ' . $clients->FirstName }}" role="button">
+                <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 cursor-pointer"
+                    onclick="showSwiftModal('Verify Client', 'You are going to verify the selected client {{ $clients->LastName . ', ' . $clients->FirstName }}.
+
+You cannot undo this action. Continue?', 'warning', [{text: 'Confirm', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitVerifyClient()'}, {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}])"
+                    role="button">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -180,9 +182,9 @@
                     Verify
                 </a>
             @elseif($clients->Status == '2')
-                <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-                    data-bs-toggle="modal" data-bs-target="#clientStatusModal" data-client-id="{{ $clients->cid }}"
-                    data-client-name="{{ $clients->LastName . ', ' . $clients->FirstName }}" role="button">
+                <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 cursor-pointer"
+                    onclick="showSwiftModal('Approve Client', 'You are going to approve the selected client.\n\nYou cannot undo this action. Continue?', 'warning', [{text: 'Confirm', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitApproveClient()'}, {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}])"
+                    role="button">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -216,8 +218,8 @@
                 @endif
 
                 @if(!$clients->CompletedMemorial || $clients->CompletedMemorial == 0)
-                    <a data-bs-toggle="modal" data-bs-target="#completeMemorialModal"
-                        class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    <a onclick="showSwiftModal('Complete Memorial Service', 'You are going to mark the selected client as having completed the memorial service.\n\nYou cannot undo this action. Continue?', 'warning', [{text: 'Confirm', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCompleteMemorial()'}, {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}])"
+                        class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer"
                         role="button">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -923,9 +925,7 @@
                                             <td class="px-4 py-3 text-sm text-gray-900">
                                                 @if($payment->VoidStatus != 1)
                                                     <a class="action-void text-red-600 hover:text-red-900 font-medium cursor-pointer"
-                                                        data-bs-toggle="modal" data-bs-target="#paymentVoidModal"
-                                                        data-payment-id="{{ $payment->Id }}"
-                                                        data-payment-orno="{{ $payment->ORNo }}">Void</a>
+                                                        onclick="showPaymentVoidModal('{{ $payment->Id }}', '{{ $payment->ORNo }}')">Void</a>
                                                 @else
                                                     <span class="text-gray-400">Locked</span>
                                                 @endif
@@ -953,13 +953,13 @@
                                     role="button" target="_blank">Statement of Account</a>
                                 @if($balance <= 0)
                                     @if($clients->CFPNO == null && $cfpApprover == 0)
-                                        <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
-                                            data-bs-toggle="modal" data-bs-target="#showApproveCfpErrorInputModal"
-                                            data-client-id="{{ $clients->cid }}" role="button">Certificate of Full Payment</a>
+                                        <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4 cursor-pointer"
+                                            onclick="showSwiftModal('Certificate Approval Required', 'Certificate of full payment requires approval.', 'warning', [{text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}])"
+                                            role="button">Certificate of Full Payment</a>
                                     @elseif($clients->CFPNO == null && $cfpApprover == 1)
-                                        <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
-                                            data-bs-toggle="modal" data-bs-target="#showApproveCfpInputModal"
-                                            data-client-id="{{ $clients->cid }}" role="button">Certificate of Full Payment</a>
+                                        <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4 cursor-pointer"
+                                            onclick="showSwiftModal('Certificate Approval', 'You are going to approve the certificate of full payment for this client.\n\nYou cannot undo this action. Continue?', 'warning', [{text: 'Confirm', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpApproval()'}, {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}])"
+                                            role="button">Certificate of Full Payment</a>
                                     @elseif($clients->CFPNO == "NA")
                                         <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
                                             data-bs-toggle="modal" data-bs-target="#showCfpNoInputModal"
@@ -1081,10 +1081,8 @@
                                                 </td>
                                                 <td class="px-4 py-3 text-sm text-gray-900">
                                                     @if($lp->status != 'void')
-                                                        <a class="action-void text-red-600 hover:text-red-900 font-medium cursor-pointer"
-                                                            data-bs-toggle="modal" data-bs-target="#loanPaymentVoidModal"
-                                                            data-loan-payment-id="{{ $lp->id }}"
-                                                            data-loan-payment-orno="{{ $lp->orno }}">Void</a>
+                                                        <button class="action-void text-red-600 hover:text-red-900 font-medium cursor-pointer"
+                                                            onclick="showLoanPaymentVoidModal('{{ $lp->id }}', '{{ $lp->orno }}')">Void</button>
                                                     @else
                                                         <span class="text-gray-400">Locked</span>
                                                     @endif
@@ -1259,8 +1257,8 @@
         </div>
 
         <!-- MODAL APPROVAL FOR CERTIFICATE OF FULL PAYMENT -->
-        <div class="modal fade" id="showApproveCfpInputModal" data-bs-backdrop="static" data-bs-keyboard="false"
-            tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" style="display: none;">
+        <div class="modal fade" id="showApproveCfpInputModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+            aria-labelledby="staticBackdropLabel" aria-hidden="true" style="display: none;">
             <div class="modal-dialog">
                 <div class="modal-content rounded-xl shadow-2xl border-0">
                     <div
@@ -1389,192 +1387,209 @@
             </div>
         </div>
 
-        <!-- MODAL VOID -->
-        <div class="modal fade" id="paymentVoidModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-            aria-labelledby="staticBackdropLabel" aria-hidden="true" style="display: none;">
-            <div class="modal-dialog">
-                <div class="modal-content rounded-xl shadow-2xl border-0">
-                    <div
-                        class="modal-header bg-gradient-to-r from-red-50 to-red-100 border-b-2 border-red-200 text-red-900 rounded-t-xl">
-                        <h5 class="modal-title font-bold flex items-center" id="staticBackdropLabel">
-                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                            Confirmation
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body p-6">
-                        <div class="space-y-3">
-                            <p class="text-gray-700 text-base">You are going to void the selected payment with OR No. <span
-                                    class="font-semibold text-purple-600" id="paymentToVoid"></span></p>
-                            <p class="font-bold text-red-600 flex items-center">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                </svg>
-                                You cannot undo this action. Continue?
-                            </p>
-                        </div>
-                    </div>
-                    <form id="voidForm" method="POST">
-                        @csrf
-                        @method('PUT')
-                        <div class="modal-footer border-0 px-6 pb-6 gap-3">
-                            <button type="button"
-                                class="px-6 py-2.5 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-lg shadow-md transition duration-200"
-                                data-bs-dismiss="modal">Close</button>
-                            <button type="button"
-                                class="px-6 py-2.5 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold rounded-lg shadow-md transition duration-200"
-                                id="confirmVoid">Confirm</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+        <style>
+            /* Tab pane visibility control */
+            .tab-pane {
+                display: none;
+            }
 
-        <!-- MODAL VOID LOAN -->
-        <div class="modal fade" id="loanPaymentVoidModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-            aria-labelledby="staticBackdropLabel" aria-hidden="true" style="display: none;">
-            <div class="modal-dialog">
-                <div class="modal-content rounded-xl shadow-2xl border-0">
-                    <div
-                        class="modal-header bg-gradient-to-r from-red-50 to-red-100 border-b-2 border-red-200 text-red-900 rounded-t-xl">
-                        <h5 class="modal-title font-bold flex items-center" id="staticBackdropLabel">
-                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                            Confirmation
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body p-6">
-                        <div class="space-y-3">
-                            <p class="text-gray-700 text-base">You are going to void the selected payment with OR No. <span
-                                    class="font-semibold text-purple-600" id="loanPaymentToVoid"></span></p>
-                            <p class="font-bold text-red-600 flex items-center">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                </svg>
-                                You cannot undo this action. Continue?
-                            </p>
-                        </div>
-                    </div>
-                    <form id="voidLoanForm" method="POST">
-                        @csrf
-                        @method('PUT')
-                        <div class="modal-footer border-0 px-6 pb-6 gap-3">
-                            <button type="button"
-                                class="px-6 py-2.5 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-lg shadow-md transition duration-200"
-                                data-bs-dismiss="modal">Close</button>
-                            <button type="button"
-                                class="px-6 py-2.5 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold rounded-lg shadow-md transition duration-200"
-                                id="confirmLoanVoid">Confirm</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+            .tab-pane.active {
+                display: block;
+            }
 
-        <!-- MODAL COMPLETE MEMORIAL -->
-        <div class="modal fade" id="completeMemorialModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-            aria-labelledby="staticBackdropLabel" aria-hidden="true" style="display: none;">
-            <div class="modal-dialog">
-                <div class="modal-content rounded-xl shadow-2xl border-0">
-                    <div class="modal-header bg-gradient-to-r from-green-600 to-green-700 text-white border-0 rounded-t-xl">
-                        <h5 class="modal-title font-bold flex items-center" id="staticBackdropLabel">
-                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            Confirmation
-                        </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                            aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body p-6">
-                        <div class="space-y-3">
-                            <p class="text-gray-700 text-base">You are going to mark the selected client as having completed
-                                the memorial service.</p>
-                            <p class="font-bold text-red-600 flex items-center">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                </svg>
-                                You cannot undo this action. Continue?
-                            </p>
-                        </div>
-                    </div>
-                    <form action="/submit-complete-memorial/{{ $clients->cid }}" method="POST">
-                        @csrf
-                        @method('PUT')
-                        <div class="modal-footer border-0 px-6 pb-6 gap-3">
-                            <button type="button"
-                                class="px-6 py-2.5 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-lg shadow-md transition duration-200"
-                                data-bs-dismiss="modal">Close</button>
-                            <button type="submit"
-                                class="px-6 py-2.5 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md transition duration-200">Confirm</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-    <style>
-        /* Tab pane visibility control */
-        .tab-pane {
-            display: none;
-        }
+            /* Payment filter button active states */
+            .payment-filter-btn.active {
+                background-color: #76df9dff !important;
+                /* green-500 */
+                border-color: #1aec67ff !important;
+                /* green-600 */
+                color: #ffffff !important;
+                /* white text */
+            }
 
-        .tab-pane.active {
-            display: block;
-        }
+            /* Global pagination styling now handled in app.css */
 
-        /* Payment filter button active states */
-        .payment-filter-btn.active {
-            background-color: #76df9dff !important;
-            /* green-500 */
-            border-color: #1aec67ff !important;
-            /* green-600 */
-            color: #ffffff !important;
-            /* white text */
-        }
+            /* Void action button styling */
+            .action-void {
+                color: #dc2626 !important;
+                /* red-600 */
+                text-decoration: underline;
+                cursor: pointer;
+            }
 
-        /* Global pagination styling now handled in app.css */
+            .action-void:hover {
+                color: #b91c1c !important;
+                /* red-700 */
+            }
 
-        /* Void action button styling */
-        .action-void {
-            color: #dc2626 !important;
-            /* red-600 */
-            text-decoration: underline;
-            cursor: pointer;
-        }
+            .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+                background: #f9fafb !important;
+                /* gray-50 */
+                border-color: #e5e7eb !important;
+                /* gray-200 */
+                color: #9ca3af !important;
+                /* gray-400 */
+            }
+        </style>
+        <script src="{{ asset('js/client-view.js') }}"></script>
+        <script>
+            // Function to submit complete memorial form
+            function submitCompleteMemorial() {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/submit-complete-memorial/{{ $clients->cid }}';
+                
+                const csrfToken = document.createElement('input');
+                csrfToken.type = 'hidden';
+                csrfToken.name = '_token';
+                csrfToken.value = '{{ csrf_token() }}';
+                
+                const method = document.createElement('input');
+                method.type = 'hidden';
+                method.name = '_method';
+                method.value = 'PUT';
+                
+                form.appendChild(csrfToken);
+                form.appendChild(method);
+                document.body.appendChild(form);
+                form.submit();
+            }
 
-        .action-void:hover {
-            color: #b91c1c !important;
-            /* red-700 */
-        }
+            // Function to submit approve client form
+            function submitApproveClient() {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/client-update-status/{{ $clients->cid }}';
+                
+                const csrfToken = document.createElement('input');
+                csrfToken.type = 'hidden';
+                csrfToken.name = '_token';
+                csrfToken.value = '{{ csrf_token() }}';
+                
+                const method = document.createElement('input');
+                method.type = 'hidden';
+                method.name = '_method';
+                method.value = 'PUT';
+                
+                form.appendChild(csrfToken);
+                form.appendChild(method);
+                document.body.appendChild(form);
+                form.submit();
+            }
 
-        .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
-            background: #f9fafb !important;
-            /* gray-50 */
-            border-color: #e5e7eb !important;
-            /* gray-200 */
-            color: #9ca3af !important;
-            /* gray-400 */
-        }
-    </style>
-    <script src="{{ asset('js/client-view.js') }}"></script>
-    <script>
+            // Function to submit verify client form
+            function submitVerifyClient() {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/client-update-status/{{ $clients->cid }}';
+                
+                const csrfToken = document.createElement('input');
+                csrfToken.type = 'hidden';
+                csrfToken.name = '_token';
+                csrfToken.value = '{{ csrf_token() }}';
+                
+                const method = document.createElement('input');
+                method.type = 'hidden';
+                method.name = '_method';
+                method.value = 'PUT';
+                
+                form.appendChild(csrfToken);
+                form.appendChild(method);
+                document.body.appendChild(form);
+                form.submit();
+            }
+
+            // Function to show payment void modal
+            let currentPaymentId = null;
+            function showPaymentVoidModal(paymentId, orNo) {
+                currentPaymentId = paymentId;
+                showSwiftModal('Void Payment', `You are going to void the selected payment with OR No. ${orNo}\n\nYou cannot undo this action. Continue?`, 'warning', [
+                    {text: 'Confirm', class: 'bg-red-500 hover:bg-red-600 text-white', action: 'submitPaymentVoid()'},
+                    {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+                ]);
+            }
+
+            // Function to submit payment void
+            function submitPaymentVoid() {
+                if (!currentPaymentId) return;
+                
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/submit-void-payment/' + currentPaymentId;
+                
+                const csrfToken = document.createElement('input');
+                csrfToken.type = 'hidden';
+                csrfToken.name = '_token';
+                csrfToken.value = '{{ csrf_token() }}';
+                
+                const method = document.createElement('input');
+                method.type = 'hidden';
+                method.name = '_method';
+                method.value = 'PUT';
+                
+                form.appendChild(csrfToken);
+                form.appendChild(method);
+                document.body.appendChild(form);
+                form.submit();
+            }
+
+            // Function to show loan payment void modal
+            let currentLoanPaymentId = null;
+            function showLoanPaymentVoidModal(loanPaymentId, orNo) {
+                currentLoanPaymentId = loanPaymentId;
+                showSwiftModal('Void Loan Payment', `You are going to void the selected payment with OR No. ${orNo}\n\nYou cannot undo this action. Continue?`, 'warning', [
+                    {text: 'Confirm', class: 'bg-red-500 hover:bg-red-600 text-white', action: 'submitLoanPaymentVoid()'},
+                    {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+                ]);
+            }
+
+            // Function to submit loan payment void
+            function submitLoanPaymentVoid() {
+                if (!currentLoanPaymentId) return;
+                
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/submit-void-loan-payment/' + currentLoanPaymentId;
+                
+                const csrfToken = document.createElement('input');
+                csrfToken.type = 'hidden';
+                csrfToken.name = '_token';
+                csrfToken.value = '{{ csrf_token() }}';
+                
+                const method = document.createElement('input');
+                method.type = 'hidden';
+                method.name = '_method';
+                method.value = 'PUT';
+                
+                form.appendChild(csrfToken);
+                form.appendChild(method);
+                document.body.appendChild(form);
+                form.submit();
+            }
+
+            // Function to submit CFP approval
+            function submitCfpApproval() {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/approve-cfp/{{ $clients->cid }}';
+                
+                const csrfToken = document.createElement('input');
+                csrfToken.type = 'hidden';
+                csrfToken.name = '_token';
+                csrfToken.value = '{{ csrf_token() }}';
+                
+                form.appendChild(csrfToken);
+                document.body.appendChild(form);
+                form.submit();
+            }
+
             // Custom tab switching (more reliable than Bootstrap)
             document.addEventListener('DOMContentLoaded', function () {
                 @if(request('status'))
                     localStorage.setItem('clientStatusFilter', '{{ request('status') }}');
                 @endif
-                                                const tabs = document.querySelectorAll('#clientTabs button[data-bs-toggle="tab"]');
+                
+                const tabs = document.querySelectorAll('#clientTabs button[data-bs-toggle="tab"]');
                 const tabPanes = document.querySelectorAll('.tab-pane');
 
                 tabs.forEach(tab => {
@@ -1590,7 +1605,7 @@
                         // Remove active classes from all tabs
                         tabs.forEach(t => {
                             t.classList.remove('text-purple-600', 'border-b-2', 'border-purple-600', 'font-semibold');
-             t.classList.add('text-gray-500');
+                            t.classList.add('text-gray-500');
                             t.setAttribute('aria-selected', 'false');
                         });
 
@@ -1611,5 +1626,5 @@
 
                 console.log('✅ Custom tabs initialized:', tabs.length, 'tabs found');
             });
-    </script>
-@endsection
+        </script>
+    @endsection
