@@ -33,12 +33,12 @@ class ContractBatchController extends Controller
                 Staff::raw('(SELECT CONCAT(LastName, " ", FirstName, " ", MiddleName) FROM `tblstaff` WHERE `Id` = tblcontractbatch.assignedstaffid) as Assigned'),
                 Contract::raw('(SELECT COUNT(`ContractBatchId`) FROM `tblcontract` WHERE `Status` = 1 AND `ContractBatchId` = tblcontractbatch.id) as countAvailContract')
             )
-            ->leftJoin('tblregion', 'tblcontractbatch.RegionId', '=', 'tblregion.id')
-            ->leftJoin('tblbranch', 'tblcontractbatch.BranchId', '=', 'tblbranch.id')
-            ->leftJoin('tblstaff', 'tblcontractbatch.AssignedStaffId', '=', 'tblstaff.id');
+            ->leftJoin('tblregion', 'tblcontractbatch.regionid', '=', 'tblregion.id')
+            ->leftJoin('tblbranch', 'tblcontractbatch.branchid', '=', 'tblbranch.id')
+            ->leftJoin('tblstaff', 'tblcontractbatch.assignedstaffid', '=', 'tblstaff.id');
 
             if ($request->filled('branch_id')) {
-                $query->where('tblcontractbatch.BranchId', $request->input('branch_id'));
+                $query->where('tblcontractbatch.branchid', $request->input('branch_id'));
             }
 
             if (!empty($request->input('search.value'))) {

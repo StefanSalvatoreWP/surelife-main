@@ -60,7 +60,7 @@ class LoanPaymentController extends Controller
             $query = LoanPayment::query()
                 ->select(
                     'tblloanpayment.*',
-                    'tblorbatch.SeriesCode'
+                    'tblorbatch.seriescode as SeriesCode'
                 )
                 ->leftJoin('tblofficialreceipt', 'tblloanpayment.orid', '=', 'tblofficialreceipt.id')
                 ->leftJoin('tblorbatch', 'tblofficialreceipt.orbatchid', '=', 'tblorbatch.id')
@@ -120,12 +120,12 @@ class LoanPaymentController extends Controller
 
         $orExists = OrBatch::select('tblorbatch.*', 'tblofficialreceipt.id')
             ->leftJoin('tblofficialreceipt', 'tblorbatch.id', '=', 'tblofficialreceipt.orbatchid')
-            ->where('ORNumber', $orNo)
-            ->where('RegionId', $clientRegion)
-            ->where('BranchId', $clientBranch)
-            ->where('Status', $availableOR)
-            ->where('Type', $orType)
-            ->where('SeriesCode', $orSeriesCode)
+            ->where('ornumber', $orNo)
+            ->where('regionid', $clientRegion)
+            ->where('branchid', $clientBranch)
+            ->where('status', $availableOR)
+            ->where('type', $orType)
+            ->where('seriescode', $orSeriesCode)
             ->first();
 
         if ($orExists) {
@@ -175,7 +175,7 @@ class LoanPaymentController extends Controller
             ];
 
             OfficialReceipt::where('id', $searchedOfficialReceiptId)
-                ->where('ORNumber', $orNo)
+                ->where('ornumber', $orNo)
                 ->update($updateORData);
 
             // update loan remarks

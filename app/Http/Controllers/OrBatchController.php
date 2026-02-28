@@ -118,15 +118,15 @@ class OrBatchController extends Controller
             // Optimized query with left join to get client data in one query
             $orserieses = OfficialReceipt::select(
                     'tblofficialreceipt.Id',
-                    'tblofficialreceipt.ORNumber',
-                    'tblofficialreceipt.Status',
-                    'tblofficialreceipt.Remarks',
+                    'tblofficialreceipt.ornumber as ORNumber',
+                    'tblofficialreceipt.status as Status',
+                    'tblofficialreceipt.remarks as Remarks',
                     'tblclient.LastName',
                     'tblclient.FirstName',
                     'tblclient.MiddleName'
                 )
                 ->leftJoin('tblpayment', function($join) {
-                    $join->on('tblofficialreceipt.ORNumber', '=', 'tblpayment.orno')
+                    $join->on('tblofficialreceipt.ornumber', '=', 'tblpayment.orno')
                          ->on('tblofficialreceipt.Id', '=', 'tblpayment.orid');
                 })
                 ->leftJoin('tblclient', 'tblpayment.clientid', '=', 'tblclient.id')
@@ -291,11 +291,11 @@ class OrBatchController extends Controller
                 $records = [];
                 for ($i = $startornum; $i <= $endornum; $i++) {
                     $records[] = [
-                        'ORBatchId' => $orbatchId,
-                        'ORNumber' => $i,
-                        'Status' => $unusedStatus,
-                        'Deleted' => '0',
-                        'Remarks' => "N/A"
+                        'orbatchid' => $orbatchId,
+                        'ornumber' => $i,
+                        'status' => $unusedStatus,
+                        'deleted' => '0',
+                        'remarks' => "N/A"
                     ];
                 }
                 OfficialReceipt::insert($records);

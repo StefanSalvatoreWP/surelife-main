@@ -30,11 +30,11 @@
                 @elseif($encashmentData->Status == 'Recorded')
                     <a href="/view-req-encashment-adjustment/{{ $encashmentData->Id }}" class="btn btn-outline-success btn-sm ms-2" role="button">Approve</a>
                 @elseif($encashmentData->Status == 'Approved')
-                    <a class="btn btn-outline-success btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#encashmentReqReleaseModal" role="button">Release</a>
+                    <a class="btn btn-outline-success btn-sm ms-2" onclick="showReleaseModal()" role="button">Release</a>
                 @endif
 
                 @if($encashmentData->Status != 'Released' && $encashmentData->Status != 'Rejected')
-                    <a class="btn btn-danger btn-sm ms-auto" data-bs-toggle="modal" data-bs-target="#encashmentReqRejectModal" role="button">Reject</a>
+                    <a class="btn btn-danger btn-sm ms-auto" onclick="showRejectModal()" role="button">Reject</a>
                 @endif
             </div>
             <input type="hidden" id="encashmentReqId" value="{{$encashmentData->Id}}" />
@@ -263,52 +263,128 @@
             </div>
         </div>
 
-        <!-- MODAL ENCASHMENT RELEASE -->
-        <div class="modal fade" id="encashmentReqReleaseModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title text-dark fw-bold" id="staticBackdropLabel">Confirmation</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <form id="encashmentReqReleaseForm" method="POST">
-                        @csrf
-                        @method('PUT')
-                        <div class="modal-body">
-                            <input type="text" class="form-control font-sm" placeholder="Enter voucher code" name="vouchercode" required />
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary btn-sm w-25" data-bs-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-success btn-sm w-25" id="confirmEncashmentReqRelease">Confirm</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+        <!-- Swift Modal Scripts -->
+        <script>
+            function showReleaseModal() {
+                const modal = document.getElementById('swiftModal');
+                const iconDiv = document.getElementById('swiftModalIcon');
+                const titleEl = document.getElementById('swiftModalTitle');
+                const messageEl = document.getElementById('swiftModalMessage');
+                const actionsEl = document.getElementById('swiftModalActions');
 
-        <!-- MODAL ENCASHMENT REJECT -->
-        <div class="modal fade" id="encashmentReqRejectModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title text-dark fw-bold" id="staticBackdropLabel">Confirmation</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <form id="encashmentReqRejectForm" method="POST">
-                        @csrf
-                        @method('PUT')
-                        <div class="modal-body">
-                            <p>Reject this selected encashment request?</p>
-                            <input type="text" class="form-control" name="rejectremarks" placeholder="Enter remarks" />
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary btn-sm w-25" data-bs-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-danger btn-sm w-25" id="confirmEncashmentReqReject">Confirm</button>
-                        </div>
+                if (!modal) return;
+
+                iconDiv.innerHTML = `<svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>`;
+                iconDiv.className = 'w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-green-100';
+
+                titleEl.textContent = 'Release Encashment';
+                
+                const encashmentId = document.getElementById('encashmentReqId')?.value || '';
+                messageEl.innerHTML = `
+                    <div class="text-gray-600 text-sm mb-4">Enter voucher code to release this encashment.</div>
+                    <form id="swiftReleaseForm">
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="_method" value="PUT">
+                        <input type="text" id="vouchercode" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="Enter voucher code" required>
                     </form>
-                </div>
-            </div>
-        </div>
+                `;
+
+                actionsEl.innerHTML = '';
+                
+                const cancelBtn = document.createElement('button');
+                cancelBtn.type = 'button';
+                cancelBtn.className = 'w-full py-3 px-6 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold rounded-xl transition duration-200';
+                cancelBtn.textContent = 'Cancel';
+                cancelBtn.addEventListener('click', () => hideSwiftModal());
+                actionsEl.appendChild(cancelBtn);
+
+                const confirmBtn = document.createElement('button');
+                confirmBtn.type = 'button';
+                confirmBtn.className = 'w-full py-3 px-6 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl transition duration-200';
+                confirmBtn.textContent = 'Confirm Release';
+                confirmBtn.addEventListener('click', () => {
+                    const voucherCode = document.getElementById('vouchercode')?.value;
+                    if (!voucherCode) {
+                        alert('Please enter a voucher code');
+                        return;
+                    }
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/encashment-release/' + encashmentId;
+                    form.innerHTML = `
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="_method" value="PUT">
+                        <input type="hidden" name="vouchercode" value="${voucherCode}">
+                    `;
+                    document.body.appendChild(form);
+                    form.submit();
+                });
+                actionsEl.appendChild(confirmBtn);
+
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+
+            function showRejectModal() {
+                const modal = document.getElementById('swiftModal');
+                const iconDiv = document.getElementById('swiftModalIcon');
+                const titleEl = document.getElementById('swiftModalTitle');
+                const messageEl = document.getElementById('swiftModalMessage');
+                const actionsEl = document.getElementById('swiftModalActions');
+
+                if (!modal) return;
+
+                iconDiv.innerHTML = `<svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>`;
+                iconDiv.className = 'w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-red-100';
+
+                titleEl.textContent = 'Reject Encashment';
+                
+                const encashmentId = document.getElementById('encashmentReqId')?.value || '';
+                messageEl.innerHTML = `
+                    <div class="text-gray-600 text-sm mb-4">Are you sure you want to reject this encashment request?</div>
+                    <form id="swiftRejectForm">
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="_method" value="PUT">
+                        <input type="text" id="rejectremarks" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" placeholder="Enter remarks (optional)">
+                    </form>
+                `;
+
+                actionsEl.innerHTML = '';
+                
+                const cancelBtn = document.createElement('button');
+                cancelBtn.type = 'button';
+                cancelBtn.className = 'w-full py-3 px-6 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold rounded-xl transition duration-200';
+                cancelBtn.textContent = 'Cancel';
+                cancelBtn.addEventListener('click', () => hideSwiftModal());
+                actionsEl.appendChild(cancelBtn);
+
+                const confirmBtn = document.createElement('button');
+                confirmBtn.type = 'button';
+                confirmBtn.className = 'w-full py-3 px-6 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl transition duration-200';
+                confirmBtn.textContent = 'Confirm Reject';
+                confirmBtn.addEventListener('click', () => {
+                    const remarks = document.getElementById('rejectremarks')?.value || '';
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/encashment-reject/' + encashmentId;
+                    form.innerHTML = `
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="_method" value="PUT">
+                        <input type="hidden" name="rejectremarks" value="${remarks}">
+                    `;
+                    document.body.appendChild(form);
+                    form.submit();
+                });
+                actionsEl.appendChild(confirmBtn);
+
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        </script>
     </div>
     <script src="{{ asset('js/req-encashment-view.js') }}"></script>
 @endsection

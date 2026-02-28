@@ -166,12 +166,12 @@ class PaymentController extends Controller
 
         $orExists = OrBatch::select('tblorbatch.*', 'tblofficialreceipt.id')
             ->leftJoin('tblofficialreceipt', 'tblorbatch.id', '=', 'tblofficialreceipt.orbatchid')
-            ->where('ORNumber', $orNo)
-            ->where('RegionId', $clientRegion)
-            ->where('BranchId', $clientBranch)
-            ->where('Status', $availableOR)
-            ->where('Type', $orType)
-            ->where('SeriesCode', $orSeriesCode)
+            ->where('ornumber', $orNo)
+            ->where('regionid', $clientRegion)
+            ->where('branchid', $clientBranch)
+            ->where('status', $availableOR)
+            ->where('type', $orType)
+            ->where('seriescode', $orSeriesCode)
             ->first();
 
         if ($orExists) {
@@ -319,7 +319,7 @@ class PaymentController extends Controller
             ];
 
             OfficialReceipt::where('id', $searchedOfficialReceiptId)
-                ->where('ORNumber', $orNo)
+                ->where('ornumber', $orNo)
                 ->update($updateORData);
 
             // get client payment term
@@ -466,33 +466,33 @@ class PaymentController extends Controller
 
         // 1. Get ALL series codes for the specific branch and region, prioritizing the requested type
         $query = OrBatch::select(
-            'tblorbatch.SeriesCode',
-            'tblorbatch.Type',
-            \DB::raw('COUNT(CASE WHEN tblofficialreceipt.Status = 1 THEN 1 END) as available_count'),
+            'tblorbatch.seriescode as SeriesCode',
+            'tblorbatch.type as Type',
+            \DB::raw('COUNT(CASE WHEN tblofficialreceipt.status = 1 THEN 1 END) as available_count'),
             \DB::raw('COUNT(tblofficialreceipt.id) as total_count')
         )
             ->join('tblofficialreceipt', 'tblorbatch.id', '=', 'tblofficialreceipt.orbatchid')
-            ->where('tblorbatch.BranchId', $branchId)
-            ->where('tblorbatch.RegionId', $regionId)
-            ->groupBy('tblorbatch.SeriesCode', 'tblorbatch.Type')
-            ->orderByRaw("CASE WHEN tblorbatch.Type = ? THEN 0 ELSE 1 END", [$orType])
-            ->orderBy('tblorbatch.SeriesCode', 'asc');
+            ->where('tblorbatch.branchid', $branchId)
+            ->where('tblorbatch.regionid', $regionId)
+            ->groupBy('tblorbatch.seriescode', 'tblorbatch.type')
+            ->orderByRaw("CASE WHEN tblorbatch.type = ? THEN 0 ELSE 1 END", [$orType])
+            ->orderBy('tblorbatch.seriescode', 'asc');
 
         $seriesCodes = $query->get();
 
         // 2. Fallback: If no series for branch, try region level (all types)
         if ($seriesCodes->isEmpty() && $regionId) {
             $seriesCodes = OrBatch::select(
-                'tblorbatch.SeriesCode',
-                'tblorbatch.Type',
-                \DB::raw('COUNT(CASE WHEN tblofficialreceipt.Status = 1 THEN 1 END) as available_count'),
+                'tblorbatch.seriescode as SeriesCode',
+                'tblorbatch.type as Type',
+                \DB::raw('COUNT(CASE WHEN tblofficialreceipt.status = 1 THEN 1 END) as available_count'),
                 \DB::raw('COUNT(tblofficialreceipt.id) as total_count')
             )
                 ->join('tblofficialreceipt', 'tblorbatch.id', '=', 'tblofficialreceipt.orbatchid')
-                ->where('tblorbatch.RegionId', $regionId)
-                ->groupBy('tblorbatch.SeriesCode', 'tblorbatch.Type')
-                ->orderByRaw("CASE WHEN tblorbatch.Type = ? THEN 0 ELSE 1 END", [$orType])
-                ->orderBy('tblorbatch.SeriesCode', 'asc')
+                ->where('tblorbatch.regionid', $regionId)
+                ->groupBy('tblorbatch.seriescode', 'tblorbatch.type')
+                ->orderByRaw("CASE WHEN tblorbatch.type = ? THEN 0 ELSE 1 END", [$orType])
+                ->orderBy('tblorbatch.seriescode', 'asc')
                 ->get();
 
             Log::info('Fallback to region-all-types', ['regionId' => $regionId, 'count' => $seriesCodes->count()]);
@@ -530,37 +530,24 @@ class PaymentController extends Controller
 
         // Get available OR numbers for the given series code
         // Relaxed type constraint to allow cross-usage (Standard series for Partial payment)
-        $orNumbers = OfficialReceipt::select('tblofficialreceipt.ORNumber', 'tblofficialreceipt.id')
+        $orNumbers = OfficialReceipt::select('tblofficialreceipt.ornumber as ORNumber', 'tblofficialreceipt.id')
             ->join('tblorbatch', 'tblorbatch.id', '=', 'tblofficialreceipt.orbatchid')
-            ->where('tblofficialreceipt.Status', '1') // Available ORs only
-            ->where('tblorbatch.SeriesCode', $seriesCode);
+            ->where('tblofficialreceipt.status', '1') // Available ORs only
+            ->where('tblorbatch.seriescode', $seriesCode);
 
         // Add branch filter if provided
         if ($branchId) {
-            $orNumbers->where('tblorbatch.BranchId', $branchId);
+            $orNumbers->where('tblorbatch.branchid', $branchId);
         }
 
         // Add region filter if provided
         if ($regionId) {
-            $orNumbers->where('tblorbatch.RegionId', $regionId);
+            $orNumbers->where('tblorbatch.regionid', $regionId);
         }
 
-        $results = $orNumbers->orderBy('tblofficialreceipt.ORNumber', 'asc')
+        $results = $orNumbers->orderBy('tblofficialreceipt.ornumber', 'asc')
             ->limit(100) // Limit to prevent overloading
             ->get();
-
-        // If no results with branch/region filters, try with just series code (global fallback)
-        if ($results->isEmpty()) {
-            $results = OfficialReceipt::select('tblofficialreceipt.ORNumber', 'tblofficialreceipt.id')
-                ->join('tblorbatch', 'tblorbatch.id', '=', 'tblofficialreceipt.orbatchid')
-                ->where('tblofficialreceipt.Status', '1')
-                ->where('tblorbatch.SeriesCode', $seriesCode)
-                ->orderBy('tblofficialreceipt.ORNumber', 'asc')
-                ->limit(100)
-                ->get();
-
-            Log::info('Fallback to series code only for OR numbers (relaxed)', ['seriesCode' => $seriesCode, 'count' => $results->count()]);
-        }
 
         // Log the results for debugging
         Log::info('getOrNumbersBySeriesCode results', [
@@ -645,12 +632,12 @@ class PaymentController extends Controller
 
         $orExists = OrBatch::select('tblorbatch.*', 'tblofficialreceipt.id')
             ->leftJoin('tblofficialreceipt', 'tblorbatch.id', '=', 'tblofficialreceipt.orbatchid')
-            ->where('ORNumber', $orNo)
-            ->where('RegionId', $clientRegion)
-            ->where('BranchId', $clientBranch)
-            ->where('Status', $availableOR)
-            ->where('Type', $orType)
-            ->where('SeriesCode', $orSeriesCode)
+            ->where('ornumber', $orNo)
+            ->where('regionid', $clientRegion)
+            ->where('branchid', $clientBranch)
+            ->where('status', $availableOR)
+            ->where('type', $orType)
+            ->where('seriescode', $orSeriesCode)
             ->first();
 
         if ($orExists) {
@@ -776,7 +763,7 @@ class PaymentController extends Controller
             ];
 
             OfficialReceipt::where('id', $searchedOfficialReceiptId)
-                ->where('ORNumber', $orNo)
+                ->where('ornumber', $orNo)
                 ->update($updateORData);
 
             // send email for successful payment

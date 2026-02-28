@@ -30,10 +30,7 @@ $(document).ready(function() {
                                 </svg>
                                 Update
                             </a>
-                            <a data-bs-toggle="modal" 
-                               data-bs-target="#menuDeleteModal" 
-                               data-menu-id="${data.id}" 
-                               data-menu-name="${data.menuitem}" 
+                            <a onclick="showDeleteMenuModal(${data.id}, '${data.menuitem}')" 
                                role="button"
                                class="inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-red-50 to-red-100 hover:from-red-100 hover:to-red-200 text-red-900 text-xs font-semibold rounded-lg shadow-sm hover:shadow-md transform hover:scale-105 transition duration-200 ease-in-out cursor-pointer">
                                 <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -63,20 +60,33 @@ $(document).ready(function() {
         loadedTable.search(this.value).draw();
     });
 
-    /* MODALS */
-    $('#menuDeleteModal').on('show.bs.modal', function(event) {
-
-        let button = $(event.relatedTarget);
-        let menuId = button.data('menu-id');
-        let menuName = button.data('menu-name');
-        
-        let modal = $(this);
-        modal.find('#menuToDelete').text(menuName);
-        modal.find('#confirmDelete').click(function() {
-            
-            let deleteForm = $('#deleteForm');
-            deleteForm.attr('action', '/submit-menu-delete/' + menuId);
-            deleteForm.submit();
-        });
-    });
 });
+
+/* Swift-Style Modal Functions */
+function showDeleteMenuModal(menuId, menuName) {
+    showSwiftModal('Confirm Deletion', `Delete selected menu "${menuName}"?\n\nThis action cannot be undone. The menu privilege will be permanently removed from the system.`, 'warning', [
+        {text: 'Delete Menu', class: 'bg-red-500 hover:bg-red-600 text-white', action: `submitDeleteMenu(${menuId})`},
+        {text: 'Cancel', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+    ]);
+}
+
+function submitDeleteMenu(menuId) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/submit-menu-delete/' + menuId;
+    
+    const csrfToken = document.createElement('input');
+    csrfToken.type = 'hidden';
+    csrfToken.name = '_token';
+    csrfToken.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    
+    const method = document.createElement('input');
+    method.type = 'hidden';
+    method.name = '_method';
+    method.value = 'DELETE';
+    
+    form.appendChild(csrfToken);
+    form.appendChild(method);
+    document.body.appendChild(form);
+    form.submit();
+}

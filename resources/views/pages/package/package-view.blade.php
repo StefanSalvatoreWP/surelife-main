@@ -58,14 +58,16 @@
                 Return
             </a>
             @if($packages->Active == 1)
-                <a class="inline-flex items-center px-4 py-2 bg-red-50 hover:bg-red-100 text-red-900 text-sm font-medium rounded-lg shadow-sm hover:shadow-md transition duration-200 cursor-pointer" data-bs-toggle="modal" data-bs-target="#packageDisableModal" data-package-id="{{ $packages->Id }}" data-package-name="{{ $packages->Package }}">
+                <a class="inline-flex items-center px-4 py-2 bg-red-50 hover:bg-red-100 text-red-900 text-sm font-medium rounded-lg shadow-sm hover:shadow-md transition duration-200 cursor-pointer"
+                   onclick="showSwiftModal('Disable Package', 'Are you sure you want to disable package {{ $packages->Package }}?\n\nThis package will no longer be available to clients.', 'warning', [{text: 'Disable Package', class: 'bg-red-500 hover:bg-red-600 text-white', action: 'submitDisablePackage()'}, {text: 'Cancel', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}])">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
                     </svg>
                     Disable Package
                 </a>
             @else
-                <a class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg shadow-sm hover:shadow-md transition duration-200 cursor-pointer" data-bs-toggle="modal" data-bs-target="#packageEnableModal" data-package-id="{{ $packages->Id }}" data-package-name="{{ $packages->Package }}">
+                <a class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg shadow-sm hover:shadow-md transition duration-200 cursor-pointer"
+                   onclick="showSwiftModal('Enable Package', 'Are you sure you want to enable package {{ $packages->Package }}?\n\nThis package will be made available to all clients.', 'success', [{text: 'Enable Package', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitEnablePackage()'}, {text: 'Cancel', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}])">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                     </svg>
@@ -247,84 +249,48 @@
             </div>
         </div>
     </div>
-
-        <!-- MODAL DISABLE PACKAGE -->
-        <div class="modal fade" id="packageDisableModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content rounded-xl shadow-2xl border-0 overflow-hidden">
-                    <div class="modal-header bg-gradient-to-r from-red-600 to-red-700 text-white border-0 py-4 px-6">
-                        <h5 class="modal-title font-bold flex items-center text-lg" id="staticBackdropLabel">
-                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                            </svg>
-                            Disable Package
-                        </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body p-6">
-                        <div class="space-y-4">
-                            <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
-                                <p class="text-gray-700 text-base">Are you sure you want to disable this package?</p>
-                                <p class="font-bold text-red-600 text-lg mt-2" id="packageToDisable"></p>
-                            </div>
-                            <div class="flex items-start space-x-3 bg-amber-50 p-4 rounded-lg border border-amber-200">
-                                <svg class="w-6 h-6 text-amber-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                                </svg>
-                                <p class="text-sm text-amber-800">This package will no longer be available to clients.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <form id="disableForm" method="POST">
-                        @csrf
-                        @method('PUT')
-                        <div class="modal-footer border-0 px-6 pb-6 gap-3 bg-gray-50">
-                            <button type="button" class="px-6 py-2.5 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-lg shadow-md transition duration-200" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" class="px-6 py-2.5 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold rounded-lg shadow-md transition duration-200" id="confirmDisable">Disable Package</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-        
-         <!-- MODAL ENABLE PACKAGE -->
-         <div class="modal fade" id="packageEnableModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content rounded-xl shadow-2xl border-0 overflow-hidden">
-                    <div class="modal-header bg-gradient-to-r from-green-600 to-green-700 text-white border-0 py-4 px-6">
-                        <h5 class="modal-title font-bold flex items-center text-lg" id="staticBackdropLabel">
-                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            Enable Package
-                        </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body p-6">
-                        <div class="space-y-4">
-                            <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-lg">
-                                <p class="text-gray-700 text-base">Are you sure you want to enable this package?</p>
-                                <p class="font-bold text-green-600 text-lg mt-2" id="packageToEnable"></p>
-                            </div>
-                            <div class="flex items-start space-x-3 bg-blue-50 p-4 rounded-lg border border-blue-200">
-                                <svg class="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-                                </svg>
-                                <p class="text-sm text-blue-800">This package will be made available to all clients.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <form id="enableForm" method="POST">
-                        @csrf
-                        @method('PUT')
-                        <div class="modal-footer border-0 px-6 pb-6 gap-3 bg-gray-50">
-                            <button type="button" class="px-6 py-2.5 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-lg shadow-md transition duration-200" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" class="px-6 py-2.5 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md transition duration-200" id="confirmEnable">Enable Package</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
     <script src="{{ asset('js/packageview.js') }}"></script>
+    <script>
+        function submitDisablePackage() {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/package-disable/{{ $packages->Id }}';
+            
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = '_token';
+            csrfToken.value = '{{ csrf_token() }}';
+            
+            const method = document.createElement('input');
+            method.type = 'hidden';
+            method.name = '_method';
+            method.value = 'PUT';
+            
+            form.appendChild(csrfToken);
+            form.appendChild(method);
+            document.body.appendChild(form);
+            form.submit();
+        }
+        
+        function submitEnablePackage() {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/package-enable/{{ $packages->Id }}';
+            
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = '_token';
+            csrfToken.value = '{{ csrf_token() }}';
+            
+            const method = document.createElement('input');
+            method.type = 'hidden';
+            method.name = '_method';
+            method.value = 'PUT';
+            
+            form.appendChild(csrfToken);
+            form.appendChild(method);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    </script>
 @endsection

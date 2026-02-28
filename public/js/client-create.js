@@ -733,8 +733,7 @@ $(document).ready(function () {
             }
             else if (paymentTermSelect === "Semi-Annual") {
                 paymentMultiplier = 2;
-            }
-            else if (paymentTermSelect === "Quarterly") {
+            } else if (paymentTermSelect === "Quarterly") {
                 paymentMultiplier = 4;
             }
 
@@ -747,7 +746,6 @@ $(document).ready(function () {
             paymentAmountElement.replaceWith(newSelect);
         }
     });
-
 
     // regions and branches
     $('#region').on('change', function () {

@@ -131,35 +131,79 @@ $(document).ready(function () {
         let clientId = $(this).data('client-id');
         let clientName = $(this).data('client-name');
 
-        // Update modal content
-        $('#clientToDelete').text(clientName);
-
-        // Remove any previous click handlers to prevent multiple submissions
-        $('#confirmDelete').off('click');
-
-        // Add new click handler
-        $('#confirmDelete').on('click', function () {
-            let deleteForm = $('#deleteForm');
-            deleteForm.attr('action', '/client-delete-submit/' + clientId);
-            deleteForm.submit();
-        });
-
-        // Show the modal - try Bootstrap 5 first, fallback to jQuery
-        let modal = $('#clientDeleteModal');
-        if (typeof bootstrap !== 'undefined') {
-            let bsModal = new bootstrap.Modal(modal[0], {
-                backdrop: false // Disable backdrop
-            });
-            bsModal.show();
+        // Use Swift modal for delete confirmation
+        if (typeof showSwiftModal === 'function') {
+            showSwiftModal(
+                'Confirm Deletion',
+                'Delete selected client: ' + clientName + '?\n\nThis action cannot be undone. The client and all associated data will be permanently removed from the system.',
+                'warning',
+                [
+                    {
+                        text: 'Cancel',
+                        class: 'bg-gray-200 hover:bg-gray-300 text-gray-800',
+                        action: 'hideSwiftModal()'
+                    },
+                    {
+                        text: 'Delete Client',
+                        class: 'bg-red-500 hover:bg-red-600 text-white',
+                        action: 'submitDeleteClient(' + clientId + ')'
+                    }
+                ]
+            );
         } else {
-            // Fallback: show modal with jQuery (no backdrop)
-            modal.addClass('show').css('display', 'flex');
+            // Fallback: submit form directly
+            submitDeleteClient(clientId);
         }
     });
 
-    // Handle modal close
-    $(document).on('click', '[data-bs-dismiss="modal"]', function () {
-        let modal = $('#clientDeleteModal');
-        modal.removeClass('show').css('display', 'none');
-    });
+    // Global function to handle client deletion
+    window.submitDeleteClient = function(clientId) {
+        // Use fetch for AJAX delete to avoid page reload and banner
+        fetch('/client-delete-submit/' + clientId, {
+            method: 'DELETE',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || document.querySelector('input[name="_token"]')?.value
+            }
+        })
+        .then(async (response) => {
+            const contentType = response.headers.get('content-type') || '';
+            const isJson = contentType.includes('application/json');
+
+            const payload = isJson ? await response.json() : await response.text();
+
+            if (!response.ok) {
+                const message = isJson
+                    ? (payload && payload.message ? payload.message : 'Failed to delete client.')
+                    : 'Failed to delete client.';
+                throw new Error(message);
+            }
+
+            return payload;
+        })
+        .then(data => {
+            if (data.success) {
+                // Show success modal and reload page after user clicks OK
+                showSwiftModal(
+                    'Success!',
+                    'Client deleted successfully.',
+                    'success',
+                    [
+                        {
+                            text: 'OK',
+                            class: 'bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg',
+                            action: 'window.location.reload()'
+                        }
+                    ]
+                );
+            } else {
+                showSwiftModal('Error', data.message || 'Failed to delete client.', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Delete error:', error);
+            showSwiftModal('Error', error?.message || 'An error occurred while deleting the client.', 'error');
+        });
+    };
 });

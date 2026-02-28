@@ -8,7 +8,7 @@
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-2xl font-bold text-gray-800">Loan Request</h3>
                 @if(!$loanRequest)
-                    <button data-bs-toggle="modal" data-bs-target="#clientLoanRequestModal"
+                    <button onclick="showLoanRequestModal()"
                         class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white text-sm font-semibold rounded-md shadow-sm hover:shadow transition duration-150">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -20,7 +20,8 @@
                     <div
                         class="inline-flex items-center px-4 py-2 bg-gray-50 text-gray-500 text-sm font-semibold rounded-md border border-gray-200 cursor-not-allowed">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M5 13l4 4L19 7" />
                         </svg>
                         Request Sent
                     </div>
@@ -164,39 +165,28 @@
                 </div>
             </div>
         </div>
-        <!-- Loan Request Modal -->
-        <div class="modal fade" id="clientLoanRequestModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-            aria-labelledby="staticBackdropLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content rounded-xl shadow-2xl border-0">
-                    <div class="modal-header bg-gradient-to-r from-green-600 to-green-700 text-white border-0 rounded-t-xl">
-                        <h5 class="modal-title font-bold flex items-center" id="staticBackdropLabel">
-                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            Confirmation
-                        </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                            aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body p-6">
-                        <p class="text-gray-700 text-base">This process will undergo review. You can monitor the loan
-                            request status to check the progress. Do you want to proceed?</p>
-                    </div>
-                    <form action="/submit-client-loanrequest/{{ session('user_id') }}" method="POST">
-                        @csrf
-                        <div class="modal-footer border-0 px-6 pb-6 gap-3">
-                            <button type="button"
-                                class="px-6 py-2.5 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-lg shadow-md transition duration-200"
-                                data-bs-dismiss="modal">Close</button>
-                            <button type="submit"
-                                class="px-6 py-2.5 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md transition duration-200"
-                                id="confirmDelete">Confirm</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
     </div>
+    <script>
+        function showLoanRequestModal() {
+            showSwiftModal('Confirmation', 'This process will undergo review. You can monitor the loan request status to check the progress. Do you want to proceed?', 'success', [
+                {text: 'Confirm', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitLoanRequest()'},
+                {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+            ]);
+        }
+        
+        function submitLoanRequest() {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/submit-client-loanrequest/{{ session('user_id') }}';
+            
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = '_token';
+            csrfToken.value = '{{ csrf_token() }}';
+            
+            form.appendChild(csrfToken);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    </script>
 @endsection

@@ -720,38 +720,36 @@ class ClientController extends Controller
             }
         }
 
-        // custom error message
+        // custom error message - FIELD SPECIFIC to help users identify exactly what's missing
         $messages = [
-            'contractno.required' => 'This field is required.',
-            'package.required' => 'This field is required.',
-            'packageprice.required' => 'This field is required.',
-            'paymentterm.required' => 'This field is required.',
-            'termamount.required' => 'This field is required.',
-            'region.required' => 'This field is required.',
-            'branch.required' => 'This field is required.',
-            'paymentamount.required' => 'This field is required.',
-            'orseriescode.required' => 'This field is required.',
-            'ornumber.required' => 'This field is required.',
-            'paymentdate.required' => 'This field is required.',
-            'lastname.required' => 'This field is required.',
-            'lastname.min' => 'Name is too short.',
-            'lastname.max' => 'Name is too long.',
-            'firstname.required' => 'This field is required.',
-            'firstname.min' => 'Name is too short.',
-            'firstname.max' => 'Name is too long.',
-            'gender.required' => 'This field is required.',
-            'birthdate.required' => 'This field is required.',
-            'age.required' => 'This field is required.',
+            'contractno.required' => 'Contract Number is required. Please select a contract.',
+            'package.required' => 'Package is required. Please select a package.',
+            'packageprice.required' => 'Package Price is required.',
+            'paymentterm.required' => 'Payment Term is required. Please select a payment term.',
+            'termamount.required' => 'Term Amount is required.',
+            'region.required' => 'Region is required. Please select a region.',
+            'branch.required' => 'Branch is required. Please select a branch.',
+            'paymentamount.required' => 'Payment Amount is required. Please select or enter a payment amount.',
+            'orseriescode.required' => 'O.R. Series Code is required. Please select an O.R. series.',
+            'ornumber.required' => 'O.R. Number is required. Please select an O.R. number.',
+            'paymentdate.required' => 'Payment Date is required. Please select a payment date.',
+            'lastname.required' => 'Last Name is required. Please enter the client\'s last name.',
+            'lastname.min' => 'Last Name is too short (minimum 1 character).',
+            'lastname.max' => 'Last Name is too long (maximum 30 characters).',
+            'firstname.required' => 'First Name is required. Please enter the client\'s first name.',
+            'firstname.min' => 'First Name is too short (minimum 1 character).',
+            'firstname.max' => 'First Name is too long (maximum 30 characters).',
+            'gender.required' => 'Gender is required. Please select a gender.',
+            'birthdate.required' => 'Birth Date is required. Please select a birth date.',
+            'age.required' => 'Age is required. Please enter the client\'s age.',
             'age.min' => 'Age must be at least 18 years old.',
-            'bestplacetocollect.required' => 'This field is required.',
-            'besttimetocollect.required' => 'This field is required.',
-            'province.required' => 'This field is required.',
-            'city.required' => 'This field is required.',
-            'barangay.required' => 'This field is required.',
-            'mobilenumber.required_without' => 'This field is required.',
-            'telephone.required_without' => 'This field is required.',
-            'email.required' => 'This field is required.',
-            'emailaddress.required' => 'This field is required.'
+            'bestplacetocollect.required' => 'Best Place to Collect is required. Please enter a collection location.',
+            'besttimetocollect.required' => 'Best Time to Collect is required. Please enter a collection time.',
+            'province.required' => 'Province is required. Please select a province.',
+            'city.required' => 'City/Municipality is required. Please select a city.',
+            'barangay.required' => 'Barangay is required. Please select a barangay.',
+            'mobilenumber.required_without' => 'Please provide either a Mobile Number or Telephone Number.',
+            'telephone.required_without' => 'Please provide either a Mobile Number or Telephone Number.',
         ];
 
         // validation fields
@@ -790,8 +788,8 @@ class ClientController extends Controller
             'mobilenumber' => 'nullable|required_without:telephone',
             'mobilenetwork' => 'nullable',
             'mobileno' => 'nullable',
-            'email' => 'required',
-            'emailaddress' => 'required',
+            'email' => 'nullable',
+            'emailaddress' => 'nullable',
             'principalbeneficiary' => 'nullable',
             'principalbeneficiaryage' => 'nullable',
             'principalbeneficiaryrelation' => 'nullable',
@@ -921,7 +919,14 @@ class ClientController extends Controller
         } else if (!empty($mobileNetwork) && !empty($mobileNo)) {
             $mobilenumber = '0' . $mobileNetwork . $mobileNo;
         }
-        $emailcomplete = $email . '@' . $emailAddress;
+        
+        // Build complete email only if email is provided
+        $emailcomplete = null;
+        if (!empty($email) && !empty($emailAddress)) {
+            $emailcomplete = $email . '@' . $emailAddress;
+        } else if (!empty($email)) {
+            $emailcomplete = $email;
+        }
 
         $status = '1';
         $remarks = "To be verified";
@@ -931,10 +936,10 @@ class ClientController extends Controller
         $availableContract = '1';
         $contractExists = ContractBatch::select('tblcontractbatch.*', 'tblcontract.id as contractid')
             ->leftJoin('tblcontract', 'tblcontractbatch.id', '=', 'tblcontract.contractbatchid')
-            ->where('tblcontract.ContractNumber', $contractNo)
-            ->where('tblcontractbatch.RegionId', $regionId)
+            ->where('contractnumber', $contractNo)
+            ->where('regionid', $regionId)
             // Removed strict BranchId check here to allow Danao contracts to be used for Alegria (same Region)
-            ->where('tblcontract.Status', $availableContract)
+            ->where('status', $availableContract)
             ->first();
 
         if ($contractExists) {
@@ -952,13 +957,13 @@ class ClientController extends Controller
 
             $orExists = OrBatch::select('tblorbatch.*', 'tblofficialreceipt.id')
                 ->leftJoin('tblofficialreceipt', 'tblorbatch.id', '=', 'tblofficialreceipt.orbatchid')
-                ->where('ORNumber', $orNo)
-                ->where('RegionId', $regionId)
-                ->where('BranchId', $branchId)
-                ->where('Status', $availableOR)
+                ->where('ornumber', $orNo)
+                ->where('regionid', $regionId)
+                ->where('branchid', $branchId)
+                ->where('status', $availableOR)
                 // Relaxed Type check to allow cross-usage (e.g. Standard series for Partial payment)
-                // ->where('Type', $orType)
-                ->where('SeriesCode', $orSeriesCode)
+                // ->where('type', $orType)
+                ->where('seriescode', $orSeriesCode)
                 ->first();
 
             if ($orExists) {
@@ -1114,15 +1119,46 @@ class ClientController extends Controller
                     return redirect('/client')->with('error', 'An error occured while creating a new client: ' . $e->getMessage());
                 }
             } else {
+                // OR not available - determine WHY and provide specific error
+                $errorMessage = 'O.R not available.';
+                
+                // Check if OR exists at all
+                $orAnyStatus = OrBatch::select('tblorbatch.*', 'tblofficialreceipt.id')
+                    ->leftJoin('tblofficialreceipt', 'tblorbatch.id', '=', 'tblofficialreceipt.orbatchid')
+                    ->where('ornumber', $orNo)
+                    ->where('seriescode', $orSeriesCode)
+                    ->first();
+                
+                if (!$orAnyStatus) {
+                    $errorMessage = 'O.R number ' . $orNo . ' not found in series ' . $orSeriesCode . '. Please select a different O.R number.';
+                } else {
+                    // Check specific issues
+                    $issues = [];
+                    if ($orAnyStatus->regionid != $regionId) {
+                        $issues[] = 'wrong region (expected: ' . $regionId . ', found: ' . $orAnyStatus->regionid . ')';
+                    }
+                    if ($orAnyStatus->branchid != $branchId) {
+                        $issues[] = 'wrong branch (expected: ' . $branchId . ', found: ' . $orAnyStatus->branchid . ')';
+                    }
+                    if ($orAnyStatus->status != $availableOR) {
+                        $statusText = $orAnyStatus->status == '1' ? 'available' : 'already used';
+                        $issues[] = 'status is ' . $statusText;
+                    }
+                    
+                    if (count($issues) > 0) {
+                        $errorMessage = 'O.R number ' . $orNo . ' cannot be used: ' . implode(', ', $issues) . '. Please select a different O.R number.';
+                    }
+                }
+                
                 // Check if request is AJAX
                 if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') == 'XMLHttpRequest') {
                     return response()->json([
                         'success' => false,
-                        'message' => 'O.R not available'
+                        'message' => $errorMessage
                     ], 422);
                 }
                 
-                return redirect()->back()->with('duplicate', 'O.R not available.')->withInput();
+                return redirect()->back()->with('duplicate', $errorMessage)->withInput();
             }
         } else {
             // Check if request is AJAX
@@ -1212,8 +1248,8 @@ class ClientController extends Controller
             'telephone' => 'nullable',
             'mobilenetwork' => 'required',
             'mobileno' => 'required|min:7|max:7',
-            'email' => 'required',
-            'emailaddress' => 'required',
+            'email' => 'nullable',
+            'emailaddress' => 'nullable',
             'principalbeneficiary' => 'nullable',
             'principalbeneficiaryage' => 'nullable',
             'principalbeneficiaryrelation' => 'nullable',
@@ -1293,7 +1329,14 @@ class ClientController extends Controller
             $beneficiary4Age = strip_tags($validatedData['beneficiary4age'] ?? '');
 
             $mobilenumber = '0' . $mobileNetwork . $mobileNo;
-            $emailcomplete = $email . '@' . $emailAddress;
+            
+            // Build complete email only if email is provided
+            $emailcomplete = null;
+            if (!empty($email) && !empty($emailAddress)) {
+                $emailcomplete = $email . '@' . $emailAddress;
+            } else if (!empty($email)) {
+                $emailcomplete = $email;
+            }
 
             $status = '1';
             $remarks = "To be verified";
@@ -1323,12 +1366,12 @@ class ClientController extends Controller
 
                 $orExists = OrBatch::select('tblorbatch.*', 'tblofficialreceipt.id')
                     ->leftJoin('tblofficialreceipt', 'tblorbatch.id', '=', 'tblofficialreceipt.orbatchid')
-                    ->where('ORNumber', $orNo)
-                    ->where('RegionId', $regionId)
-                    ->where('BranchId', $branchId)
-                    ->where('Status', $availableOR)
-                    ->where('Type', $orType)
-                    ->where('SeriesCode', $orSeriesCode)
+                    ->where('ornumber', $orNo)
+                    ->where('regionid', $regionId)
+                    ->where('branchid', $branchId)
+                    ->where('status', $availableOR)
+                    ->where('type', $orType)
+                    ->where('seriescode', $orSeriesCode)
                     ->first();
 
                 if ($orExists) {
@@ -2471,7 +2514,7 @@ class ClientController extends Controller
         }
     }
     // delete client
-    public function deleteClient(Client $client)
+    public function deleteClient(Client $client, Request $request)
     {
 
         try {
@@ -2484,11 +2527,33 @@ class ClientController extends Controller
                 Payment::where('clientid', $client->Id)->delete();
 
                 Log::channel('activity')->info('[StaffID] ' . session('user_id') . ' [Menu] Client ' . '[Action] Delete ' . '[Target] ' . $client->Id);
+                
+                // Return JSON for AJAX requests
+                if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') == 'XMLHttpRequest') {
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Client deleted successfully',
+                        'redirect' => '/client'
+                    ]);
+                }
+                
                 return redirect('/client')->with('warning', 'Selected client has been deleted!');
             } else {
+                if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') == 'XMLHttpRequest') {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'You do not have access to this function'
+                    ], 403);
+                }
                 return redirect()->back()->with('error', 'You do not have access to this function.');
             }
         } catch (\Exception $e) {
+            if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') == 'XMLHttpRequest') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'An error occurred while deleting the client'
+                ], 500);
+            }
             return redirect('/client')->with('error', 'An error occurred while deleting the selected client.');
         }
     }

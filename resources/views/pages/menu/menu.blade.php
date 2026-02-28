@@ -56,7 +56,7 @@
                 </svg>
                 Create New Menu
             </a>
-            <button data-bs-toggle="modal" data-bs-target="#menuViewRolesModal" class="inline-flex items-center px-6 py-3 bg-white border-2 border-green-200 hover:border-green-300 text-green-800 hover:text-green-900 font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+            <button onclick="showViewRolesModal()" class="inline-flex items-center px-6 py-3 bg-white border-2 border-green-200 hover:border-green-300 text-green-800 hover:text-green-900 font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
@@ -87,81 +87,54 @@
             </div>
         </div>
 
-        <!-- MODAL ROLES -->
-        <div class="modal fade" id="menuViewRolesModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" style="display: none;">
-            <div class="modal-dialog modal-dialog-centered" style="max-width: 95vw;">
-                <div class="modal-content rounded-xl shadow-2xl border-0">
-                    <div class="modal-header bg-gradient-to-r from-blue-600 to-blue-700 text-white border-0 rounded-t-xl p-6">
-                        <div class="flex items-center">
-                            <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                            </svg>
-                            <h5 class="text-xl font-bold m-0">View Roles</h5>
-                        </div>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body p-6">
-                        <div class="overflow-x-auto pb-4" style="max-height: 70vh;">
-                            <div class="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-7 lg:grid-cols-8 xl:grid-cols-10 gap-4" style="min-width: max-content;">
-                                @foreach ($roles as $role)
-                                    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200 hover:shadow-lg hover:scale-105 transition-all duration-200" style="min-width: 120px; max-width: 140px;">
-                                        <div class="text-center">
-                                            <span class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-600 text-white font-bold text-lg shadow-md mb-3">
-                                                {{ $role->Level }}
-                                            </span>
-                                            <h6 class="text-xs font-semibold text-gray-800 leading-tight break-words">{{ $role->Role }}</h6>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer border-0 p-6 pt-0">
-                        <button type="button" class="px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-lg transition duration-200 ease-in-out" data-bs-dismiss="modal">Close</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- MODAL DELETE -->
-        <div class="modal fade" id="menuDeleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" style="display: none;">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content rounded-xl shadow-2xl border-0">
-                    <div class="modal-header bg-gradient-to-r from-red-50 to-red-100 border-b-2 border-red-200 text-red-900 rounded-t-xl p-6">
-                        <div class="flex items-center">
-                            <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                            </svg>
-                            <h5 class="text-xl font-bold m-0">Confirm Deletion</h5>
-                        </div>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body p-6">
-                        <div class="flex items-start mb-4">
-                            <div class="flex-shrink-0">
-                                <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
-                                    <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                    </svg>
-                                </div>
-                            </div>
-                            <div class="ml-4 flex-1">
-                                <p class="text-gray-800 font-semibold mb-2">Delete selected menu? <span class="text-red-600 font-bold" id="menuToDelete"></span></p>
-                                <p class="text-gray-600 text-sm">This action cannot be undone. The menu privilege will be permanently removed from the system.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <form id="deleteForm" method="POST">
-                        @csrf
-                        @method('DELETE')
-                        <div class="modal-footer border-0 p-6 pt-0">
-                            <button type="button" class="px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-lg transition duration-200 ease-in-out" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" class="px-6 py-2.5 bg-red-50 hover:bg-red-100 text-red-900 font-semibold rounded-lg shadow-md hover:shadow-lg transition duration-200 ease-in-out" id="confirmDelete">Delete Menu</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
     </div>
-    <script src="{{ asset('js/menu.js') }}"></script>
+
+    <!-- View Roles Modal Script -->
+    <script>
+        function showViewRolesModal() {
+            const rolesHtml = `<div class="overflow-x-auto pb-4" style="max-height: 60vh;">
+                <div class="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-7 lg:grid-cols-8 xl:grid-cols-10 gap-4" style="min-width: max-content;">
+                    @foreach ($roles as $role)
+                        <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200 hover:shadow-lg hover:scale-105 transition-all duration-200" style="min-width: 120px; max-width: 140px;">
+                            <div class="text-center">
+                                <span class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-600 text-white font-bold text-lg shadow-md mb-3">
+                                    {{ $role->Level }}
+                                </span>
+                                <h6 class="text-xs font-semibold text-gray-800 leading-tight break-words">{{ $role->Role }}</h6>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>`;
+
+            const modal = document.getElementById('swiftModal');
+            const iconDiv = document.getElementById('swiftModalIcon');
+            const titleEl = document.getElementById('swiftModalTitle');
+            const messageEl = document.getElementById('swiftModalMessage');
+            const actionsEl = document.getElementById('swiftModalActions');
+
+            if (!modal) return;
+
+            iconDiv.innerHTML = `<svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>`;
+            iconDiv.className = 'w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-blue-100';
+
+            titleEl.textContent = 'View Roles';
+            messageEl.innerHTML = rolesHtml;
+
+            actionsEl.innerHTML = '';
+            const closeBtn = document.createElement('button');
+            closeBtn.type = 'button';
+            closeBtn.className = 'w-full py-3 px-6 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold rounded-xl transition duration-200';
+            closeBtn.textContent = 'Close';
+            closeBtn.addEventListener('click', () => {
+                hideSwiftModal();
+            });
+            actionsEl.appendChild(closeBtn);
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+    </script>
 @endsection

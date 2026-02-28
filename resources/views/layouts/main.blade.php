@@ -49,6 +49,10 @@
     <!-- UTF-8 Encoding Fix -->
         <script src="{{ asset('js/encoding-fix.js') }}"></script>
         
+        <!-- Swift-Style Modal Component - Available on all pages -->
+        @include('components.swift-modal')
+        <script src="{{ asset('js/swift-modal.js') }}"></script>
+
         @yield('scripts')
     </div>
     
@@ -57,7 +61,7 @@
         <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
             <p class="text-center text-sm text-gray-500">
        
-         © 2022-2024 Surelife Care and Services ver 1.7.1 :: 
+         &copy; 2022-2024 Surelife Care and Services ver 1.7.1 :: 
                 <a href="/home" class="text-primary-600 hover:text-primary-700 font-medium">Changelog</a>
             </p>
         </div>

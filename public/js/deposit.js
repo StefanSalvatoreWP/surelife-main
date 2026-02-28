@@ -105,11 +105,11 @@ $(document).ready(function() {
                     
                     var noteLink = '<span class="action-btn action-btn-note disabled">' + noteIcon + 'Note</span>';
                     if(data.Note != null && data.Note != ""){
-                        noteLink = '<a data-bs-toggle="modal" data-bs-target="#depositNoteModal" data-deposit-note="' + data.Note + '" role="button" class="action-btn action-btn-note">' + noteIcon + 'Note</a>';
+                        noteLink = '<a onclick="showDepositNoteModal(\'' + data.Note.replace(/'/g, "\\'") + '\')" role="button" class="action-btn action-btn-note">' + noteIcon + 'Note</a>';
                     }
                   
                     var updateLink = '<a href="/deposit-update/' + data.Id + '" class="action-btn action-btn-update">' + updateIcon + 'Update</a>';
-                    var deleteLink = '<a data-bs-toggle="modal" data-bs-target="#depositDeleteModal" data-deposit-id="' + data.Id + '" data-deposit-sequenceno="' + data.SequenceNo + '" role="button" class="action-btn action-btn-delete">' + deleteIcon + 'Delete</a>';
+                    var deleteLink = '<a onclick="showDeleteDepositModal(' + data.Id + ', \'' + (data.SequenceNo || 'N/A') + '\')" role="button" class="action-btn action-btn-delete">' + deleteIcon + 'Delete</a>';
                     
                     return '<div class="action-buttons-container">' + viewLink + noteLink + updateLink + deleteLink + '</div>';
                 }
@@ -136,29 +136,39 @@ $(document).ready(function() {
         loadedTable.ajax.reload();
     });
 
-    /* MODALS */
-    $('#depositNoteModal').on('show.bs.modal', function(event) {
-
-        let button = $(event.relatedTarget);
-        let depositNote = button.data('deposit-note');
-    
-        let modal = $(this);
-        modal.find('#depositNote').text(depositNote);
-    });
-
-    $('#depositDeleteModal').on('show.bs.modal', function(event) {
-
-        let button = $(event.relatedTarget);
-        let depositId = button.data('deposit-id');
-        let depositSequenceNo = button.data('deposit-sequenceno');
-        
-        let modal = $(this);
-        modal.find('#depositToDelete').text(depositSequenceNo);
-        modal.find('#confirmDelete').click(function() {
-            
-            let deleteForm = $('#deleteForm');
-            deleteForm.attr('action', '/submit-deposit-delete/' + depositId);
-            deleteForm.submit();
-        });
-    });
 });
+
+/* Swift-Style Modal Functions */
+function showDepositNoteModal(note) {
+    showSwiftModal('Deposit Note', note, 'info', [
+        {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+    ]);
+}
+
+function showDeleteDepositModal(depositId, sequenceNo) {
+    showSwiftModal('Confirm Deletion', `Delete selected deposit sequence no. ${sequenceNo}?\n\nThis action cannot be undone. The deposit record will be permanently removed from the system.`, 'warning', [
+        {text: 'Delete Deposit', class: 'bg-red-500 hover:bg-red-600 text-white', action: `submitDeleteDeposit(${depositId})`},
+        {text: 'Cancel', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+    ]);
+}
+
+function submitDeleteDeposit(depositId) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/submit-deposit-delete/' + depositId;
+    
+    const csrfToken = document.createElement('input');
+    csrfToken.type = 'hidden';
+    csrfToken.name = '_token';
+    csrfToken.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    
+    const method = document.createElement('input');
+    method.type = 'hidden';
+    method.name = '_method';
+    method.value = 'DELETE';
+    
+    form.appendChild(csrfToken);
+    form.appendChild(method);
+    document.body.appendChild(form);
+    form.submit();
+}

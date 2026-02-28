@@ -416,7 +416,7 @@
                                             </td>
                                             @if(session('user_roleid') != 7)
                                                 <td>
-                                                    <a data-bs-toggle="modal" data-bs-target="#paymentVoidModal" data-payment-id="{{ $paymentIndex->Id }}" data-payment-orno="{{ $paymentIndex->ORNo }}" role="button">
+                                                    <a onclick="showPaymentVoidModal('{{ $paymentIndex->Id }}', '{{ $paymentIndex->ORNo }}')" role="button">
                                                         <span class="badge bg-danger">Void</span>
                                                     </a>
                                                 </td>
@@ -436,7 +436,7 @@
                                     <a href="/client-printsoa-pdf/{{ $clients->cid }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white text-sm font-medium rounded-md shadow-sm hover:shadow transition duration-150" role="button" target="_blank">SOA (PDF)</a>
                                     @if($balance <= 0)
                                         @if($clients->CFPNO == null)
-                                            <a class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white text-sm font-medium rounded-md shadow-sm hover:shadow transition duration-150" data-bs-toggle="modal" data-bs-target="#showCfpNoInputModal" data-client-id="{{ $clients->cid }}" role="button">Certificate of Full Payment</a>
+                                            <a class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white text-sm font-medium rounded-md shadow-sm hover:shadow transition duration-150" onclick="showCfpInputModal({{ $clients->cid }})" role="button">Certificate of Full Payment</a>
                                         @else
                                             <a href="/client-printcofp/{{ $clients->cid }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white text-sm font-medium rounded-md shadow-sm hover:shadow transition duration-150" role="button">Certificate of Full Payment</a>
                                         @endif
@@ -515,5 +515,94 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+// Swift-Style Modal Functions
+let currentPaymentId = null;
+function showPaymentVoidModal(paymentId, orNo) {
+    currentPaymentId = paymentId;
+    showSwiftModal('Void Payment', `You are going to void the selected payment with OR No. ${orNo}\n\nYou cannot undo this action. Continue?`, 'warning', [
+        {text: 'Confirm', class: 'bg-red-500 hover:bg-red-600 text-white', action: 'submitPaymentVoid()'},
+        {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+    ]);
+}
+
+function submitPaymentVoid() {
+    if (!currentPaymentId) return;
+    
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/submit-void-payment/' + currentPaymentId;
+    
+    const csrfToken = document.createElement('input');
+    csrfToken.type = 'hidden';
+    csrfToken.name = '_token';
+    csrfToken.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    
+    const method = document.createElement('input');
+    method.type = 'hidden';
+    method.name = '_method';
+    method.value = 'PUT';
+    
+    form.appendChild(csrfToken);
+    form.appendChild(method);
+    document.body.appendChild(form);
+    form.submit();
+}
+
+// Certificate of Full Payment Modal
+function showCfpInputModal(clientId) {
+    const modal = document.getElementById('swiftModal');
+    const iconDiv = document.getElementById('swiftModalIcon');
+    const titleEl = document.getElementById('swiftModalTitle');
+    const messageEl = document.getElementById('swiftModalMessage');
+    const actionsEl = document.getElementById('swiftModalActions');
+
+    if (!modal) return;
+
+    iconDiv.innerHTML = `<svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+    </svg>`;
+    iconDiv.className = 'w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-purple-100';
+
+    titleEl.textContent = 'Certificate of Full Payment';
+    messageEl.innerHTML = `
+        <div class="text-gray-600 text-sm mb-4">Enter certificate number to generate the Certificate of Full Payment.</div>
+        <input type="text" id="cfpNoInput" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="Enter certificate number">
+    `;
+
+    actionsEl.innerHTML = '';
+    
+    const cancelBtn = document.createElement('button');
+    cancelBtn.type = 'button';
+    cancelBtn.className = 'w-full py-3 px-6 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold rounded-xl transition duration-200';
+    cancelBtn.textContent = 'Cancel';
+    cancelBtn.addEventListener('click', () => hideSwiftModal());
+    actionsEl.appendChild(cancelBtn);
+
+    const submitBtn = document.createElement('button');
+    submitBtn.type = 'button';
+    submitBtn.className = 'w-full py-3 px-6 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-xl transition duration-200';
+    submitBtn.textContent = 'Submit';
+    submitBtn.addEventListener('click', () => {
+        const cfpNo = document.getElementById('cfpNoInput')?.value;
+        if (!cfpNo) {
+            alert('Please enter a certificate number');
+            return;
+        }
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/submit-cfp/' + clientId;
+        form.innerHTML = `
+            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="cfp_no" value="${cfpNo}">
+        `;
+        document.body.appendChild(form);
+        form.submit();
+    });
+    actionsEl.appendChild(submitBtn);
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
 </script>
 @endsection
