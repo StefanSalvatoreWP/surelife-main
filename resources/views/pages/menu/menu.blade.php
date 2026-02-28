@@ -56,7 +56,7 @@
                 </svg>
                 Create New Menu
             </a>
-            <button data-bs-toggle="modal" data-bs-target="#menuViewRolesModal" class="inline-flex items-center px-6 py-3 bg-white border-2 border-green-200 hover:border-green-300 text-green-800 hover:text-green-900 font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+            <button onclick="showViewRolesModal()" class="inline-flex items-center px-6 py-3 bg-white border-2 border-green-200 hover:border-green-300 text-green-800 hover:text-green-900 font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
@@ -87,42 +87,54 @@
             </div>
         </div>
 
-        <!-- MODAL ROLES -->
-        <div class="modal fade" id="menuViewRolesModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" style="display: none;">
-            <div class="modal-dialog modal-dialog-centered" style="max-width: 95vw;">
-                <div class="modal-content rounded-xl shadow-2xl border-0">
-                    <div class="modal-header bg-gradient-to-r from-blue-600 to-blue-700 text-white border-0 rounded-t-xl p-6">
-                        <div class="flex items-center">
-                            <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                            </svg>
-                            <h5 class="text-xl font-bold m-0">View Roles</h5>
-                        </div>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body p-6">
-                        <div class="overflow-x-auto pb-4" style="max-height: 70vh;">
-                            <div class="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-7 lg:grid-cols-8 xl:grid-cols-10 gap-4" style="min-width: max-content;">
-                                @foreach ($roles as $role)
-                                    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200 hover:shadow-lg hover:scale-105 transition-all duration-200" style="min-width: 120px; max-width: 140px;">
-                                        <div class="text-center">
-                                            <span class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-600 text-white font-bold text-lg shadow-md mb-3">
-                                                {{ $role->Level }}
-                                            </span>
-                                            <h6 class="text-xs font-semibold text-gray-800 leading-tight break-words">{{ $role->Role }}</h6>
-                                        </div>
-                                    </div>
-                                @endforeach
+    </div>
+
+    <!-- View Roles Modal Script -->
+    <script>
+        function showViewRolesModal() {
+            const rolesHtml = `<div class="overflow-x-auto pb-4" style="max-height: 60vh;">
+                <div class="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-7 lg:grid-cols-8 xl:grid-cols-10 gap-4" style="min-width: max-content;">
+                    @foreach ($roles as $role)
+                        <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200 hover:shadow-lg hover:scale-105 transition-all duration-200" style="min-width: 120px; max-width: 140px;">
+                            <div class="text-center">
+                                <span class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-600 text-white font-bold text-lg shadow-md mb-3">
+                                    {{ $role->Level }}
+                                </span>
+                                <h6 class="text-xs font-semibold text-gray-800 leading-tight break-words">{{ $role->Role }}</h6>
                             </div>
                         </div>
-                    </div>
-                    <div class="modal-footer border-0 p-6 pt-0">
-                        <button type="button" class="px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-lg transition duration-200 ease-in-out" data-bs-dismiss="modal">Close</button>
-                    </div>
+                    @endforeach
                 </div>
-            </div>
-        </div>
+            </div>`;
 
-    </div>
-    <script src="{{ asset('js/menu.js') }}"></script>
+            const modal = document.getElementById('swiftModal');
+            const iconDiv = document.getElementById('swiftModalIcon');
+            const titleEl = document.getElementById('swiftModalTitle');
+            const messageEl = document.getElementById('swiftModalMessage');
+            const actionsEl = document.getElementById('swiftModalActions');
+
+            if (!modal) return;
+
+            iconDiv.innerHTML = `<svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>`;
+            iconDiv.className = 'w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-blue-100';
+
+            titleEl.textContent = 'View Roles';
+            messageEl.innerHTML = rolesHtml;
+
+            actionsEl.innerHTML = '';
+            const closeBtn = document.createElement('button');
+            closeBtn.type = 'button';
+            closeBtn.className = 'w-full py-3 px-6 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold rounded-xl transition duration-200';
+            closeBtn.textContent = 'Close';
+            closeBtn.addEventListener('click', () => {
+                hideSwiftModal();
+            });
+            actionsEl.appendChild(closeBtn);
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+    </script>
 @endsection

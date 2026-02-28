@@ -962,7 +962,10 @@ You cannot undo this action. Continue?', 'warning', [{text: 'Confirm', class: 'b
                                             role="button">Certificate of Full Payment</a>
                                     @elseif($clients->CFPNO == "NA")
                                         <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
-                                            data-bs-toggle="modal" data-bs-target="#showCfpNoInputModal"
+                                            onclick="showSwiftModal('Certificate of Full Payment', 'Enter certificate number to proceed.', 'warning', [
+                                                {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpWithInput()'},
+                                                {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+                                            ])"
                                             data-client-id="{{ $clients->cid }}" role="button">Certificate of Full Payment</a>
                                     @else
                                         <a href="/client-printcofp/{{ $clients->cid }}"
@@ -991,15 +994,23 @@ You cannot undo this action. Continue?', 'warning', [{text: 'Confirm', class: 'b
                                     @if($balance <= 0)
                                         @if($clients->CFPNO == null && $cfpApprover == 0)
                                             <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
-                                                data-bs-toggle="modal" data-bs-target="#showApproveCfpErrorInputModal"
+                                                onclick="showSwiftModal('Warning', 'Certificate of full payment requires approval.', 'warning', [
+                                                    {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+                                                ])"
                                                 data-client-id="{{ $clients->cid }}" role="button">Certificate of Full Payment</a>
                                         @elseif($clients->CFPNO == null && $cfpApprover == 1)
                                             <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
-                                                data-bs-toggle="modal" data-bs-target="#showApproveCfpInputModal"
+                                                onclick="showSwiftModal('Certificate Approval', 'You are going to approve the certificate of full payment for this client.\\n\\n⚠️ You cannot undo this action. Continue?', 'warning', [
+                                                    {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpApproval()'},
+                                                    {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+                                                ])"
                                                 data-client-id="{{ $clients->cid }}" role="button">Certificate of Full Payment</a>
                                         @elseif($clients->CFPNO == "NA")
                                             <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
-                                                data-bs-toggle="modal" data-bs-target="#showCfpNoInputModal"
+                                                onclick="showSwiftModal('Certificate of Full Payment', 'Enter certificate number to proceed.', 'warning', [
+                                                    {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpWithInput()'},
+                                                    {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+                                                ])"
                                                 data-client-id="{{ $clients->cid }}" role="button">Certificate of Full Payment</a>
                                         @else
                                             <a href="/client-printcofp/{{ $clients->cid }}"
@@ -1293,44 +1304,6 @@ You cannot undo this action. Continue?', 'warning', [{text: 'Confirm', class: 'b
                         <button type="button"
                             class="px-6 py-2.5 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md transition duration-200"
                             id="cofpApproval">Submit</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- MODAL CERTIFICATE OF FULL PAYMENT -->
-        <div class="modal fade" id="showCfpNoInputModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-            aria-labelledby="staticBackdropLabel" aria-hidden="true" style="display: none;">
-            <div class="modal-dialog">
-                <div class="modal-content rounded-xl shadow-2xl border-0">
-                    <div
-                        class="modal-header bg-gradient-to-r from-purple-600 to-purple-700 text-white border-0 rounded-t-xl">
-                        <h5 class="modal-title font-bold flex items-center" id="staticBackdropLabel">
-                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            Certificate of Full Payment
-                        </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                            aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body p-6">
-                        <div class="form-group">
-                            <label for="cfpNoInput" class="block text-sm font-medium text-gray-700 mb-2">Certificate
-                                Number</label>
-                            <input type="text"
-                                class="form-control w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                                id="cfpNoInput" placeholder="Enter certificate number">
-                        </div>
-                    </div>
-                    <div class="modal-footer border-0 px-6 pb-6 gap-3">
-                        <button type="button"
-                            class="px-6 py-2.5 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-lg shadow-md transition duration-200"
-                            data-bs-dismiss="modal">Close</button>
-                        <button type="button"
-                            class="px-6 py-2.5 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md transition duration-200"
-                            id="downloadCfpWithInput">Submit</button>
                     </div>
                 </div>
             </div>
