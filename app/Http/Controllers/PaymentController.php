@@ -549,19 +549,6 @@ class PaymentController extends Controller
             ->limit(100) // Limit to prevent overloading
             ->get();
 
-        // If no results with branch/region filters, try with just series code (global fallback)
-        if ($results->isEmpty()) {
-            $results = OfficialReceipt::select('tblofficialreceipt.ORNumber', 'tblofficialreceipt.id')
-                ->join('tblorbatch', 'tblorbatch.id', '=', 'tblofficialreceipt.orbatchid')
-                ->where('tblofficialreceipt.Status', '1')
-                ->where('tblorbatch.SeriesCode', $seriesCode)
-                ->orderBy('tblofficialreceipt.ORNumber', 'asc')
-                ->limit(100)
-                ->get();
-
-            Log::info('Fallback to series code only for OR numbers (relaxed)', ['seriesCode' => $seriesCode, 'count' => $results->count()]);
-        }
-
         // Log the results for debugging
         Log::info('getOrNumbersBySeriesCode results', [
             'count' => $results->count(),

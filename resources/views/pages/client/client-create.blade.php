@@ -1768,19 +1768,31 @@
                         data.forEach(o => {
                             console.log(`🔢 [fetchOrNumbers]   ORNumber: ${o.ORNumber} (ID: ${o.id})`);
                         });
-                        const items = data.map(o => ({
-                            value: o.ORNumber,
-                            label: String(o.ORNumber),
-                            badge: 'available'
-                        }));
-                        orNumberDropdown.setItems(items);
-                        if (selectedNumber) {
-                            orNumberDropdown.setValue(selectedNumber);
-                        } else if (items.length > 0) {
-                            // Auto-select first O.R. Number if none selected
-                            const firstNumber = items[0].value;
-                            orNumberDropdown.setValue(firstNumber);
-                            console.log(`✅ [fetchOrNumbers] Auto-selected first O.R. Number: ${firstNumber}`);
+                        
+                        if (data.length === 0) {
+                            // No available OR numbers for this combination
+                            orNumberDropdown.setItems([{
+                                value: '',
+                                label: 'No available O.R. numbers for selected Region/Branch/Series',
+                                badge: 'empty',
+                                disabled: true
+                            }]);
+                            console.warn('⚠️ [fetchOrNumbers] No available OR numbers for:', { seriesCode, regionId, branchId, paymentType });
+                        } else {
+                            const items = data.map(o => ({
+                                value: o.ORNumber,
+                                label: String(o.ORNumber),
+                                badge: 'available'
+                            }));
+                            orNumberDropdown.setItems(items);
+                            if (selectedNumber) {
+                                orNumberDropdown.setValue(selectedNumber);
+                            } else if (items.length > 0) {
+                                // Auto-select first O.R. Number if none selected
+                                const firstNumber = items[0].value;
+                                orNumberDropdown.setValue(firstNumber);
+                                console.log(`✅ [fetchOrNumbers] Auto-selected first O.R. Number: ${firstNumber}`);
+                            }
                         }
                     })
                     .catch(err => {
@@ -2518,5 +2530,240 @@
             }
             input.value = value;
         }
+
+        // ============================================
+        // AJAX FORM SUBMISSION WITH VALIDATION
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('clientForm');
+            
+            // Function to clear all errors
+            function clearAllErrors() {
+                form.querySelectorAll('input, select, textarea').forEach(field => {
+                    field.classList.remove('border-red-500', 'ring-2', 'ring-red-500');
+                });
+                form.querySelectorAll('.field-error-message').forEach(el => el.remove());
+                const alert = document.getElementById('validationAlert');
+                if (alert) alert.remove();
+            }
+            
+            // Function to display field errors (without alert banner)
+            function displayFieldErrors(errors) {
+                clearAllErrors();
+                let errorList = [];
+                let firstErrorField = null;
+                
+                const fieldMap = {
+                    'contractno': ['contractno', 'contractNoSearch'],
+                    'package': ['package'],
+                    'packageprice': ['packagePrice'],
+                    'paymentterm': ['paymentTerm'],
+                    'termamount': ['termAmount'],
+                    'region': ['region'],
+                    'branch': ['branch'],
+                    'paymentamount': ['paymentAmount'],
+                    'orseriescode': ['orSeriesCode', 'orSeriesSearch'],
+                    'ornumber': ['orNumber', 'orNumberSearch'],
+                    'paymentdate': ['paymentDate'],
+                    'lastname': ['lastName'],
+                    'firstname': ['firstName'],
+                    'gender': ['gender'],
+                    'birthdate': ['birthDate'],
+                    'age': ['age'],
+                    'bestplacetocollect': ['bestPlaceToCollect'],
+                    'besttimetocollect': ['bestTimeToCollect'],
+                    'province': ['province', 'addressProvince'],
+                    'city': ['city', 'addressCity'],
+                    'barangay': ['barangay', 'addressBarangay'],
+                    'mobilenumber': ['mobileNumber'],
+                    'telephone': ['telephone'],
+                    'email': ['email'],
+                    'emailaddress': ['emailDomainSelect', 'customEmailDomain']
+                };
+                
+                // Process errors object
+                for (let fieldName in errors) {
+                    if (errors.hasOwnProperty(fieldName)) {
+                        let messages = errors[fieldName];
+                        let fieldIds = fieldMap[fieldName] || [fieldName];
+                        let field = document.getElementById(fieldIds[0]);
+                        
+                        if (field && !firstErrorField) {
+                            firstErrorField = field;
+                        }
+                        
+                        // Add error styling to field
+                        if (field) {
+                            field.classList.add('border-red-500', 'ring-2', 'ring-red-500');
+                            let parent = field.closest('div');
+                            if (parent) {
+                                let errorEl = document.createElement('p');
+                                errorEl.className = 'field-error-message text-red-600 text-sm mt-1';
+                                
+                                // Handle both array and string error messages
+                                let errorText = '';
+                                if (Array.isArray(messages)) {
+                                    errorText = messages[0];
+                                } else if (typeof messages === 'string') {
+                                    errorText = messages;
+                                } else {
+                                    errorText = String(messages);
+                                }
+                                
+                                errorEl.textContent = errorText;
+                                parent.appendChild(errorEl);
+                            }
+                        }
+                        
+                        // Build error list for modal - ensure it's a string
+                        let errorMsg = '';
+                        if (Array.isArray(messages)) {
+                            errorMsg = messages[0];
+                        } else if (typeof messages === 'string') {
+                            errorMsg = messages;
+                        } else {
+                            errorMsg = String(messages);
+                        }
+                        errorList.push(errorMsg);
+                    }
+                }
+                
+                // Show error modal with OK button (no alert banner)
+                if (errorList.length > 0 && typeof showSwiftModal === 'function') {
+                    let errorMessageText = 'Please check the highlighted fields and correct them before submitting.\n\nMissing fields:\n' + errorList.map(err => '• ' + err).join('\n');
+                    showSwiftModal('Validation Failed', errorMessageText, 'error');
+                }
+                
+                // Scroll to first error field
+                if (firstErrorField) {
+                    firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+            
+            // Handle form submission
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    clearAllErrors();
+                    
+                    // Validate contact info - at least one required
+                    const mobileNumber = document.getElementById('mobileNumber');
+                    const telephone = document.getElementById('telephone');
+                    const mobileValue = mobileNumber ? mobileNumber.value.trim() : '';
+                    const telephoneValue = telephone ? telephone.value.trim() : '';
+                    
+                    if (!mobileValue && !telephoneValue) {
+                        // Show error for both fields
+                        if (mobileNumber) {
+                            mobileNumber.classList.add('border-red-500', 'ring-2', 'ring-red-500');
+                            let parent = mobileNumber.closest('div');
+                            if (parent && !parent.querySelector('.field-error-message')) {
+                                let errorEl = document.createElement('p');
+                                errorEl.className = 'field-error-message text-red-600 text-sm mt-1';
+                                errorEl.textContent = 'Please provide either a Mobile Number or Telephone Number.';
+                                parent.appendChild(errorEl);
+                            }
+                        }
+                        if (telephone) {
+                            telephone.classList.add('border-red-500', 'ring-2', 'ring-red-500');
+                            let parent = telephone.closest('div');
+                            if (parent && !parent.querySelector('.field-error-message')) {
+                                let errorEl = document.createElement('p');
+                                errorEl.className = 'field-error-message text-red-600 text-sm mt-1';
+                                errorEl.textContent = 'Please provide either a Mobile Number or Telephone Number.';
+                                parent.appendChild(errorEl);
+                            }
+                        }
+                        
+                        // Show error modal
+                        if (typeof showSwiftModal === 'function') {
+                            showSwiftModal('Validation Failed', 'Please provide at least one contact number (Mobile or Telephone).', 'error');
+                        }
+                        
+                        // Scroll to first contact field
+                        if (mobileNumber) {
+                            mobileNumber.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                        return false;
+                    }
+                    
+                    let submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
+                    let originalBtnText = submitBtn ? submitBtn.innerHTML : '';
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<span class="inline-flex items-center"><svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Submitting...</span>';
+                    }
+                    
+                    let formData = new FormData(form);
+                    
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => {
+                        if (response.status === 422) {
+                            return response.json().then(data => {
+                                if (data.errors) {
+                                    displayFieldErrors(data.errors);
+                                    if (typeof showSwiftModal === 'function') {
+                                        showSwiftModal('Validation Failed', 'Please check the highlighted fields and correct them before submitting.', 'error');
+                                    }
+                                }
+                                throw new Error('Validation failed');
+                            });
+                        }
+                        if (!response.ok) {
+                            throw new Error('Server error');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            localStorage.removeItem('clientFormData');
+                            if (typeof showSwiftModal === 'function') {
+                                showSwiftModal('Success!', (data.message || 'Client created successfully!') + '\n\nClick OK to continue.', 'success', [
+                                    {
+                                        text: 'OK',
+                                        class: 'bg-green-500 hover:bg-green-600 text-white',
+                                        action: 'window.location.href = "' + (data.redirect || '/client') + '"'
+                                    }
+                                ]);
+                            } else {
+                                // Fallback if modal doesn't work
+                                window.location.href = data.redirect || '/client';
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        if (error.message !== 'Validation failed') {
+                            if (typeof showSwiftModal === 'function') {
+                                showSwiftModal('Error', 'An error occurred while submitting the form. Please try again.', 'error');
+                            }
+                        }
+                    })
+                    .finally(() => {
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = originalBtnText;
+                        }
+                    });
+                });
+                
+                // Real-time error clearing
+                form.addEventListener('input', function(e) {
+                    if (e.target.classList.contains('border-red-500')) {
+                        e.target.classList.remove('border-red-500', 'ring-2', 'ring-red-500');
+                        let parent = e.target.closest('div');
+                        if (parent) {
+                            let errorMsg = parent.querySelector('.field-error-message');
+                            if (errorMsg) errorMsg.remove();
+                        }
+                    }
+                });
+            }
+        });
     </script>
 @endsection
