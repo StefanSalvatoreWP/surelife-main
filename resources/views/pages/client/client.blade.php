@@ -184,7 +184,7 @@
                     <form id="deleteForm" method="POST">
                         @csrf
                         @method('DELETE')
-                        <div class="modal-footer border-0 p-6 pt-0">
+                        <div class="modal-footer border-0 p-6 pt-0 d-flex gap-3">
                             <button type="button" class="px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-lg transition duration-200 ease-in-out transform hover:scale-105 active:scale-95" data-bs-dismiss="modal">Cancel</button>
                             <button type="button" class="px-6 py-2.5 bg-red-50 hover:bg-red-100 text-red-900 font-semibold rounded-lg shadow-md hover:shadow-lg transition duration-200 ease-in-out transform hover:scale-105 active:scale-95" id="confirmDelete">
                                 <span class="flex items-center">

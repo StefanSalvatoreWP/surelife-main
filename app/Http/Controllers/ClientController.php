@@ -936,10 +936,10 @@ class ClientController extends Controller
         $availableContract = '1';
         $contractExists = ContractBatch::select('tblcontractbatch.*', 'tblcontract.id as contractid')
             ->leftJoin('tblcontract', 'tblcontractbatch.id', '=', 'tblcontract.contractbatchid')
-            ->where('tblcontract.ContractNumber', $contractNo)
-            ->where('tblcontractbatch.RegionId', $regionId)
+            ->where('contractnumber', $contractNo)
+            ->where('regionid', $regionId)
             // Removed strict BranchId check here to allow Danao contracts to be used for Alegria (same Region)
-            ->where('tblcontract.Status', $availableContract)
+            ->where('status', $availableContract)
             ->first();
 
         if ($contractExists) {
@@ -957,13 +957,13 @@ class ClientController extends Controller
 
             $orExists = OrBatch::select('tblorbatch.*', 'tblofficialreceipt.id')
                 ->leftJoin('tblofficialreceipt', 'tblorbatch.id', '=', 'tblofficialreceipt.orbatchid')
-                ->where('ORNumber', $orNo)
-                ->where('RegionId', $regionId)
-                ->where('BranchId', $branchId)
-                ->where('Status', $availableOR)
+                ->where('ornumber', $orNo)
+                ->where('regionid', $regionId)
+                ->where('branchid', $branchId)
+                ->where('status', $availableOR)
                 // Relaxed Type check to allow cross-usage (e.g. Standard series for Partial payment)
-                // ->where('Type', $orType)
-                ->where('SeriesCode', $orSeriesCode)
+                // ->where('type', $orType)
+                ->where('seriescode', $orSeriesCode)
                 ->first();
 
             if ($orExists) {
@@ -1125,8 +1125,8 @@ class ClientController extends Controller
                 // Check if OR exists at all
                 $orAnyStatus = OrBatch::select('tblorbatch.*', 'tblofficialreceipt.id')
                     ->leftJoin('tblofficialreceipt', 'tblorbatch.id', '=', 'tblofficialreceipt.orbatchid')
-                    ->where('ORNumber', $orNo)
-                    ->where('SeriesCode', $orSeriesCode)
+                    ->where('ornumber', $orNo)
+                    ->where('seriescode', $orSeriesCode)
                     ->first();
                 
                 if (!$orAnyStatus) {
@@ -1134,14 +1134,14 @@ class ClientController extends Controller
                 } else {
                     // Check specific issues
                     $issues = [];
-                    if ($orAnyStatus->RegionId != $regionId) {
-                        $issues[] = 'wrong region (expected: ' . $regionId . ', found: ' . $orAnyStatus->RegionId . ')';
+                    if ($orAnyStatus->regionid != $regionId) {
+                        $issues[] = 'wrong region (expected: ' . $regionId . ', found: ' . $orAnyStatus->regionid . ')';
                     }
-                    if ($orAnyStatus->BranchId != $branchId) {
-                        $issues[] = 'wrong branch (expected: ' . $branchId . ', found: ' . $orAnyStatus->BranchId . ')';
+                    if ($orAnyStatus->branchid != $branchId) {
+                        $issues[] = 'wrong branch (expected: ' . $branchId . ', found: ' . $orAnyStatus->branchid . ')';
                     }
-                    if ($orAnyStatus->Status != $availableOR) {
-                        $statusText = $orAnyStatus->Status == '1' ? 'available' : 'already used';
+                    if ($orAnyStatus->status != $availableOR) {
+                        $statusText = $orAnyStatus->status == '1' ? 'available' : 'already used';
                         $issues[] = 'status is ' . $statusText;
                     }
                     
@@ -1366,12 +1366,12 @@ class ClientController extends Controller
 
                 $orExists = OrBatch::select('tblorbatch.*', 'tblofficialreceipt.id')
                     ->leftJoin('tblofficialreceipt', 'tblorbatch.id', '=', 'tblofficialreceipt.orbatchid')
-                    ->where('ORNumber', $orNo)
-                    ->where('RegionId', $regionId)
-                    ->where('BranchId', $branchId)
-                    ->where('Status', $availableOR)
-                    ->where('Type', $orType)
-                    ->where('SeriesCode', $orSeriesCode)
+                    ->where('ornumber', $orNo)
+                    ->where('regionid', $regionId)
+                    ->where('branchid', $branchId)
+                    ->where('status', $availableOR)
+                    ->where('type', $orType)
+                    ->where('seriescode', $orSeriesCode)
                     ->first();
 
                 if ($orExists) {
