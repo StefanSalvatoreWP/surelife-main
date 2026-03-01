@@ -298,7 +298,7 @@ Route::delete('/submit-expense-delete/{expense}', [ExpensesController::class, 'd
 // payment - main screen
 Route::get('/payment', [PaymentController::class, 'searchAll']);
 // spot cash approval - main screen
-Route::get('/spotcash-approval', [PaymentController::class, 'getPendingSpotCashPayments']);
+Route::get('/spotcash-approval', [PaymentController::class, 'getPendingSpotCashPayments'])->name('spotcash.approval');
 // spot cash approval - approve payment
 Route::put('/spotcash-approve/{payment}', [PaymentController::class, 'approveSpotCashPayment']);
 // spot cash approval - reject payment

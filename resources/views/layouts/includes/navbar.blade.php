@@ -87,6 +87,7 @@
      
       $trans_viewpayments = false;
       $trans_viewloanpayments = false;
+      $trans_spotcash_approval = false;
 
       $reports = false;
 
@@ -156,6 +157,9 @@
         }
         if(str_contains($m, 'Loan Payments') && $roleLevel <= $m->rolelevel) {
             $trans_viewloanpayments = true;
+        }
+        if(str_contains($m, 'Spot Cash Approval') && $roleLevel <= $m->rolelevel) {
+            $trans_spotcash_approval = true;
         }
 
         // reports
@@ -505,7 +509,7 @@
         @else
             <span class="px-3 sm:px-4 py-2 text-sm sm:text-base text-gray-400 cursor-not-allowed whitespace-nowrap">Documents</span>
         @endif
-        @if($trans_viewpayments || $trans_viewloanpayments)
+        @if($trans_viewpayments || $trans_viewloanpayments || $trans_viewpayments)
             <div class="relative group">
                 <button class="px-3 sm:px-4 py-2 text-sm sm:text-base text-gray-700 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition duration-200 font-medium whitespace-nowrap flex items-center space-x-1">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -552,6 +556,25 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
                                 <span>Loan Payments</span>
+                            </div>
+                        </span>
+                    @endif
+                    @if($trans_viewpayments)
+                        <a href="/spotcash-approval" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600 transition duration-150">
+                            <div class="flex items-center space-x-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <span>Spot Cash Approval</span>
+                            </div>
+                        </a>
+                    @else
+                        <span class="block px-4 py-2.5 text-sm text-gray-400 cursor-not-allowed">
+                            <div class="flex items-center space-x-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <span>Spot Cash Approval</span>
                             </div>
                         </span>
                     @endif

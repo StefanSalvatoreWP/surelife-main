@@ -15,8 +15,8 @@ return new class extends Migration {
             $table->string('HomeProvince', 100)->nullable()->after('HomeRegion');
             $table->string('HomeCity', 100)->nullable()->after('HomeProvince');
             $table->string('HomeBarangay', 100)->nullable()->after('HomeCity');
-            $table->string('HomeZipCode', 10)->nullable()->after('HomeBarangay');
-            $table->string('HomeStreet', 100)->nullable()->after('HomeZipCode');
+            $table->string('homezipcode', 10)->nullable()->after('homebarangay');
+            $table->string('HomeStreet', 100)->nullable()->after('homezipcode');
         });
     }
 
@@ -31,7 +31,7 @@ return new class extends Migration {
                 'HomeProvince',
                 'HomeCity',
                 'HomeBarangay',
-                'HomeZipCode',
+                'homezipcode',
                 'HomeStreet'
             ]);
         });

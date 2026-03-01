@@ -293,8 +293,8 @@
                                 @php
                                     $prevMiddleName = old('middlename');
                                 @endphp
-                                <label for="middleName" class="block text-sm font-medium text-gray-700 mb-2">Middle Name</label>
-                                <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="middleName" name="middlename" value="{{ $prevMiddleName }}" maxlength="30"/>
+                                <label for="middleName" class="block text-sm font-medium text-gray-700 mb-2">Middle Name <span class="text-gray-400 text-xs">(Optional)</span></label>
+                                <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="middleName" name="middlename" value="{{ $prevMiddleName }}" maxlength="30" placeholder="Leave blank if none"/>
                             </div>
                             <div>
                                 <label for="gender" class="block text-sm font-medium text-gray-700 mb-2">Gender</label>
@@ -897,7 +897,10 @@
                 { id: 'birthDate', name: 'Birth Date', section: 'PERSONAL' },
                 { id: 'addressProvince', name: 'Province', section: 'PERSONAL' },
                 { id: 'addressCity', name: 'City', section: 'PERSONAL' },
-                { id: 'addressBarangay', name: 'Barangay', section: 'PERSONAL' }
+                { id: 'addressBarangay', name: 'Barangay', section: 'PERSONAL' },
+                // Beneficiary age fields validation
+                { id: 'principalBeneficiaryAge', name: 'Principal Beneficiary Age', section: 'BENEFICIARY' },
+                { id: 'beneficiary1age', name: 'Beneficiary 1 Age', section: 'BENEFICIARY' }
                 // mobileNumber removed from required fields - handled by contact validation
             ];
 
@@ -1082,6 +1085,17 @@
                         console.log(`   Value: "${err.value || '(empty)'}"`);
                         console.log(`   Message: ${err.message || 'This field is required'}`);
                     });
+                    
+                    // Show warning modal with error summary
+                    let errorMessage = '<div class="text-left"><p class="font-semibold mb-2">Please fill in the following required fields:</p><ul class="list-disc pl-5 space-y-1">';
+                    errors.forEach(err => {
+                        errorMessage += `<li class="text-red-600">${err.section}: ${err.field}</li>`;
+                    });
+                    errorMessage += '</ul></div>';
+                    
+                    showSwiftModal('Required Fields Missing', errorMessage, 'warning', [
+                        {text: 'OK, I\'ll fix it', class: 'bg-yellow-500 hover:bg-yellow-600 text-white'}
+                    ]);
                     
                     // Scroll to first error
                     if (errors[0].element) {
@@ -2185,6 +2199,16 @@
                 // Clear the custom input when hiding
                 document.getElementById('religionOther').value = '';
             }
+        }
+
+        // Capitalize name function - fixes "capitalizeName is not defined" error
+        function capitalizeName(input) {
+            if (!input || !input.value) return;
+            
+            // Capitalize first letter of each word
+            input.value = input.value.replace(/\w\S*/g, function(txt) {
+                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+            });
         }
 
         // Add event listeners for auto-capitalization

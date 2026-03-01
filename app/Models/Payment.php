@@ -10,6 +10,9 @@ use Illuminate\Database\Eloquent\Model;
 class Payment extends Model
 {
     protected $table = 'tblpayment';
+    protected $primaryKey = 'Id';
+    public $incrementing = true;
+    protected $keyType = 'int';
     public $timestamps = false;
 
     use HasFactory;

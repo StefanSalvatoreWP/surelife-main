@@ -358,6 +358,7 @@ class PaymentController extends Controller
 
             switch ($clientTerm->Term) {
                 case "Spotcash":
+                case "Spot-Cash":
                     $total_price = $base_price;
                     break;
                 case "Annual":
@@ -852,7 +853,7 @@ class PaymentController extends Controller
         if (!$client) return false;
 
         $paymentTerm = PaymentTerm::select('Term')->where('Id', $client->PaymentTermId)->first();
-        return $paymentTerm && $paymentTerm->Term === 'Spotcash';
+        return $paymentTerm && ($paymentTerm->Term === 'Spotcash' || $paymentTerm->Term === 'Spot-Cash');
     }
 
     /**
@@ -862,7 +863,11 @@ class PaymentController extends Controller
     {
         $query = Payment::query()
             ->select(
-                'tblpayment.*',
+                'tblpayment.Id as id',
+                'tblpayment.ORNo as ORNo',
+                'tblpayment.amountpaid as amountpaid',
+                'tblpayment.date as date',
+                'tblpayment.approval_status',
                 'tblclient.LastName',
                 'tblclient.FirstName',
                 'tblclient.MiddleName',
@@ -870,10 +875,15 @@ class PaymentController extends Controller
             )
             ->leftJoin('tblclient', 'tblpayment.clientid', '=', 'tblclient.id')
             ->where('tblpayment.approval_status', 'Pending')
-            ->where('tblpayment.voidstatus', '<>', 1)
+            ->where(function($q) {
+                $q->where('tblpayment.voidstatus', '<>', 1)
+                  ->orWhereNull('tblpayment.voidstatus');
+            })
             ->orderBy('tblpayment.datecreated', 'desc');
 
-        if ($request->ajax()) {
+        $isDataTablesRequest = $request->has('draw') || $request->has('start') || $request->has('length');
+
+        if ($request->ajax() || $request->wantsJson() || $isDataTablesRequest) {
             return DataTables::of($query)
                 ->filter(function ($query) use ($request) {
                     if ($request->has('search') && !empty($request->input('search.value'))) {
@@ -918,7 +928,7 @@ class PaymentController extends Controller
                 'approval_remarks' => $request->input('approval_remarks')
             ];
 
-            Payment::where('id', $payment->Id)->update($updateData);
+            Payment::where('Id', $payment->Id)->update($updateData);
 
             Log::channel('activity')->info('[StaffID] ' . session('user_id') . ' [Menu] Payment Approval [Action] Approve Spot Cash [Target] ' . $payment->Id);
 
@@ -955,7 +965,7 @@ class PaymentController extends Controller
                 'remarks' => 'Rejected: ' . $request->input('approval_remarks')
             ];
 
-            Payment::where('id', $payment->Id)->update($updateData);
+            Payment::where('Id', $payment->Id)->update($updateData);
 
             // Release the OR back to available status
             OfficialReceipt::where('id', $payment->ORId)

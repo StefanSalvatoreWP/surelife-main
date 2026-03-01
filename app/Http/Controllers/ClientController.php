@@ -1077,6 +1077,10 @@ class ClientController extends Controller
                         $paymentMethod = '1';
                     }
 
+                    // Check if client has Spotcash payment term - requires approval
+                    $isSpotCash = $this->isSpotCashClient($clientId);
+                    Log::info('Spotcash check result: ' . ($isSpotCash ? 'YES' : 'NO'));
+                    
                     $insertPaymentData = [
                         'orno' => $orNo,
                         'clientid' => $clientId,
@@ -1090,6 +1094,34 @@ class ClientController extends Controller
                         'createdby' => session('user_id'),
                         'datecreated' => date("Y-m-d")
                     ];
+                    Log::info('Payment data prepared: ' . json_encode($insertPaymentData));
+                    
+                    if ($isSpotCash) {
+                        // For Spotcash payments, set approval status to Pending
+                        $insertPaymentData['approval_status'] = 'Pending';
+                        $insertPaymentData['approved_by'] = null;
+                        $insertPaymentData['approved_at'] = null;
+                        $insertPaymentData['approval_remarks'] = null;
+                        
+                        Log::info('Inserting SPOT CASH payment with Pending status');
+                        
+                        Payment::insert($insertPaymentData);
+                        
+                        Log::channel('activity')->info('[StaffID] ' . session('user_id') . ' [Menu] Client ' . '[Action] Insert Spot Cash Pending Approval ' . '[Target] ' . $clientId);
+                        
+                        // Check if request is AJAX
+                        if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') == 'XMLHttpRequest') {
+                            return response()->json([
+                                'success' => true,
+                                'message' => 'Client created successfully. Spot cash payment submitted for approval.',
+                                'client_id' => $clientId,
+                                'redirect' => '/client'
+                            ]);
+                        }
+                        
+                        return redirect('/client')->with('success', 'Added new client! Spot cash payment submitted for approval.');
+                    }
+                    
                     Payment::insert($insertPaymentData);
                     Log::channel('activity')->info('[StaffID] ' . session('user_id') . ' [Menu] Client ' . '[Action] Insert Payment' . '[Target] ' . $clientId);
 
@@ -4384,5 +4416,30 @@ class ClientController extends Controller
         } else {
             return response()->json(['msg' => 'Contract is already assigned to another client.']);
         }
+    }
+
+    /**
+     * Check if client has Spotcash payment term
+     */
+    private function isSpotCashClient($clientId)
+    {
+        Log::info('=== isSpotCashClient DEBUG ===');
+        Log::info('Client ID: ' . $clientId);
+        
+        $client = Client::select('PaymentTermId')->where('id', $clientId)->first();
+        if (!$client) {
+            Log::error('Client not found: ' . $clientId);
+            return false;
+        }
+        
+        Log::info('Client PaymentTermId: ' . $client->PaymentTermId);
+        
+        $paymentTerm = PaymentTerm::select('Term')->where('Id', $client->PaymentTermId)->first();
+        Log::info('PaymentTerm: ' . ($paymentTerm ? $paymentTerm->Term : 'NULL'));
+        
+        $isSpotCash = $paymentTerm && ($paymentTerm->Term === 'Spotcash' || $paymentTerm->Term === 'Spot-Cash');
+        Log::info('Is Spotcash: ' . ($isSpotCash ? 'YES' : 'NO'));
+        
+        return $isSpotCash;
     }
 }
