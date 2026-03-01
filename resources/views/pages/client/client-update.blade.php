@@ -76,7 +76,7 @@
                 }
             });
         </script>
-        <form action="/submit-client-update/{{ $clients->Id }}" method="POST" enctype="multipart/form-data">
+        <form id="clientUpdateForm" action="/submit-client-update/{{ $clients->Id }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             <!-- CONTRACT Section -->
@@ -1278,6 +1278,244 @@
     @section('scripts')
     {{-- Numeric and Plus restriction for phone fields --}}
     <script>
+        // Initialize N/A placeholders on page load for contact fields
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileNumber = document.getElementById('mobileNumber');
+            const telephone = document.getElementById('telephone');
+            const email = document.getElementById('email');
+            
+            // Set initial N/A placeholders for empty fields
+            if (mobileNumber && !mobileNumber.value.trim()) {
+                mobileNumber.placeholder = 'N/A';
+            }
+            if (telephone && !telephone.value.trim()) {
+                telephone.placeholder = 'N/A';
+            }
+            if (email && !email.value.trim()) {
+                email.placeholder = 'N/A';
+            }
+            
+            // Clear N/A placeholder when user starts typing
+            [mobileNumber, telephone, email].forEach(element => {
+                if (element) {
+                    element.addEventListener('focus', function() {
+                        if (this.placeholder === 'N/A') {
+                            this.placeholder = '';
+                        }
+                    });
+                    
+                    element.addEventListener('blur', function() {
+                        if (!this.value.trim()) {
+                            this.placeholder = 'N/A';
+                        }
+                    });
+                }
+            });
+        });
+
+        // Contact validation function (same as create form)
+        function validateContactInfo() {
+            const mobileNumber = document.getElementById('mobileNumber');
+            const telephone = document.getElementById('telephone');
+            const email = document.getElementById('email');
+            
+            let isValid = true;
+            let errorMessage = '';
+            
+            // Check if at least one phone number is provided
+            const mobileValue = mobileNumber ? mobileNumber.value.trim() : '';
+            const telephoneValue = telephone ? telephone.value.trim() : '';
+            
+            if (!mobileValue && !telephoneValue) {
+                errorMessage = 'Please provide either a mobile number or telephone number';
+                isValid = false;
+                
+                // Add error styling
+                if (mobileNumber) mobileNumber.classList.add('border-red-500', 'ring-2', 'ring-red-500');
+                if (telephone) telephone.classList.add('border-red-500', 'ring-2', 'ring-red-500');
+            } else {
+                // Remove error styling if validation passes
+                if (mobileNumber) mobileNumber.classList.remove('border-red-500', 'ring-2', 'ring-red-500');
+                if (telephone) telephone.classList.remove('border-red-500', 'ring-2', 'ring-red-500');
+                
+                // Show "N/A" for empty fields
+                if (mobileNumber && !mobileValue) {
+                    mobileNumber.placeholder = 'N/A';
+                }
+                if (telephone && !telephoneValue) {
+                    telephone.placeholder = 'N/A';
+                }
+            }
+            
+            // Validate email format if provided
+            if (email && email.value.trim()) {
+                const emailValue = email.value.trim();
+                const emailDomainSelect = document.getElementById('emailDomainSelect');
+                const customEmailDomain = document.getElementById('customEmailDomain');
+                
+                let fullEmail = emailValue;
+                if (emailDomainSelect) {
+                    if (emailDomainSelect.value === 'others' && customEmailDomain) {
+                        fullEmail += '@' + customEmailDomain.value.trim();
+                    } else if (emailDomainSelect.value !== 'others') {
+                        fullEmail += '@' + emailDomainSelect.value;
+                    }
+                }
+                
+                // Basic email validation
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(fullEmail)) {
+                    errorMessage += (errorMessage ? '\n' : '') + 'Please enter a valid email address';
+                    isValid = false;
+                    if (email) email.classList.add('border-red-500', 'ring-2', 'ring-red-500');
+                } else {
+                    if (email) email.classList.remove('border-red-500', 'ring-2', 'ring-red-500');
+                }
+            } else {
+                // Show "N/A" for empty email field
+                if (email && !email.value.trim()) {
+                    email.placeholder = 'N/A';
+                    if (email) email.classList.remove('border-red-500', 'ring-2', 'ring-red-500');
+                }
+            }
+            
+            return { isValid, errorMessage };
+        }
+
+        // Form submission validation with modal error display
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('clientUpdateForm');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    // Validate contact information first
+                    const contactValidation = validateContactInfo();
+                    if (!contactValidation.isValid) {
+                        if (typeof showSwiftModal === 'function') {
+                            showSwiftModal('Contact Information Required', contactValidation.errorMessage, 'warning');
+                        } else {
+                            alert(contactValidation.errorMessage);
+                        }
+                        return false;
+                    }
+                    
+                    // Collect validation errors
+                    const errors = [];
+                    
+                    // Required fields validation
+                    const requiredFields = [
+                        { id: 'contractNo', name: 'Contract No.' },
+                        { id: 'package', name: 'Package' },
+                        { id: 'paymentTerm', name: 'Payment Term' },
+                        { id: 'region', name: 'Region' },
+                        { id: 'branch', name: 'Branch' },
+                        { id: 'lastName', name: 'Last Name' },
+                        { id: 'firstName', name: 'First Name' },
+                        { id: 'gender', name: 'Gender' },
+                        { id: 'birthDate', name: 'Birth Date' },
+                        { id: 'addressProvince', name: 'Province' },
+                        { id: 'addressCity', name: 'City' },
+                        { id: 'addressBarangay', name: 'Barangay' }
+                    ];
+                    
+                    requiredFields.forEach(field => {
+                        const element = document.getElementById(field.id);
+                        if (!element || !element.value.trim()) {
+                            errors.push(`${field.name} is required`);
+                            if (element) {
+                                element.classList.add('border-red-500', 'ring-2', 'ring-red-500');
+                            }
+                        } else {
+                            if (element) {
+                                element.classList.remove('border-red-500', 'ring-2', 'ring-red-500');
+                            }
+                        }
+                    });
+                    
+                    // Show errors in modal if any
+                    if (errors.length > 0) {
+                        const errorMessage = 'Please check the following fields:\n' + errors.map(err => '• ' + err).join('\n');
+                        if (typeof showSwiftModal === 'function') {
+                            showSwiftModal('Validation Failed', errorMessage, 'error');
+                        } else {
+                            alert(errorMessage);
+                        }
+                        return false;
+                    }
+                    
+                    // Submit form via fetch for modal success message
+                    const formData = new FormData(form);
+                    
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => {
+                        if (response.redirected) {
+                            // Success - show modal then redirect
+                            if (typeof showSwiftModal === 'function') {
+                                showSwiftModal('Success!', 'Client updated successfully!\n\nClick OK to continue.', 'success', [
+                                    {text: 'OK', class: 'bg-green-500 hover:bg-green-600 text-white', action: function() { window.location.href = response.url; }}
+                                ]);
+                            } else {
+                                window.location.href = response.url;
+                            }
+                        } else if (!response.ok) {
+                            return response.json().then(data => {
+                                throw new Error(data.message || 'Update failed');
+                            });
+                        } else {
+                            // Success with JSON response
+                            return response.json().then(data => {
+                                if (typeof showSwiftModal === 'function') {
+                                    showSwiftModal('Success!', (data.message || 'Client updated successfully!') + '\n\nClick OK to continue.', 'success', [
+                                        {text: 'OK', class: 'bg-green-500 hover:bg-green-600 text-white', action: function() { window.location.href = data.redirect || '/client'; }}
+                                    ]);
+                                } else {
+                                    window.location.href = data.redirect || '/client';
+                                }
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Submission error:', error);
+                        if (typeof showSwiftModal === 'function') {
+                            showSwiftModal('Update Failed', 'Please check your input and try again.\n\n' + error.message, 'error');
+                        } else {
+                            alert('Update failed: ' + error.message);
+                        }
+                    });
+                    
+                    return false;
+                });
+            }
+            
+            // Add blur validation for contact fields
+            const mobileNumber = document.getElementById('mobileNumber');
+            const telephone = document.getElementById('telephone');
+            const email = document.getElementById('email');
+            
+            if (mobileNumber) {
+                mobileNumber.addEventListener('blur', function() {
+                    validateContactInfo();
+                });
+            }
+            if (telephone) {
+                telephone.addEventListener('blur', function() {
+                    validateContactInfo();
+                });
+            }
+            if (email) {
+                email.addEventListener('blur', function() {
+                    validateContactInfo();
+                });
+            }
+        });
+
         (function() {
             console.log('Phone restriction script STARTING');
             function restrictPhoneInput(fieldId, allowPlus) {

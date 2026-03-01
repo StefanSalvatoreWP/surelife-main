@@ -848,15 +848,16 @@ $(document).ready(function () {
         if (!mobileNumber || mobileNumber.length !== 10) {
             console.warn('⚠️ WARNING: Mobile number should be exactly 10 digits!');
         }
-        if (!emailUsername || !emailDomainSelect) {
+        // Email is optional - only warn if partially filled
+        if ((emailUsername && !emailDomainSelect) || (!emailUsername && emailDomainSelect)) {
             console.warn('⚠️ WARNING: Email fields are incomplete!');
         }
-        if (emailDomainSelect === 'others' && !customEmailDomain) {
+        if (emailDomainSelect === 'others' && emailUsername && !customEmailDomain) {
             console.warn('⚠️ WARNING: Custom email domain is empty!');
         }
 
         // Check for required fields
-        const requiredFields = ['contractno', 'package', 'paymentterm', 'region', 'branch', 'recruitedby', 'lastname', 'firstname', 'gender', 'birthdate', 'age', 'address_region', 'address_province', 'address_city', 'address_barangay'];
+        const requiredFields = ['contractno', 'package', 'paymentterm', 'region', 'branch', 'lastname', 'firstname', 'gender', 'birthdate', 'age', 'address_region', 'address_province', 'address_city', 'address_barangay'];
         const missingFields = [];
 
         requiredFields.forEach(fieldName => {
