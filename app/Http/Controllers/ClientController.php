@@ -1310,6 +1310,7 @@ class ClientController extends Controller
             $mobileNo = strip_tags($validatedData['mobileno']);
             $email = strip_tags($validatedData['email']);
             $emailAddress = strip_tags($validatedData['emailaddress']);
+            $clientStatus = strip_tags($validatedData['status'] ?? $client->Status);
             $principalBeneficiary = strip_tags($validatedData['principalbeneficiary'] ?? '');
             $principalBeneficiaryAge = strip_tags($validatedData['principalbeneficiaryage'] ?? '');
             $principalBeneficiaryRelation = strip_tags($validatedData['principalbeneficiaryrelation'] ?? '');
@@ -1914,6 +1915,7 @@ class ClientController extends Controller
                             'secondary3age' => $beneficiary3Age,
                             'secondary4name' => $beneficiary4,
                             'secondary4age' => $beneficiary4Age,
+                            'status' => $clientStatus,
                             'datecreated' => date("Y-m-d")
                         ];
 

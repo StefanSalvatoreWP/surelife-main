@@ -32,7 +32,11 @@ class Payment extends Model
         'status',
         'remarks',
         'deposited',
-        'voidstatus'
+        'voidstatus',
+        'approval_status',
+        'approved_by',
+        'approved_at',
+        'approval_remarks'
     ];
 
     // Relationship with Client

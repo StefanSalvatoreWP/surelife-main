@@ -310,6 +310,24 @@ class PaymentController extends Controller
                 Log::channel('activity')->info('[StaffID] ' . session('user_id') . ' [Menu] Payment ' . '[Action] Custom Payment ' . '[Target] ' . $client->Id);
             }
 
+            // Check if client has Spotcash payment term - requires approval
+            $isSpotCash = $this->isSpotCashClient($client->Id);
+            
+            if ($isSpotCash) {
+                // For Spotcash payments, set approval status to Pending
+                $insertPaymentData['approval_status'] = 'Pending';
+                $insertPaymentData['approved_by'] = null;
+                $insertPaymentData['approved_at'] = null;
+                $insertPaymentData['approval_remarks'] = null;
+                
+                // Do NOT mark OR as used yet - wait for approval
+                Payment::insert($insertPaymentData);
+                
+                Log::channel('activity')->info('[StaffID] ' . session('user_id') . ' [Menu] Payment ' . '[Action] Insert Spot Cash Pending Approval ' . '[Target] ' . $client->Id);
+                
+                return redirect('/client-view/' . $client->Id)->with('info', 'Spot cash payment submitted for approval. An approver or admin must approve this payment before it is processed.');
+            }
+
             Payment::insert($insertPaymentData);
 
             // update OR status
@@ -819,5 +837,136 @@ class PaymentController extends Controller
         }
 
         return response()->json(['msg' => 'Something went wrong']);
+    }
+
+    /*********************************/
+    /******** SPOT CASH APPROVAL *****/
+    /*********************************/
+
+    /**
+     * Check if client has Spotcash payment term
+     */
+    private function isSpotCashClient($clientId)
+    {
+        $client = Client::select('PaymentTermId')->where('id', $clientId)->first();
+        if (!$client) return false;
+
+        $paymentTerm = PaymentTerm::select('Term')->where('Id', $client->PaymentTermId)->first();
+        return $paymentTerm && $paymentTerm->Term === 'Spotcash';
+    }
+
+    /**
+     * Get pending spot cash payments for approval
+     */
+    public function getPendingSpotCashPayments(Request $request)
+    {
+        $query = Payment::query()
+            ->select(
+                'tblpayment.*',
+                'tblclient.LastName',
+                'tblclient.FirstName',
+                'tblclient.MiddleName',
+                'tblclient.ContractNumber'
+            )
+            ->leftJoin('tblclient', 'tblpayment.clientid', '=', 'tblclient.id')
+            ->where('tblpayment.approval_status', 'Pending')
+            ->where('tblpayment.voidstatus', '<>', 1)
+            ->orderBy('tblpayment.datecreated', 'desc');
+
+        if ($request->ajax()) {
+            return DataTables::of($query)
+                ->filter(function ($query) use ($request) {
+                    if ($request->has('search') && !empty($request->input('search.value'))) {
+                        $searchTerm = $request->input('search.value');
+                        if (is_numeric($searchTerm)) {
+                            $query->where(function ($q) use ($searchTerm) {
+                                $q->where('tblpayment.ORNo', '=', $searchTerm)
+                                    ->orWhere('tblclient.ContractNumber', '=', $searchTerm);
+                            });
+                        } else {
+                            $query->where('tblclient.LastName', 'like', "$searchTerm%");
+                        }
+                    }
+                })
+                ->toJson();
+        }
+
+        return view('pages.payment.spotcash-approval');
+    }
+
+    /**
+     * Approve spot cash payment
+     */
+    public function approveSpotCashPayment(Request $request, Payment $payment)
+    {
+        try {
+            // Validate request
+            $request->validate([
+                'approval_remarks' => 'nullable|string|max:500'
+            ]);
+
+            // Check if payment is pending approval
+            if ($payment->approval_status !== 'Pending') {
+                return redirect()->back()->with('error', 'Payment is not pending approval.');
+            }
+
+            // Update payment with approval
+            $updateData = [
+                'approval_status' => 'Approved',
+                'approved_by' => session('user_id'),
+                'approved_at' => now(),
+                'approval_remarks' => $request->input('approval_remarks')
+            ];
+
+            Payment::where('id', $payment->Id)->update($updateData);
+
+            Log::channel('activity')->info('[StaffID] ' . session('user_id') . ' [Menu] Payment Approval [Action] Approve Spot Cash [Target] ' . $payment->Id);
+
+            return redirect()->back()->with('success', 'Spot cash payment approved successfully!');
+        } catch (\Exception $e) {
+            Log::error('Error approving spot cash payment: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'An error occurred while approving the payment.');
+        }
+    }
+
+    /**
+     * Reject spot cash payment
+     */
+    public function rejectSpotCashPayment(Request $request, Payment $payment)
+    {
+        try {
+            // Validate request
+            $request->validate([
+                'approval_remarks' => 'required|string|max:500'
+            ]);
+
+            // Check if payment is pending approval
+            if ($payment->approval_status !== 'Pending') {
+                return redirect()->back()->with('error', 'Payment is not pending approval.');
+            }
+
+            // Update payment with rejection
+            $updateData = [
+                'approval_status' => 'Rejected',
+                'approved_by' => session('user_id'),
+                'approved_at' => now(),
+                'approval_remarks' => $request->input('approval_remarks'),
+                'voidstatus' => 1,
+                'remarks' => 'Rejected: ' . $request->input('approval_remarks')
+            ];
+
+            Payment::where('id', $payment->Id)->update($updateData);
+
+            // Release the OR back to available status
+            OfficialReceipt::where('id', $payment->ORId)
+                ->update(['status' => '1']);
+
+            Log::channel('activity')->info('[StaffID] ' . session('user_id') . ' [Menu] Payment Approval [Action] Reject Spot Cash [Target] ' . $payment->Id);
+
+            return redirect()->back()->with('success', 'Spot cash payment rejected successfully.');
+        } catch (\Exception $e) {
+            Log::error('Error rejecting spot cash payment: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'An error occurred while rejecting the payment.');
+        }
     }
 }

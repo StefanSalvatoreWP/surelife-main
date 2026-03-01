@@ -81,7 +81,7 @@
             @method('PUT')
             <!-- CONTRACT Section -->
             <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
-                <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
+                <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200 rounded-t-xl">
                     <h3 class="text-lg font-bold text-gray-800">CONTRACT</h3>
                 </div>
                 <div class="p-6">
@@ -91,7 +91,7 @@
                                     $prevContractNo = old('contractno', $clients->ContractNumber);
                                 @endphp                
                                 <label for="contractNo" class="block text-sm font-medium text-gray-700 mb-2">Contract No.</label>
-                                <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="contractNo" name="contractno" value="{{ $prevContractNo }}" {{ $canEditContractNumber ? '' : 'readonly' }} data-can-edit="{{ $canEditContractNumber ? 'true' : 'false' }}" />
+                                <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="contractNo" name="contractno" value="{{ $prevContractNo }}" {{ $canEditContractNumber ? '' : 'readonly' }} data-can-edit="{{ $canEditContractNumber ? 'true' : 'false' }}" />
                                 @unless($canEditContractNumber)
                                     <small class="text-gray-500 text-xs mt-1 block">
                                         <i class="fas fa-lock"></i>
@@ -104,7 +104,7 @@
                             </div>
                             <div>
                                 <label for="package" class="block text-sm font-medium text-gray-700 mb-2">Package</label>
-                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="package" name="package">
+                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="package" name="package">
                                     @php
                                         $selectedPackage = old('package', $clients->PackageID);
                                     @endphp
@@ -123,7 +123,7 @@
                                     $prevPackagePrice = old('packageprice');
                                 @endphp
                                 <label for="packagePrice" class="block text-sm font-medium text-gray-700 mb-2">Price</label>
-                                <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="packagePrice" name="packageprice" value="{{ $prevPackagePrice }}" readonly />
+                                <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="packagePrice" name="packageprice" value="{{ $prevPackagePrice }}" readonly />
                                 @error('packageprice')
                                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -136,13 +136,13 @@
                                 <input type="hidden" id="defPaymentTerm" value="{{ $prevPaymentTerm }}" />
 
                                 @if($clients->AppliedChangeMode == 1 || $clients->Status != 3)
-                                    <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="paymentTerm" name="paymentterm">
+                                    <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="paymentTerm" name="paymentterm">
                                     </select>
                                     @error('paymentterm')
                                         <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                                     @enderror
                                 @else
-                                    <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="paymentTerm" name="paymentterm" disabled>
+                                    <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="paymentTerm" name="paymentterm" disabled>
                                     </select>
                                     <input type="hidden" value="{{ $prevPaymentTerm }}" name="paymentterm" readonly />
                                     @error('paymentterm')
@@ -157,14 +157,14 @@
                                     $prevTermAmount = old('termamount', $clients->PaymentTermAmount);
                                 @endphp
                                 <label for="termAmount" class="block text-sm font-medium text-gray-700 mb-2">Term Amount</label>
-                                <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="termAmount" name="termamount" value="{{ $prevTermAmount }}" readonly />
+                                <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="termAmount" name="termamount" value="{{ $prevTermAmount }}" readonly />
                                 @error('termamount')
                                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
                             <div>
                                 <label for="region" class="block text-sm font-medium text-gray-700 mb-2">Region</label>
-                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="region" name="region">
+                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="region" name="region">
                                     @php
                                         $selectedRegion = old('region', $clients->RegionId);
                                     @endphp
@@ -180,7 +180,7 @@
                             </div>
                             <div>
                                 <label for="branch" class="block text-sm font-medium text-gray-700 mb-2">Branch</label>
-                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="branch" name="branch">
+                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="branch" name="branch">
                                     @php
                                         $selectedBranch = old('branch', $clients->BranchId);
                                     @endphp
@@ -197,7 +197,7 @@
                             </div>
                             <div>
                                 <label for="recruitedBy" class="block text-sm font-medium text-gray-700 mb-2">FSA</label>
-                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="recruitedBy" name="recruitedby">
+                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="recruitedBy" name="recruitedby">
                                     @php
                                         $selectedRecruitedBy = old('recruitedby', $clients->RecruitedBy);
                                     @endphp
@@ -209,6 +209,20 @@
                                 </select>
                                 <input type="hidden" id="defRecruitedBy" value="{{ $selectedRecruitedBy }}" />
                                 @error('recruitedby')
+                                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            <div>
+                                @php
+                                    $selectedStatus = old('status', $clients->Status);
+                                @endphp
+                                <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="status" name="status">
+                                    <option value="1" {{ $selectedStatus == '1' ? 'selected' : '' }}>Pending</option>
+                                    <option value="2" {{ $selectedStatus == '2' ? 'selected' : '' }}>Verified</option>
+                                    <option value="3" {{ $selectedStatus == '3' ? 'selected' : '' }}>Active</option>
+                                </select>
+                                @error('status')
                                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
@@ -230,7 +244,7 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                                 <div>
                                     <label for="downpaymentType" class="block text-sm font-medium text-gray-700 mb-2">Downpayment Type</label>
-                                    <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="downpaymentType" name="downpaymenttype">
+                                    <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="downpaymentType" name="downpaymenttype">
                                         @php
                                             if ($orbatchinfo->Type == null) {
                                                 $downpaymentType = 'Standard';
@@ -257,7 +271,7 @@
                                     @endphp
                                     <input type="hidden" id="defAmountPaid" value="{{ $prevDownpaymentAmount }}" />
                                     <label for="paymentAmount" class="block text-sm font-medium text-gray-700 mb-2">Payment Amount</label>
-                                    <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="paymentAmount" name="paymentamount">
+                                    <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="paymentAmount" name="paymentamount">
                                     </select>
                                     @error('paymentamount')
                                         <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
@@ -268,7 +282,7 @@
                                         $prevOrSeriesCode = old('orseriescode', $orbatchinfo->SeriesCode); 
                                     @endphp
                                     <label for="orSeriesCode" class="block text-sm font-medium text-gray-700 mb-2">O.R Series Code</label>
-                                    <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="orSeriesCode" name="orseriescode" maxlength="30" value="{{ $prevOrSeriesCode }}" />
+                                    <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="orSeriesCode" name="orseriescode" maxlength="30" value="{{ $prevOrSeriesCode }}" />
                                     @error('orseriescode')
                                         <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                                     @enderror
@@ -278,7 +292,7 @@
                                         $prevOrNumber = old('ornumber', $paymentinfo->ORNo); 
                                     @endphp
                                     <label for="orNumber" class="block text-sm font-medium text-gray-700 mb-2">O.R Number</label>
-                                    <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="orNumber" name="ornumber" maxlength="30" value="{{ $prevOrNumber }}" />
+                                    <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="orNumber" name="ornumber" maxlength="30" value="{{ $prevOrNumber }}" />
                                     @error('ornumber')
                                         <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                                     @enderror
@@ -287,7 +301,7 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
                                 <div>
                                     <label for="paymentMethod" class="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
-                                    <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="paymentMethod" name="paymentmethod">
+                                    <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="paymentMethod" name="paymentmethod">
                                         @php
                                             $selectedPaymentMethod = old('paymentmethod');
 
@@ -306,7 +320,7 @@
                                         $prevPaymentDate = old('paymentdate', $paymentinfo->Date);
                                     @endphp
                                     <label for="paymentDate" class="block text-sm font-medium text-gray-700 mb-2">Payment Date</label>
-                                    <input type="date" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="paymentDate" name="paymentdate" value="{{ $prevPaymentDate }}" />
+                                    <input type="date" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="paymentDate" name="paymentdate" value="{{ $prevPaymentDate }}" />
                                     @error('paymentdate')
                                         <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                                     @enderror
@@ -318,7 +332,7 @@
 
             <!-- PERSONAL Section -->
             <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
-                <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
+                <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200 rounded-t-xl">
                     <h3 class="text-lg font-bold text-gray-800 flex items-center">
                         <svg class="w-5 h-5 mr-2 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
@@ -333,7 +347,7 @@
                                     $prevLastName = old('lastname', $clients->LastName);
                                 @endphp
                                 <label for="lastName" class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
-                                <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="lastName" name="lastname" value="{{ $prevLastName }}" maxlength="30"/>
+                                <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="lastName" name="lastname" value="{{ $prevLastName }}" maxlength="30"/>
                                 @error('lastname')
                                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -343,7 +357,7 @@
                                     $prevFirstName = old('firstname', $clients->FirstName);
                                 @endphp
                                 <label for="firstName" class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
-                                <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="firstName" name="firstname" value="{{ $prevFirstName }}" maxlength="30"/>
+                                <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="firstName" name="firstname" value="{{ $prevFirstName }}" maxlength="30"/>
                                 @error('firstname')
                                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -353,14 +367,14 @@
                                     $prevMiddleName = old('middlename', $clients->MiddleName);
                                 @endphp
                                 <label for="middleName" class="block text-sm font-medium text-gray-700 mb-2">Middle Name</label>
-                                <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="middleName" name="middlename" value="{{ $prevMiddleName }}" maxlength="30"/>
+                                <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="middleName" name="middlename" value="{{ $prevMiddleName }}" maxlength="30"/>
                                 @error('middlename')
                                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
                             <div>
                                 <label for="gender" class="block text-sm font-medium text-gray-700 mb-2">Gender</label>
-                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="gender" name="gender">
+                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="gender" name="gender">
                                     @php
                                         $selectedGender = old('gender', $clients->Gender);
                                     @endphp
@@ -474,7 +488,7 @@
                                     $selectedAddressRegion = old('address_region', $mappedRegionCode);
                                 @endphp
                                 <label for="addressRegion" class="block text-sm font-medium text-gray-700 mb-2">Region</label>
-                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="addressRegion" name="address_region">
+                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="addressRegion" name="address_region">
                                     <option value="">Select Region</option>
                                     @foreach($addressRegions as $region)
                                         <option value="{{ $region->code }}" {{ $selectedAddressRegion == $region->code ? 'selected' : '' }}>
@@ -491,7 +505,7 @@
                                     $selectedAddressProvince = old('address_province', $clients->Province ?? '');
                                 @endphp
                                 <label for="addressProvince" class="block text-sm font-medium text-gray-700 mb-2">Province</label>
-                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="addressProvince" name="address_province">
+                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="addressProvince" name="address_province">
                                     <option value="">Select Province</option>
                                 </select>
                                 @error('address_province')
@@ -503,7 +517,7 @@
                                     $selectedAddressCity = old('address_city', $clients->City ?? '');
                                 @endphp
                                 <label for="addressCity" class="block text-sm font-medium text-gray-700 mb-2">City/Municipality</label>
-                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="addressCity" name="address_city">
+                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="addressCity" name="address_city">
                                     <option value="">Select City/Municipality</option>
                                 </select>
                                 @error('address_city')
@@ -515,7 +529,7 @@
                                     $selectedAddressBarangay = old('address_barangay', $clients->Barangay ?? '');
                                 @endphp
                                 <label for="addressBarangay" class="block text-sm font-medium text-gray-700 mb-2">Barangay</label>
-                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="addressBarangay" name="address_barangay">
+                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="addressBarangay" name="address_barangay">
                                     <option value="">Select Barangay</option>
                                 </select>
                                 @error('address_barangay')
@@ -529,14 +543,14 @@
                                     $prevZipcode = old('zipcode', $clients->ZipCode);
                                 @endphp
                                 <label for="zipcode" class="block text-sm font-medium text-gray-700 mb-2">ZIP code</label>
-                                <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="zipcode" name="zipcode" maxlength="10" value="{{ $prevZipcode }}" placeholder="Select city first" title="Select a city to auto-fill zipcode or enable manual input" />
+                                <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="zipcode" name="zipcode" maxlength="10" value="{{ $prevZipcode }}" placeholder="Select city first" title="Select a city to auto-fill zipcode or enable manual input" />
                             </div>
                             <div>
                                 @php
                                     $prevStreet = old('street', $clients->Street);
                                 @endphp
                                 <label for="street" class="block text-sm font-medium text-gray-700 mb-2">Street</label>
-                                <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="street" name="street" maxlength="30" value="{{ $prevStreet }}" />
+                                <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="street" name="street" maxlength="30" value="{{ $prevStreet }}" />
                             </div>
                         </div>
                 </div>
@@ -544,7 +558,7 @@
 
             <!-- HOME ADDRESS Section -->
             <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
-                <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
+                <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200 rounded-t-xl">
                     <div class="flex items-center justify-between">
                         <h3 class="text-lg font-bold text-gray-800 flex items-center">
                             <svg class="w-5 h-5 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
@@ -565,7 +579,7 @@
                                     $selectedHomeRegion = old('home_region', $clients->HomeRegion ?? '');
                                 @endphp
                                 <label for="homeRegion" class="block text-sm font-medium text-gray-700 mb-2">Region</label>
-                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="homeRegion" name="home_region">
+                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="homeRegion" name="home_region">
                                     <option value="">Select Region</option>
                                     @foreach($addressRegions as $region)
                                         <option value="{{ $region->code }}" {{ $selectedHomeRegion == $region->code ? 'selected' : '' }}>
@@ -582,7 +596,7 @@
                                     $selectedHomeProvince = old('home_province', $clients->HomeProvince ?? '');
                                 @endphp
                                 <label for="homeProvince" class="block text-sm font-medium text-gray-700 mb-2">Province</label>
-                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="homeProvince" name="home_province">
+                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="homeProvince" name="home_province">
                                     <option value="">Select Province</option>
                                 </select>
                                 @error('home_province')
@@ -594,7 +608,7 @@
                                     $selectedHomeCity = old('home_city', $clients->HomeCity ?? '');
                                 @endphp
                                 <label for="homeCity" class="block text-sm font-medium text-gray-700 mb-2">City/Municipality</label>
-                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="homeCity" name="home_city">
+                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="homeCity" name="home_city">
                                     <option value="">Select City/Municipality</option>
                                 </select>
                                 @error('home_city')
@@ -606,7 +620,7 @@
                                     $selectedHomeBarangay = old('home_barangay', $clients->HomeBarangay ?? '');
                                 @endphp
                                 <label for="homeBarangay" class="block text-sm font-medium text-gray-700 mb-2">Barangay</label>
-                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="homeBarangay" name="home_barangay">
+                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="homeBarangay" name="home_barangay">
                                     <option value="">Select Barangay</option>
                                 </select>
                                 @error('home_barangay')
@@ -620,14 +634,14 @@
                                     $prevHomeZipcode = old('home_zipcode', $clients->HomeZipCode ?? '');
                                 @endphp
                                 <label for="homeZipcode" class="block text-sm font-medium text-gray-700 mb-2">ZIP code</label>
-                                <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="homeZipcode" name="home_zipcode" maxlength="10" value="{{ $prevHomeZipcode }}" placeholder="Select city first" />
+                                <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="homeZipcode" name="home_zipcode" maxlength="10" value="{{ $prevHomeZipcode }}" placeholder="Select city first" />
                             </div>
                             <div>
                                 @php
                                     $prevHomeStreet = old('home_street', $clients->HomeStreet ?? '');
                                 @endphp
                                 <label for="homeStreet" class="block text-sm font-medium text-gray-700 mb-2">Street</label>
-                                <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="homeStreet" name="home_street" maxlength="30" value="{{ $prevHomeStreet }}" />
+                                <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="homeStreet" name="home_street" maxlength="30" value="{{ $prevHomeStreet }}" />
                             </div>
                         </div>
                 </div>
@@ -635,7 +649,7 @@
 
             <!-- CONTACT Section -->
             <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
-                <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
+                <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200 rounded-t-xl">
                     <h3 class="text-lg font-bold text-gray-800 flex items-center">
                         <svg class="w-5 h-5 mr-2 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
@@ -650,7 +664,7 @@
                                     $prevTelephone = preg_replace('/[^0-9+]/', '', old('telephone', $clients->HomeNumber));
                                 @endphp                
                                 <label for="telephone" class="block text-sm font-medium text-gray-700 mb-2">Telephone</label>
-                                <input type="tel" class="w-full px-4 py-2.5 border-4 border-red-500 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="telephone" name="telephone" maxlength="30" value="{{ $prevTelephone }}" inputmode="tel" placeholder="e.g. +63212345678" onkeypress="console.log('Telephone KEY pressed:', event.key); var c=event.charCode; return c===0||c===43||(c>=48&&c<=57);" oninput="console.log('Telephone VALUE changed:', this.value); this.value=this.value.replace(/[^0-9+]/g,'');" />
+                                <input type="tel" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="telephone" name="telephone" maxlength="15" value="{{ $prevTelephone }}" placeholder="02 8123 4567" inputmode="numeric" onkeypress="var c=event.charCode;return c===0||(c>=48&&c<=57);" oninput="this.value=this.value.replace(/[^0-9]/g,'');" />
                             </div>
                             <div>
                                 <label for="mobileNumber" class="block text-sm font-medium text-gray-700 mb-2">Mobile (+63)</label>
@@ -663,7 +677,7 @@
                                 @endphp
                                 <div class="flex">
                                     <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-600 font-medium">+63</span>
-                                    <input type="tel" class="flex-1 px-4 py-2.5 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="mobileNumber" name="mobilenumber" placeholder="9123456789" maxlength="10" value="{{ $fullMobileNumber }}" inputmode="numeric" onkeypress="var c=event.charCode;return c===0||(c>=48&&c<=57);" oninput="this.value=this.value.replace(/[^0-9]/g,'');" />
+                                    <input type="tel" class="flex-1 px-4 py-2.5 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="mobileNumber" name="mobilenumber" placeholder="9123456789" maxlength="10" value="{{ $fullMobileNumber }}" inputmode="numeric" onkeypress="var c=event.charCode;return c===0||(c>=48&&c<=57);" oninput="this.value=this.value.replace(/[^0-9]/g,'');" />
                                 </div>
                                 @error('mobilenumber')
                                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
@@ -671,7 +685,7 @@
                             </div>
                             <div>
                                 <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                                <div class="flex gap-2">
+                                <div class="flex gap-3">
                                     @php 
                                                                                 $selectedEmail = old('email', substr($clients->EmailAddress, 0, strpos($clients->EmailAddress, '@')));
                                         $selectedEmailAddress = old('emailaddress', substr($clients->EmailAddress, strpos($clients->EmailAddress, '@') + 1));
@@ -685,9 +699,9 @@
                                             }
                                         }
                                     @endphp
-                                    <input type="text" class="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="email" name="email" maxlength="30" value="{{ $selectedEmail }}" />
+                                    <input type="text" class="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="email" name="email" maxlength="30" value="{{ $selectedEmail }}" />
                                     <span class="flex items-center px-3 border border-gray-300 bg-gray-50 rounded-lg text-gray-600">@</span>
-                                    <select class="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="emailDomainSelect" name="emailaddress" onchange="toggleCustomEmailDomain()">
+                                    <select class="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="emailDomainSelect" name="emailaddress" onchange="toggleCustomEmailDomain()">
                                         @foreach($emails as $email)
                                             <option value="{{ $email->Email }}" {{ $selectedEmailAddress == $email->Email ? 'selected' : '' }}>
                                                 {{ $email->Email }}
@@ -696,7 +710,7 @@
                                         <option value="others" {{ $isCustomDomain ? 'selected' : '' }}>Others</option>
                                     </select>
                                 </div>
-                                <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 mt-2" id="customEmailDomain" name="customemaildomain" placeholder="Enter custom domain (e.g., company.com)" maxlength="50" value="{{ $isCustomDomain ? $selectedEmailAddress : '' }}" style="display: {{ $isCustomDomain ? 'block' : 'none' }};" />
+                                <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 mt-2" id="customEmailDomain" name="customemaildomain" placeholder="Enter custom domain (e.g., company.com)" maxlength="50" value="{{ $isCustomDomain ? $selectedEmailAddress : '' }}" style="display: {{ $isCustomDomain ? 'block' : 'none' }};" />
                                 <div class="space-y-1 mt-1">
                                     @error('email')
                                         <p class="text-red-600 text-sm">{{ $message }}</p>
@@ -711,21 +725,21 @@
             </div>
             <!-- BENEFICIARIES Section -->
             <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
-                <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
+                <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200 rounded-t-xl">
                     <h3 class="text-lg font-bold text-gray-800 flex items-center">
-                        <svg class="w-5 h-5 mr-2 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+                        <svg class="w-5 h-5 mr-2 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v2h8v-2zM16 11a2 2 0 100-4 2 2 0 000 4z"/>
                         </svg>
                         BENEFICIARIES
                     </h3>
                 </div>
                 <div class="p-6">
-                        <div class="mb-6 bg-blue-50/50 p-5 rounded-xl border border-blue-100">
+                        <div class="mb-6 bg-blue-50/50 p-6 rounded-xl border border-blue-100">
                             <h4 class="text-sm font-bold text-gray-800 mb-3 flex items-center">
                                 <svg class="w-4 h-4 mr-1.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                                 Principal Beneficiary Details
                             </h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
                                 <div>
                                     @php
                                         $prevPrincipalBeneficiary = old('principalbeneficiary', $clients->PrincipalBeneficiaryName);
@@ -733,7 +747,7 @@
                                         $prevPrincipalBeneficiaryRelation = old('principalbeneficiaryrelation', $clients->principalbeneficiaryrelation);
                                     @endphp
                                     <label for="principalBeneficiary" class="block text-xs font-medium text-gray-700 mb-1">Full Name & Age</label>
-                                    <div class="flex gap-2">
+                                    <div class="flex gap-3">
                                         <input type="text" class="flex-1 px-4 py-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 bg-white" id="principalBeneficiary" name="principalbeneficiary" maxlength="30" value="{{ $prevPrincipalBeneficiary }}" placeholder="Full Name" />
                                         <input type="number" class="w-20 px-4 py-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 bg-white" id="principalBeneficiaryAge" name="principalbeneficiaryage" maxlength="3" value="{{ $prevPrincipalBeneficiaryAge }}" placeholder="Age" />
                                     </div>
@@ -767,16 +781,16 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
                             <div>
                                 @php
                                     $prevBeneficiary1 = old('beneficiary1', $clients->Secondary1Name);
                                     $prevBeneficiary1Age = old('beneficiary1age', $clients->Secondary1Age);
                                 @endphp
                                 <label for="beneficiary1" class="block text-sm font-medium text-gray-700 mb-2">Beneficiary 1 (Age)</label>
-                                <div class="flex gap-2">
-                                    <input type="text" class="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="beneficiary1" name="beneficiary1" maxlength="30" value="{{ $prevBeneficiary1 }}" />
-                                    <input type="number" class="w-20 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="beneficiary1age" name="beneficiary1age" maxlength="3" value="{{ $prevBeneficiary1Age }}" />
+                                <div class="flex gap-3">
+                                    <input type="text" class="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="beneficiary1" name="beneficiary1" maxlength="30" value="{{ $prevBeneficiary1 }}" />
+                                    <input type="number" class="w-20 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="beneficiary1age" name="beneficiary1age" maxlength="3" value="{{ $prevBeneficiary1Age }}" />
                                 </div>
                             </div>
                             <div>
@@ -785,9 +799,9 @@
                                     $prevBeneficiary2Age = old('beneficiary2age', $clients->Secondary2Age);
                                 @endphp
                                 <label for="beneficiary2" class="block text-sm font-medium text-gray-700 mb-2">Beneficiary 2 (Age)</label>
-                                <div class="flex gap-2">
-                                    <input type="text" class="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="beneficiary2" name="beneficiary2" maxlength="30" value="{{ $prevBeneficiary2 }}" />
-                                    <input type="number" class="w-20 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="beneficiary2age" name="beneficiary2age" maxlength="3" value="{{ $prevBeneficiary2Age }}" />
+                                <div class="flex gap-3">
+                                    <input type="text" class="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="beneficiary2" name="beneficiary2" maxlength="30" value="{{ $prevBeneficiary2 }}" />
+                                    <input type="number" class="w-20 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="beneficiary2age" name="beneficiary2age" maxlength="3" value="{{ $prevBeneficiary2Age }}" />
                                 </div>
                             </div>
 
@@ -797,9 +811,9 @@
                                     $prevBeneficiary3Age = old('beneficiary3age', $clients->Secondary3Age);
                                 @endphp
                                 <label for="beneficiary3" class="block text-sm font-medium text-gray-700 mb-2">Beneficiary 3 (Age)</label>
-                                <div class="flex gap-2">
-                                    <input type="text" class="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="beneficiary3" name="beneficiary3" maxlength="30" value="{{ $prevBeneficiary3 }}" />
-                                    <input type="number" class="w-20 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="beneficiary3age" name="beneficiary3age" maxlength="3" value="{{ $prevBeneficiary3Age }}" />
+                                <div class="flex gap-3">
+                                    <input type="text" class="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="beneficiary3" name="beneficiary3" maxlength="30" value="{{ $prevBeneficiary3 }}" />
+                                    <input type="number" class="w-20 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="beneficiary3age" name="beneficiary3age" maxlength="3" value="{{ $prevBeneficiary3Age }}" />
                                 </div>
                             </div>
 
@@ -809,9 +823,9 @@
                                     $prevBeneficiary4Age = old('beneficiary4age', $clients->Secondary4Age);
                                 @endphp
                                 <label for="beneficiary4" class="block text-sm font-medium text-gray-700 mb-2">Beneficiary 4 (Age)</label>
-                                <div class="flex gap-2">
-                                    <input type="text" class="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="beneficiary4" name="beneficiary4" maxlength="30" value="{{ $prevBeneficiary4 }}" />
-                                    <input type="number" class="w-20 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" id="beneficiary4age" name="beneficiary4age" maxlength="3" value="{{ $prevBeneficiary4Age }}" />
+                                <div class="flex gap-3">
+                                    <input type="text" class="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="beneficiary4" name="beneficiary4" maxlength="30" value="{{ $prevBeneficiary4 }}" />
+                                    <input type="number" class="w-20 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="beneficiary4age" name="beneficiary4age" maxlength="3" value="{{ $prevBeneficiary4Age }}" />
                                 </div>
                             </div>
                         </div>
@@ -820,7 +834,7 @@
 
             <!-- Submit Button -->
             <div class="flex justify-center mt-8">
-                <button type="submit" class="px-12 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                <button type="submit" class="px-12 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                     <span class="flex items-center">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>

@@ -171,9 +171,7 @@
             <input type="hidden" id="clientid" value="{{ $clients->cid }}" />
             @if($clients->Status == '1')
                 <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 cursor-pointer"
-                    onclick="showSwiftModal('Verify Client', 'You are going to verify the selected client {{ $clients->LastName . ', ' . $clients->FirstName }}.
-
-You cannot undo this action. Continue?', 'warning', [{text: 'Confirm', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitVerifyClient()'}, {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}])"
+                    onclick="showSwiftModal('Verify Client', 'You are going to verify the selected client {{ $clients->LastName . ', ' . $clients->FirstName }}. You cannot undo this action. Continue?', 'warning', [{text: 'Confirm', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitVerifyClient()'}, {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}])"
                     role="button">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -183,7 +181,7 @@ You cannot undo this action. Continue?', 'warning', [{text: 'Confirm', class: 'b
                 </a>
             @elseif($clients->Status == '2')
                 <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 cursor-pointer"
-                    onclick="showSwiftModal('Approve Client', 'You are going to approve the selected client.\n\nYou cannot undo this action. Continue?', 'warning', [{text: 'Confirm', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitApproveClient()'}, {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}])"
+                    onclick="showSwiftModal('Approve Client', 'You are going to approve the selected client. You cannot undo this action. Continue?', 'warning', [{text: 'Confirm', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitApproveClient()'}, {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}])"
                     role="button">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -218,7 +216,7 @@ You cannot undo this action. Continue?', 'warning', [{text: 'Confirm', class: 'b
                 @endif
 
                 @if(!$clients->CompletedMemorial || $clients->CompletedMemorial == 0)
-                    <a onclick="showSwiftModal('Complete Memorial Service', 'You are going to mark the selected client as having completed the memorial service.\n\nYou cannot undo this action. Continue?', 'warning', [{text: 'Confirm', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCompleteMemorial()'}, {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}])"
+                    <a onclick="showSwiftModal('Complete Memorial Service', 'You are going to mark the selected client as having completed the memorial service. You cannot undo this action. Continue?', 'warning', [{text: 'Confirm', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCompleteMemorial()'}, {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}])"
                         class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer"
                         role="button">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -958,7 +956,7 @@ You cannot undo this action. Continue?', 'warning', [{text: 'Confirm', class: 'b
                                             role="button">Certificate of Full Payment</a>
                                     @elseif($clients->CFPNO == null && $cfpApprover == 1)
                                         <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4 cursor-pointer"
-                                            onclick="showSwiftModal('Certificate Approval', 'You are going to approve the certificate of full payment for this client.\n\nYou cannot undo this action. Continue?', 'warning', [{text: 'Confirm', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpApproval()'}, {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}])"
+                                            onclick="showSwiftModal('Certificate Approval', 'You are going to approve the certificate of full payment for this client. You cannot undo this action. Continue?', 'warning', [{text: 'Confirm', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpApproval()'}, {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}])"
                                             role="button">Certificate of Full Payment</a>
                                     @elseif($clients->CFPNO == "NA")
                                         <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
@@ -1000,7 +998,7 @@ You cannot undo this action. Continue?', 'warning', [{text: 'Confirm', class: 'b
                                                 data-client-id="{{ $clients->cid }}" role="button">Certificate of Full Payment</a>
                                         @elseif($clients->CFPNO == null && $cfpApprover == 1)
                                             <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
-                                                onclick="showSwiftModal('Certificate Approval', 'You are going to approve the certificate of full payment for this client.\\n\\n⚠️ You cannot undo this action. Continue?', 'warning', [
+                                                onclick="showSwiftModal('Certificate Approval', 'You are going to approve the certificate of full payment for this client. You cannot undo this action. Continue?', 'warning', [
                                                     {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpApproval()'},
                                                     {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
                                                 ])"
