@@ -345,6 +345,9 @@ $(document).ready(function() {
     function loadZipcode(cityCode) {
         const $zipcodeInput = $('#zipcode');
         
+        // Get selected province code for province-aware lookup
+        const provinceCode = $('#addressProvince').val();
+        
         // Show loading state
         $zipcodeInput.val('Loading...');
         $zipcodeInput.prop('readonly', true);
@@ -353,7 +356,10 @@ $(document).ready(function() {
         $.ajax({
             url: '/get-address-zipcode',
             method: 'GET',
-            data: { cityName: cityCode },
+            data: { 
+                cityName: cityCode,
+                provinceCode: provinceCode  // NEW: Pass province for accurate lookup
+            },
             dataType: 'json',
             cache: false,
             success: function(response) {

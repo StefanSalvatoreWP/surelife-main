@@ -1,20 +1,30 @@
 <?php
 /**
- * Smart Merge Zip Codes
+ * Smart Merge Zip Codes (Local)
  * 
  * 1. Parses philippine_provinces_and_cities.sql
  * 2. Updates tbladdress with matching names
  * 3. Handles "City" suffix variations
+ * 
+ * Usage: php smart_merge_zips.php
  */
 
-$host = '127.0.0.1';
-$dbname = 'slc_db';
-$pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", 'root', '');
+// ==========================================
+// LOCAL DATABASE CONFIGURATION
+$host = 'localhost';
+$dbname = 'surelife';
+$username = 'root';
+$password = '';
+// ==========================================
 
-echo "--- STARTING SMART MERGE ---\n";
+$pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+echo "=== SMART MERGE ZIP CODES (LOCAL) ===\n";
+echo "Database: {$host} / {$dbname}\n\n";
 
 // 1. Parse SQL File
-$sqlFile = 'philippine-provinces-and-cities-sql-0.3/philippine_provinces_and_cities.sql';
+$sqlFile = __DIR__ . '/philippine_provinces_and_cities.sql';
 if (!file_exists($sqlFile)) {
     die("Error: SQL file not found at $sqlFile\n");
 }
@@ -72,8 +82,13 @@ foreach ($matches as $m) {
     }
 }
 
-echo "--- MERGE COMPLETE ---\n";
+echo "\n=== MERGE COMPLETE ===\n";
 echo "Direct Matches Updated: $updateCount\n";
 echo "Variation Matches Updated: $variationCount\n";
 echo "Total Updated: " . ($updateCount + $variationCount) . "\n";
-echo "Unmatched Source Cities: $missingCount (These are in the SQL file but not found in tbladdress)\n";
+echo "Unmatched Source Cities: $missingCount\n";
+
+// Count remaining cities without ZIP
+$stmt = $pdo->query("SELECT COUNT(*) as cnt FROM tbladdress WHERE address_type = 'citymun' AND (zipcode IS NULL OR zipcode = '')");
+$remaining = $stmt->fetch(PDO::FETCH_OBJ)->cnt;
+echo "\nCities still without ZIP: {$remaining}\n";

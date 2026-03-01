@@ -30,6 +30,7 @@ class PopulateZipcodes extends Command
         $this->info("Found " . count($matches) . " city records in SQL file");
 
         $updated = 0;
+        $skipped = 0;
         $notFound = 0;
 
         foreach ($matches as $match) {
@@ -40,24 +41,42 @@ class PopulateZipcodes extends Command
                 continue;
             }
 
-            // Try to find matching city in tbladdress
-            $city = DB::table('tbladdress')
+            // Try EXACT match first to prevent false positives
+            $exactMatch = DB::table('tbladdress')
                 ->where('address_type', 'citymun')
-                ->where('description', 'LIKE', '%' . $cityName . '%')
+                ->where('description', $cityName)
                 ->first();
 
-            if ($city) {
+            if ($exactMatch) {
                 DB::table('tbladdress')
-                    ->where('id', $city->id)
+                    ->where('id', $exactMatch->id)
                     ->update(['zipcode' => $zipcode]);
                 $updated++;
             } else {
-                $notFound++;
+                // Only use fuzzy matching if NO exact match exists
+                $fuzzyMatches = DB::table('tbladdress')
+                    ->where('address_type', 'citymun')
+                    ->where('description', 'LIKE', '%' . $cityName . '%')
+                    ->get();
+
+                if ($fuzzyMatches->count() === 1) {
+                    // Safe to update - only one match
+                    DB::table('tbladdress')
+                        ->where('id', $fuzzyMatches->first()->id)
+                        ->update(['zipcode' => $zipcode]);
+                    $updated++;
+                } elseif ($fuzzyMatches->count() > 1) {
+                    // Multiple matches - skip to avoid false assignment
+                    $this->warn("Skipping ambiguous city '{$cityName}' - {$fuzzyMatches->count()} matches");
+                    $skipped++;
+                } else {
+                    $notFound++;
+                }
             }
         }
 
-        // Also try matching from tblcity legacy table
-        $this->info('Also checking legacy tblcity table...');
+        // Also try matching from tblcity legacy table for remaining cities
+        $this->info('Checking legacy tblcity table for remaining cities...');
 
         $legacyCities = DB::table('tblcity')->get();
         foreach ($legacyCities as $legacyCity) {
@@ -65,9 +84,21 @@ class PopulateZipcodes extends Command
                 continue;
             }
 
-            $city = DB::table('tbladdress')
+            // Skip if city already has zipcode
+            $hasZip = DB::table('tbladdress')
                 ->where('address_type', 'citymun')
                 ->where('description', 'LIKE', '%' . $legacyCity->City . '%')
+                ->whereNotNull('zipcode')
+                ->exists();
+
+            if ($hasZip) {
+                continue;
+            }
+
+            // Try exact match first
+            $city = DB::table('tbladdress')
+                ->where('address_type', 'citymun')
+                ->where('description', $legacyCity->City)
                 ->whereNull('zipcode')
                 ->first();
 
@@ -92,7 +123,9 @@ class PopulateZipcodes extends Command
         $this->info("=== ZIPCODE POPULATION SUMMARY ===");
         $this->info("Cities with zipcode: {$withZip}");
         $this->info("Cities without zipcode: {$withoutZip}");
-        $this->info("Total updated this run: {$updated}");
+        $this->info("Updated this run: {$updated}");
+        $this->info("Skipped (ambiguous): {$skipped}");
+        $this->info("Not found: {$notFound}");
 
         return 0;
     }

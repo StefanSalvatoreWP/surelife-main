@@ -46,15 +46,30 @@ class CityController extends Controller
     }
 
     // search data - city zipcode
-    // search data - city zipcode
+    // search data - city zipcode - NOW PROVINCE-AWARE
     public function getCityZipcode(Request $request)
     {
-
         $cityName = $request->input('cityName');
+        $provinceCode = $request->input('provinceCode'); // NEW: Accept province code
 
-        // 1. Try tbladdress (populated by smart_merge_zips.php)
-        // We match by description (Name) since that's what we typically receive here
-        // Using LIKE to handle case insensitivity
+        // 1. Try tbladdress with PROVINCE-AWARE lookup (if province provided)
+        if (!empty($provinceCode)) {
+            $zipInfo = DB::table('tbladdress')
+                ->where('address_type', 'citymun')
+                ->where('province_code', $provinceCode)
+                ->where(function ($query) use ($cityName) {
+                    $query->where('description', 'LIKE', $cityName)
+                          ->orWhere('description', 'LIKE', '%' . $cityName . '%');
+                })
+                ->select('zipcode', 'description')
+                ->first();
+
+            if ($zipInfo && !empty($zipInfo->zipcode)) {
+                return response()->json([$zipInfo->zipcode]);
+            }
+        }
+
+        // 2. Try tbladdress (fallback: match by city name only)
         $zipInfo = DB::table('tbladdress')
             ->where('address_type', 'citymun')
             ->where('description', 'LIKE', $cityName)
@@ -65,9 +80,8 @@ class CityController extends Controller
             return response()->json([$zipInfo->zipcode]);
         }
 
-        // 2. Fallback to old tblcity
+        // 3. Fallback to old tblcity
         $zipcodeCollection = City::where('city', $cityName)->get();
-
         $zipcodes = $zipcodeCollection->pluck('Zipcode')->toArray();
 
         return response()->json($zipcodes);
