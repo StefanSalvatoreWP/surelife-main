@@ -3512,7 +3512,6 @@ class ClientController extends Controller
     // client view - loan request
     public function clientHomeLoanRequest(Request $request)
     {
-
         $clientDetails = Client::where('id', session('user_id'))->first();
         $hasLoanRequest = LoanRequest::where('clientid', $clientDetails->Id)->first();
 
@@ -3521,7 +3520,7 @@ class ClientController extends Controller
 
         if ($hasLoanRequest) {
             $loanPayments = LoanPayment::query()
-                ->where('clientid', $clientDetails)
+                ->where('clientid', $clientDetails->Id)
                 ->where('loanrequestid', $hasLoanRequest->Id)
                 ->get();
 
@@ -3529,35 +3528,44 @@ class ClientController extends Controller
             $loanBalance = $hasLoanRequest->Amount - $totalLoanPayments;
         }
 
-        $term = 12;
+        // Use LoanCalculator for eligibility (same as actual loan request)
+        $contract = \App\Models\Contract::where('clientid', $clientDetails->Id)->first();
+        
+        // If no separate contract record, create virtual contract from client data
+        if (!$contract) {
+            $package = \App\Models\Package::find($clientDetails->PackageId ?? $clientDetails->packageid);
+            $paymentTerm = \App\Models\PaymentTerm::find($clientDetails->PaymentTermId ?? $clientDetails->paymenttermid);
+            
+            $contract = new \stdClass();
+            $contract->Id = null;
+            $contract->clientid = $clientDetails->Id;
+            $contract->contractnumber = $clientDetails->ContractNumber ?? $clientDetails->contractnumber;
+            $contract->packageid = $clientDetails->PackageId ?? $clientDetails->packageid;
+            $contract->packageprice = $clientDetails->PackagePrice ?? $clientDetails->packageprice ?? $package->Price ?? 0;
+            $contract->paymenttermid = $clientDetails->PaymentTermId ?? $clientDetails->paymenttermid;
+            $contract->paymenttermamount = $clientDetails->PaymentTermAmount ?? $clientDetails->paymenttermamount ?? $paymentTerm->Price ?? 0;
+        }
 
-        $clientTerm = PaymentTerm::where('id', $clientDetails->PaymentTermId)->first();
-        $clientInstallments = Payment::where('clientid', $clientDetails->Id)->count();
+        $totalPremiumsPaid = Payment::where('clientid', $clientDetails->Id)->sum('amountpaid');
+        
+        $calculator = new \App\Services\LoanCalculator();
+        $loanDetails = $calculator->calculateLoanDetails($contract, $totalPremiumsPaid, 12);
 
-        $annualPaymentAmount = floor($clientTerm->Price * $term) - (floor($clientTerm->Price * $term) * 0.10);
-        $noOfYearsPaid = floor($term / $clientInstallments);
-
-        $totalAnnualPayment = $annualPaymentAmount * $noOfYearsPaid;
-
-        $totalNumYearsPaid = $noOfYearsPaid * 10;
-        $grossLoanableAmount = $totalAnnualPayment * ($totalNumYearsPaid / 100);
-        $handlingFee = $grossLoanableAmount * 0.10;
-        $netLoanableAmount = $grossLoanableAmount - $handlingFee;
-
-        $noOfMonthPayments = 12;
-        $loanMonthlyDue = $grossLoanableAmount / $noOfMonthPayments;
-        $percentageInterest = 1.25 / 100;
-        $interest = $loanMonthlyDue * $percentageInterest;
-        $monthlyInterest = $interest * $term;
-        $totalMonthlyDue = $loanMonthlyDue + $monthlyInterest;
+        $isEligible = $loanDetails['eligible'] ?? false;
+        $eligibilityMessage = $loanDetails['message'] ?? '';
+        $netLoanableAmount = $loanDetails['net_loan_amount'] ?? 0;
+        $monthlyDue = $loanDetails['monthly_total_due'] ?? 0;
+        $tier = $loanDetails['tier'] ?? 0;
 
         return view('pages.client-home.client-loanrequest', [
             'loanStatus' => $loanStatus,
             'loanRequest' => $hasLoanRequest,
             'loanBalance' => $loanBalance,
             'netLoanAmount' => $netLoanableAmount,
-            'monthlyLoanAmount' => $totalMonthlyDue,
-            'totalNumYearsPaid' => $totalNumYearsPaid
+            'monthlyLoanAmount' => $monthlyDue,
+            'isEligible' => $isEligible,
+            'eligibilityMessage' => $eligibilityMessage,
+            'tier' => $tier
         ]);
     }
 

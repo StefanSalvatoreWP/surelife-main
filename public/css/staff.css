@@ -47,6 +47,64 @@
     border-spacing: 0;
 }
 
+/* DataTables wrapper - full width for centering */
+#common_dataTable_wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+#common_dataTable_wrapper .dataTables_container {
+    width: 100% !important;
+}
+
+#common_dataTable_wrapper .row.dt-row {
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+/* Table layout fixed for centering */
+#common_dataTable_wrapper table.dataTable {
+    width: 100% !important;
+    table-layout: fixed !important;
+}
+
+/* Column widths - distribute space properly */
+#common_dataTable thead th:nth-child(1),
+#common_dataTable tbody td:nth-child(1) {
+    width: 15% !important;
+}
+
+#common_dataTable thead th:nth-child(2),
+#common_dataTable tbody td:nth-child(2) {
+    width: 20% !important;
+}
+
+#common_dataTable thead th:nth-child(3),
+#common_dataTable tbody td:nth-child(3) {
+    width: 20% !important;
+}
+
+#common_dataTable thead th:nth-child(4),
+#common_dataTable tbody td:nth-child(4) {
+    width: 15% !important;
+}
+
+#common_dataTable thead th:nth-child(5),
+#common_dataTable tbody td:nth-child(5) {
+    width: 15% !important;
+}
+
+/* Action column - enough space for both buttons */
+#common_dataTable thead th:last-child,
+#common_dataTable tbody td:last-child {
+    width: 15% !important;
+    min-width: 150px !important;
+    overflow: visible !important;
+    white-space: nowrap !important;
+    text-align: center !important;
+}
+
 /* Table Header Styling */
 #common_dataTable thead th {
     background: linear-gradient(135deg, #dae4e1 0%, #c5cecb 100%) !important;

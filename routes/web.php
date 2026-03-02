@@ -325,6 +325,20 @@ Route::get('/req-loans/view/{loanRequest}', [LoanRequestController::class, 'view
 Route::put('/submit-req-loan/{loanRequest}', [LoanRequestController::class, 'updateLoanRequest']);
 Route::delete('/submit-req-loan-delete/{loanRequest}', [LoanRequestController::class, 'deleteLoanRequet']);
 
+// loans - monitoring dashboard
+Route::get('/loan-monitoring', [LoanRequestController::class, 'monitoring'])->name('loan.monitoring');
+Route::get('/loan-monitoring/data', [LoanRequestController::class, 'getMonitoringData'])->name('loan.monitoring.data');
+
+// loans - calculations
+Route::get('/loan-calculate', [LoanRequestController::class, 'calculateLoanDetails'])->name('loan.calculate');
+Route::get('/loan-eligible-tiers', [LoanRequestController::class, 'getEligibleTiers'])->name('loan.eligible-tiers');
+
+// loans - waiver
+Route::post('/loan-waiver', [LoanRequestController::class, 'storeWaiver'])->name('loan.waiver.store');
+
+// loans - application form (client view)
+Route::get('/loan-apply/{client}', [LoanRequestController::class, 'showApplyForm'])->name('loan.apply');
+
 /* ----- REQUEST COMMISSIONS - ADMIN VIEW -----*/
 Route::get('/req-encashments', [EncashmentReqController::class, 'searchAll']);
 Route::get('/view-req-encashment/{encashmentReq}', [EncashmentReqController::class, 'viewEncashmentReq']);

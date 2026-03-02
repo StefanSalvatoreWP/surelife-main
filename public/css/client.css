@@ -130,11 +130,16 @@ select[class*="appearance-none"]::-ms-expand {
     margin-right: 0 !important;
 }
 
-#spotcash-approval-table_wrapper table.dataTable,
-#common_dataTable_wrapper table.dataTable {
+#spotcash-approval-table_wrapper table.dataTable {
     width: 100% !important;
     max-width: 100% !important;
     table-layout: fixed !important;
+}
+
+#common_dataTable_wrapper table.dataTable {
+    width: 100% !important;
+    max-width: 100% !important;
+    table-layout: auto !important;
 }
 
 #spotcash-approval-table_wrapper table.dataTable thead th,
@@ -150,10 +155,14 @@ select[class*="appearance-none"]::-ms-expand {
     max-width: 100% !important;
 }
 
-#common_dataTable_wrapper .dataTables_wrapper .row {
-    width: 100% !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
+/* Payment page specific - use fixed layout for centering */
+.payment-section-wrapper #common_dataTable_wrapper table.dataTable {
+    table-layout: fixed !important;
+}
+
+/* Client page specific - use auto layout for action buttons */
+#common_dataTable_wrapper table.dataTable {
+    table-layout: auto !important;
 }
 
 /* Table Header Styling */
@@ -321,20 +330,42 @@ select[class*="appearance-none"]::-ms-expand {
 
 /* Action Buttons Styling - Responsive Enhancements */
 .action-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.375rem;
-    padding: 0.5rem 0.75rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    border-radius: 0.5rem;
-    transition: all 0.2s ease;
-    text-decoration: none;
-    border: none;
-    cursor: pointer;
-    min-height: 44px;
-    min-width: 44px;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.375rem !important;
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.875rem !important;
+    font-weight: 600 !important;
+    border-radius: 0.5rem !important;
+    transition: all 0.2s ease !important;
+    text-decoration: none !important;
+    border: none !important;
+    cursor: pointer !important;
+    min-height: 44px !important;
+    min-width: 44px !important;
+    position: relative !important;
+    z-index: 10 !important;
+    pointer-events: auto !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Ensure action button container is visible */
+.action-btn-container {
+    display: flex !important;
+    gap: 0.5rem !important;
+    position: relative !important;
+    z-index: 5 !important;
+}
+
+/* Fix Action column width */
+#common_dataTable tbody td:last-child,
+#common_dataTable thead th:last-child {
+    min-width: 180px !important;
+    width: 180px !important;
+    overflow: visible !important;
+    white-space: nowrap !important;
 }
 
 /* Mobile-specific action button adjustments */
@@ -353,16 +384,16 @@ select[class*="appearance-none"]::-ms-expand {
 }
 
 .action-btn-view {
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
-    color: white;
-    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+    background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+    color: white !important;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3) !important;
 }
 
 .action-btn-view:hover {
-    background: linear-gradient(135deg, #2563eb, #1d4ed8);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.4);
-    color: white;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.4) !important;
+    color: white !important;
 }
 
 .action-btn-update {
@@ -392,16 +423,16 @@ select[class*="appearance-none"]::-ms-expand {
 }
 
 .action-btn-delete {
-    background: linear-gradient(135deg, #fef2f2, #fecaca);
-    color: #7f1d1d;
-    box-shadow: 0 2px 4px rgba(254, 242, 242, 0.3);
+    background: linear-gradient(135deg, #fef2f2, #fecaca) !important;
+    color: #7f1d1d !important;
+    box-shadow: 0 2px 4px rgba(254, 242, 242, 0.3) !important;
 }
 
 .action-btn-delete:hover {
-    background: linear-gradient(135deg, #fecaca, #fca5a5);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(254, 202, 202, 0.4);
-    color: #7f1d1d;
+    background: linear-gradient(135deg, #fecaca, #fca5a5) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 8px rgba(254, 202, 202, 0.4) !important;
+    color: #7f1d1d !important;
 }
 
 .action-btn-image {

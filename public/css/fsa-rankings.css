@@ -27,6 +27,12 @@
     width: 100% !important;
 }
 
+/* Fix table centering */
+#common_dataTable_wrapper table.dataTable {
+    width: 100% !important;
+    table-layout: fixed !important;
+}
+
 .dataTables_scroll {
     width: 100% !important;
 }

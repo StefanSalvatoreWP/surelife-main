@@ -48,24 +48,39 @@ function showSwiftModal(title, message, type = 'error', buttons = []) {
     actionsEl.innerHTML = '';
 
     const runAction = (action) => {
-        if (!action) return;
+        console.log('=== runAction called ===');
+        console.log('Action type:', typeof action);
+        console.log('Action value:', action);
+        
+        if (!action) {
+            console.log('No action provided, returning');
+            return;
+        }
         if (typeof action === 'function') {
+            console.log('Action is a function, executing...');
             action();
             return;
         }
 
         if (typeof action === 'string') {
-            // Execute in global scope; avoids inline HTML/attribute quoting issues.
-            Function(action)();
+            console.log('Action is a string, executing with eval:', action);
+            try {
+                eval(action);
+                console.log('Action executed successfully');
+            } catch (e) {
+                console.error('Action execution error:', e);
+            }
         }
     };
 
     const addButton = (btn) => {
+        console.log('Adding button:', btn.text, 'Action:', btn.action);
         const el = document.createElement('button');
         el.type = 'button';
         el.className = `w-full py-3 px-6 ${btn.class || ''} font-semibold rounded-xl transition duration-200`;
         el.textContent = btn.text || 'OK';
         el.addEventListener('click', () => {
+            console.log('=== Button clicked:', btn.text, '===');
             runAction(btn.action);
             hideSwiftModal();
         });

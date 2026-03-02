@@ -15,7 +15,7 @@
 .dataTables_filter {
     float: right;
     margin-bottom: 1rem;
-    margin-left: 2rem; /* Add space between entries and search */
+    margin-left: 2rem;
 }
 
 .dataTables_length label {
@@ -37,8 +37,85 @@
 /* Table Full Width */
 #common_dataTable {
     width: 100% !important;
-    border-collapse: separate;
+    border-collapse: collapse;
     border-spacing: 0;
+}
+
+/* DataTables wrapper - full width for centering */
+#common_dataTable_wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+#common_dataTable_wrapper .dataTables_container {
+    width: 100% !important;
+    overflow-x: auto !important;
+}
+
+#common_dataTable_wrapper .row.dt-row {
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+#common_dataTable_wrapper .row.dt-row > div {
+    overflow-x: auto !important;
+    width: 100% !important;
+}
+
+/* Table layout auto for natural column sizing */
+#common_dataTable_wrapper table.dataTable {
+    width: 100% !important;
+    table-layout: auto !important;
+}
+
+/* Column min-widths - allow natural sizing with minimums */
+#common_dataTable thead th,
+#common_dataTable tbody td {
+    min-width: 100px;
+    white-space: nowrap;
+}
+
+#common_dataTable thead th:nth-child(1),
+#common_dataTable tbody td:nth-child(1) {
+    min-width: 50px;
+    width: 50px;
+}
+
+#common_dataTable thead th:nth-child(2),
+#common_dataTable tbody td:nth-child(2) {
+    min-width: 140px;
+}
+
+#common_dataTable thead th:nth-child(3),
+#common_dataTable tbody td:nth-child(3) {
+    min-width: 120px;
+}
+
+#common_dataTable thead th:nth-child(4),
+#common_dataTable tbody td:nth-child(4) {
+    min-width: 120px;
+}
+
+#common_dataTable thead th:nth-child(5),
+#common_dataTable tbody td:nth-child(5) {
+    min-width: 130px;
+}
+
+#common_dataTable thead th:nth-child(6),
+#common_dataTable tbody td:nth-child(6) {
+    min-width: 120px;
+}
+
+#common_dataTable thead th:nth-child(7),
+#common_dataTable tbody td:nth-child(7) {
+    min-width: 170px;
+}
+
+#common_dataTable thead th:nth-child(8),
+#common_dataTable tbody td:nth-child(8) {
+    min-width: 280px;
+    width: 280px;
 }
 
 /* Table Header Styling */
@@ -46,11 +123,19 @@
     background: linear-gradient(135deg, #dae4e1 0%, #c5cecb 100%) !important;
     color: rgb(95, 89, 89) !important;
     font-weight: 700 !important;
-    padding: 1rem 1.5rem !important;
+    padding: 1rem 1rem !important;
     border: none !important;
     text-transform: uppercase;
     font-size: 0.75rem;
     letter-spacing: 0.05em;
+    white-space: nowrap !important;
+    text-align: left;
+}
+
+/* Action header - align right */
+#common_dataTable thead th:nth-child(8) {
+    text-align: right !important;
+    padding-right: 2rem !important;
 }
 
 /* Table Body Styling */
@@ -296,12 +381,13 @@
     height: 0.875rem;
 }
 
-/* Action buttons container */
+/* Action buttons container - horizontal layout */
 .action-buttons-container {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap !important;
     gap: 0.375rem;
     align-items: center;
+    justify-content: flex-start;
 }
 
 /* Responsive adjustments */
