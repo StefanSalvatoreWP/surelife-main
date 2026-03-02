@@ -342,12 +342,21 @@
                                 @php
                                     $paymentStatus = 'Active';
                                     $statusClass = 'bg-green-200 text-green-700';
-                                    $ninetyDaysAgo = \Carbon\Carbon::now()->subDays(90);
+
+                                    // Term-aware lapse threshold (Term + Grace = 2x term)
+                                    $lapseMonths = match ($clients->Term) {
+                                        'Monthly' => 3,
+                                        'Quarterly' => 6,
+                                        'Semi-Annual' => 12,
+                                        'Annual' => 24,
+                                        default => 2,
+                                    };
+                                    $lapseCutoff = \Carbon\Carbon::now()->subMonths($lapseMonths);
 
                                     if ($isFullyPaid || $totalValidPayments >= $total_price) {
                                         $paymentStatus = 'Fully Paid';
                                         $statusClass = 'bg-green-300 text-green-800';
-                                    } elseif (is_null($lastValidPaymentDate) || $lastValidPaymentDate->lt($ninetyDaysAgo)) {
+                                    } elseif (is_null($lastValidPaymentDate) || $lastValidPaymentDate->lt($lapseCutoff)) {
                                         $paymentStatus = 'Lapse';
                                         $statusClass = 'bg-red-200 text-red-700';
                                     }
@@ -636,14 +645,14 @@
                                             </div>
 
                                             <script>
-                                                        function openIdModal() {
-                                                            document.getElementById('validIdModal').classList.remove('hidden');
-                                                            document.body.classList.add('overflow-hidden');
-                                                        }
-                                                        function closeIdModal() {
-                                                            document.getElementById('validIdModal').classList.add('hidden');
-                                                            document.body.classList.remove('overflow-hidden');
-                                                        }
+                                                function openIdModal() {
+                                                    document.getElementById('validIdModal').classList.remove('hidden');
+                                                    document.body.classList.add('overflow-hidden');
+                                                }
+                                                function closeIdModal() {
+                                                    document.getElementById('validIdModal').classList.add('hidden');
+                                                    document.body.classList.remove('overflow-hidden');
+                                                }
                                             </script>
                                         @else
                                             <div
@@ -795,11 +804,20 @@
                                 @php
                                     $paymentStatus = 'Active';
                                     $isLapsed = false;
-                                    $ninetyDaysAgo = \Carbon\Carbon::now()->subDays(90);
+
+                                    // Term-aware lapse threshold (Term + Grace = 2x term)
+                                    $lapseMonths = match ($clients->Term) {
+                                        'Monthly' => 3,
+                                        'Quarterly' => 6,
+                                        'Semi-Annual' => 12,
+                                        'Annual' => 24,
+                                        default => 2,
+                                    };
+                                    $lapseCutoff = \Carbon\Carbon::now()->subMonths($lapseMonths);
 
                                     // Use $lastValidPaymentDate calculated at the top of the file
                                     // consistently with the Client Information tab
-                                    if (is_null($lastValidPaymentDate) || $lastValidPaymentDate->lt($ninetyDaysAgo)) {
+                                    if (is_null($lastValidPaymentDate) || $lastValidPaymentDate->lt($lapseCutoff)) {
                                         $paymentStatus = 'Lapse';
                                         $isLapsed = true;
                                     }
@@ -810,6 +828,9 @@
                                             <div>
                                                 <p class="text-sm text-red-600 font-medium mb-1">Payment Status</p>
                                                 <p class="text-2xl font-bold text-red-900">{{ $paymentStatus }}</p>
+                                                <p class="text-xs text-red-500 mt-1">{{ $clients->Term }} · Lapse after
+                                                    {{ $lapseMonths }} mos
+                                                </p>
                                             </div>
                                             <div class="bg-red-200 rounded-full p-3">
                                                 <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor"
@@ -827,6 +848,9 @@
                                             <div>
                                                 <p class="text-sm text-green-600 font-medium mb-1">Payment Status</p>
                                                 <p class="text-2xl font-bold text-green-900">{{ $paymentStatus }}</p>
+                                                <p class="text-xs text-green-600 mt-1">{{ $clients->Term }} · Lapse after
+                                                    {{ $lapseMonths }} mos
+                                                </p>
                                             </div>
                                             <div class="bg-green-200 rounded-full p-3">
                                                 <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor"
@@ -961,10 +985,11 @@
                                     @elseif($clients->CFPNO == "NA")
                                         <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
                                             onclick="showSwiftModal('Certificate of Full Payment', 'Enter certificate number to proceed.', 'warning', [
-                                                {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpWithInput()'},
-                                                {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
-                                            ])"
-                                            data-client-id="{{ $clients->cid }}" role="button">Certificate of Full Payment</a>
+                                                                                                            {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpWithInput()'},
+                                                                                                            {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+                                                                                                        ])"
+                                            data-client-id="{{ $clients->cid }}" role="button">Certificate of Full
+                                            Payment</a>
                                     @else
                                         <a href="/client-printcofp/{{ $clients->cid }}"
                                             class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
@@ -993,23 +1018,26 @@
                                         @if($clients->CFPNO == null && $cfpApprover == 0)
                                             <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
                                                 onclick="showSwiftModal('Warning', 'Certificate of full payment requires approval.', 'warning', [
-                                                    {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
-                                                ])"
-                                                data-client-id="{{ $clients->cid }}" role="button">Certificate of Full Payment</a>
+                                                                                                                            {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+                                                                                                                        ])"
+                                                data-client-id="{{ $clients->cid }}" role="button">Certificate of
+                                                Full Payment</a>
                                         @elseif($clients->CFPNO == null && $cfpApprover == 1)
                                             <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
                                                 onclick="showSwiftModal('Certificate Approval', 'You are going to approve the certificate of full payment for this client. You cannot undo this action. Continue?', 'warning', [
-                                                    {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpApproval()'},
-                                                    {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
-                                                ])"
-                                                data-client-id="{{ $clients->cid }}" role="button">Certificate of Full Payment</a>
+                                                                                                                            {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpApproval()'},
+                                                                                                                            {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+                                                                                                                        ])"
+                                                data-client-id="{{ $clients->cid }}" role="button">Certificate of
+                                                Full Payment</a>
                                         @elseif($clients->CFPNO == "NA")
                                             <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
                                                 onclick="showSwiftModal('Certificate of Full Payment', 'Enter certificate number to proceed.', 'warning', [
-                                                    {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpWithInput()'},
-                                                    {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
-                                                ])"
-                                                data-client-id="{{ $clients->cid }}" role="button">Certificate of Full Payment</a>
+                                                                                                                            {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpWithInput()'},
+                                                                                                                            {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+                                                                                                                        ])"
+                                                data-client-id="{{ $clients->cid }}" role="button">Certificate of
+                                                Full Payment</a>
                                         @else
                                             <a href="/client-printcofp/{{ $clients->cid }}"
                                                 class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
@@ -1090,7 +1118,8 @@
                                                 </td>
                                                 <td class="px-4 py-3 text-sm text-gray-900">
                                                     @if($lp->status != 'void')
-                                                        <button class="action-void text-red-600 hover:text-red-900 font-medium cursor-pointer"
+                                                        <button
+                                                            class="action-void text-red-600 hover:text-red-900 font-medium cursor-pointer"
                                                             onclick="showLoanPaymentVoidModal('{{ $lp->id }}', '{{ $lp->orno }}')">Void</button>
                                                     @else
                                                         <span class="text-gray-400">Locked</span>
@@ -1266,8 +1295,8 @@
         </div>
 
         <!-- MODAL APPROVAL FOR CERTIFICATE OF FULL PAYMENT -->
-        <div class="modal fade" id="showApproveCfpInputModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-            aria-labelledby="staticBackdropLabel" aria-hidden="true" style="display: none;">
+        <div class="modal fade" id="showApproveCfpInputModal" data-bs-backdrop="static" data-bs-keyboard="false"
+            tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" style="display: none;">
             <div class="modal-dialog">
                 <div class="modal-content rounded-xl shadow-2xl border-0">
                     <div
@@ -1409,17 +1438,17 @@
                 const form = document.createElement('form');
                 form.method = 'POST';
                 form.action = '/submit-complete-memorial/{{ $clients->cid }}';
-                
+
                 const csrfToken = document.createElement('input');
                 csrfToken.type = 'hidden';
                 csrfToken.name = '_token';
                 csrfToken.value = '{{ csrf_token() }}';
-                
+
                 const method = document.createElement('input');
                 method.type = 'hidden';
                 method.name = '_method';
                 method.value = 'PUT';
-                
+
                 form.appendChild(csrfToken);
                 form.appendChild(method);
                 document.body.appendChild(form);
@@ -1431,17 +1460,17 @@
                 const form = document.createElement('form');
                 form.method = 'POST';
                 form.action = '/client-update-status/{{ $clients->cid }}';
-                
+
                 const csrfToken = document.createElement('input');
                 csrfToken.type = 'hidden';
                 csrfToken.name = '_token';
                 csrfToken.value = '{{ csrf_token() }}';
-                
+
                 const method = document.createElement('input');
                 method.type = 'hidden';
                 method.name = '_method';
                 method.value = 'PUT';
-                
+
                 form.appendChild(csrfToken);
                 form.appendChild(method);
                 document.body.appendChild(form);
@@ -1453,17 +1482,17 @@
                 const form = document.createElement('form');
                 form.method = 'POST';
                 form.action = '/client-update-status/{{ $clients->cid }}';
-                
+
                 const csrfToken = document.createElement('input');
                 csrfToken.type = 'hidden';
                 csrfToken.name = '_token';
                 csrfToken.value = '{{ csrf_token() }}';
-                
+
                 const method = document.createElement('input');
                 method.type = 'hidden';
                 method.name = '_method';
                 method.value = 'PUT';
-                
+
                 form.appendChild(csrfToken);
                 form.appendChild(method);
                 document.body.appendChild(form);
@@ -1475,29 +1504,29 @@
             function showPaymentVoidModal(paymentId, orNo) {
                 currentPaymentId = paymentId;
                 showSwiftModal('Void Payment', `You are going to void the selected payment with OR No. ${orNo}\n\nYou cannot undo this action. Continue?`, 'warning', [
-                    {text: 'Confirm', class: 'bg-red-500 hover:bg-red-600 text-white', action: 'submitPaymentVoid()'},
-                    {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+                    { text: 'Confirm', class: 'bg-red-500 hover:bg-red-600 text-white', action: 'submitPaymentVoid()' },
+                    { text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800' }
                 ]);
             }
 
             // Function to submit payment void
             function submitPaymentVoid() {
                 if (!currentPaymentId) return;
-                
+
                 const form = document.createElement('form');
                 form.method = 'POST';
                 form.action = '/submit-void-payment/' + currentPaymentId;
-                
+
                 const csrfToken = document.createElement('input');
                 csrfToken.type = 'hidden';
                 csrfToken.name = '_token';
                 csrfToken.value = '{{ csrf_token() }}';
-                
+
                 const method = document.createElement('input');
                 method.type = 'hidden';
                 method.name = '_method';
                 method.value = 'PUT';
-                
+
                 form.appendChild(csrfToken);
                 form.appendChild(method);
                 document.body.appendChild(form);
@@ -1509,29 +1538,29 @@
             function showLoanPaymentVoidModal(loanPaymentId, orNo) {
                 currentLoanPaymentId = loanPaymentId;
                 showSwiftModal('Void Loan Payment', `You are going to void the selected payment with OR No. ${orNo}\n\nYou cannot undo this action. Continue?`, 'warning', [
-                    {text: 'Confirm', class: 'bg-red-500 hover:bg-red-600 text-white', action: 'submitLoanPaymentVoid()'},
-                    {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+                    { text: 'Confirm', class: 'bg-red-500 hover:bg-red-600 text-white', action: 'submitLoanPaymentVoid()' },
+                    { text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800' }
                 ]);
             }
 
             // Function to submit loan payment void
             function submitLoanPaymentVoid() {
                 if (!currentLoanPaymentId) return;
-                
+
                 const form = document.createElement('form');
                 form.method = 'POST';
                 form.action = '/submit-void-loan-payment/' + currentLoanPaymentId;
-                
+
                 const csrfToken = document.createElement('input');
                 csrfToken.type = 'hidden';
                 csrfToken.name = '_token';
                 csrfToken.value = '{{ csrf_token() }}';
-                
+
                 const method = document.createElement('input');
                 method.type = 'hidden';
                 method.name = '_method';
                 method.value = 'PUT';
-                
+
                 form.appendChild(csrfToken);
                 form.appendChild(method);
                 document.body.appendChild(form);
@@ -1543,12 +1572,12 @@
                 const form = document.createElement('form');
                 form.method = 'POST';
                 form.action = '/approve-cfp/{{ $clients->cid }}';
-                
+
                 const csrfToken = document.createElement('input');
                 csrfToken.type = 'hidden';
                 csrfToken.name = '_token';
                 csrfToken.value = '{{ csrf_token() }}';
-                
+
                 form.appendChild(csrfToken);
                 document.body.appendChild(form);
                 form.submit();
@@ -1559,8 +1588,8 @@
                 @if(request('status'))
                     localStorage.setItem('clientStatusFilter', '{{ request('status') }}');
                 @endif
-                
-                const tabs = document.querySelectorAll('#clientTabs button[data-bs-toggle="tab"]');
+
+                            const tabs = document.querySelectorAll('#clientTabs button[data-bs-toggle="tab"]');
                 const tabPanes = document.querySelectorAll('.tab-pane');
 
                 tabs.forEach(tab => {
@@ -1598,4 +1627,4 @@
                 console.log('✅ Custom tabs initialized:', tabs.length, 'tabs found');
             });
         </script>
-    @endsection
+@endsection

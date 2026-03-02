@@ -123,9 +123,16 @@ class ClientController extends Controller
             } else if ($request->input('status') === 'approved') {
                 $query->where('Status', '=', '3');
             } else if ($request->input('status') === 'lapse') {
-                // Lapse: Approved clients whose last valid payment was more than 3 months ago
-                // OR clients with NO valid payments at all (but still have outstanding balance)
-                $threeMonthsAgo = Carbon::now()->subMonths(3)->format('Y-m-d');
+                // Lapse: Approved clients whose last valid payment exceeds
+                // the term-aware threshold (Term + Grace = 2x the term period)
+                // Monthly=2mo, Quarterly=6mo, Semi-Annual=12mo, Annual=24mo
+                $lapseInterval = "CASE tblpaymentterm.Term
+                    WHEN 'Monthly'     THEN 3
+                    WHEN 'Quarterly'   THEN 6
+                    WHEN 'Semi-Annual' THEN 12
+                    WHEN 'Annual'      THEN 24
+                    ELSE 2
+                END";
 
                 // Use efficient JOINs with pre-aggregated payment data
                 $query->where('tblclient.Status', '=', '3')
@@ -139,9 +146,9 @@ class ClientController extends Controller
                         AND (Remarks IS NULL OR Remarks IN ('Standard', 'Partial', 'Custom'))
                         GROUP BY clientid
                     ) as payment_stats"), 'tblclient.id', '=', 'payment_stats.clientid')
-                    // Lapsed: last payment > 3 months ago OR no payments at all
-                    ->where(function ($q) use ($threeMonthsAgo) {
-                        $q->where('payment_stats.last_payment_date', '<', $threeMonthsAgo)
+                    // Lapsed: last payment beyond term+grace threshold OR no payments at all
+                    ->where(function ($q) use ($lapseInterval) {
+                        $q->whereRaw("payment_stats.last_payment_date < DATE_SUB(NOW(), INTERVAL ({$lapseInterval}) MONTH)")
                             ->orWhereNull('payment_stats.last_payment_date');
                     })
                     // Not fully paid yet
@@ -156,8 +163,16 @@ class ClientController extends Controller
                         END
                     )");
             } else if ($request->input('status') === 'active') {
-                // Active: Approved clients with outstanding balance and last payment within 3 months
-                $threeMonthsAgo = Carbon::now()->subMonths(3)->format('Y-m-d');
+                // Active: Approved clients with outstanding balance and last payment
+                // within the term-aware threshold (Term + Grace = 2x the term period)
+                // Monthly=2mo, Quarterly=6mo, Semi-Annual=12mo, Annual=24mo
+                $lapseInterval = "CASE tblpaymentterm.Term
+                    WHEN 'Monthly'     THEN 3
+                    WHEN 'Quarterly'   THEN 6
+                    WHEN 'Semi-Annual' THEN 12
+                    WHEN 'Annual'      THEN 24
+                    ELSE 2
+                END";
 
                 // Use efficient JOINs with pre-aggregated payment data
                 $query->where('tblclient.Status', '=', '3')
@@ -171,8 +186,8 @@ class ClientController extends Controller
                         AND (Remarks IS NULL OR Remarks IN ('Standard', 'Partial', 'Custom'))
                         GROUP BY clientid
                     ) as payment_stats"), 'tblclient.id', '=', 'payment_stats.clientid')
-                    // Active: last payment within 3 months
-                    ->where('payment_stats.last_payment_date', '>=', $threeMonthsAgo)
+                    // Active: last payment within term+grace threshold
+                    ->whereRaw("payment_stats.last_payment_date >= DATE_SUB(NOW(), INTERVAL ({$lapseInterval}) MONTH)")
                     // Not fully paid yet
                     ->whereRaw("COALESCE(payment_stats.total_paid, 0) < (
                         CASE 
@@ -825,7 +840,7 @@ class ClientController extends Controller
                     'errors' => $fields->errors()
                 ], 422);
             }
-            
+
             return redirect()
                 ->back()
                 ->withErrors($fields)
@@ -919,7 +934,7 @@ class ClientController extends Controller
         } else if (!empty($mobileNetwork) && !empty($mobileNo)) {
             $mobilenumber = '0' . $mobileNetwork . $mobileNo;
         }
-        
+
         // Build complete email only if email is provided
         $emailcomplete = null;
         if (!empty($email) && !empty($emailAddress)) {
@@ -1080,7 +1095,7 @@ class ClientController extends Controller
                     // Check if client has Spotcash payment term - requires approval
                     $isSpotCash = $this->isSpotCashClient($clientId);
                     Log::info('Spotcash check result: ' . ($isSpotCash ? 'YES' : 'NO'));
-                    
+
                     $insertPaymentData = [
                         'orno' => $orNo,
                         'clientid' => $clientId,
@@ -1095,20 +1110,20 @@ class ClientController extends Controller
                         'datecreated' => date("Y-m-d")
                     ];
                     Log::info('Payment data prepared: ' . json_encode($insertPaymentData));
-                    
+
                     if ($isSpotCash) {
                         // For Spotcash payments, set approval status to Pending
                         $insertPaymentData['approval_status'] = 'Pending';
                         $insertPaymentData['approved_by'] = null;
                         $insertPaymentData['approved_at'] = null;
                         $insertPaymentData['approval_remarks'] = null;
-                        
+
                         Log::info('Inserting SPOT CASH payment with Pending status');
-                        
+
                         Payment::insert($insertPaymentData);
-                        
+
                         Log::channel('activity')->info('[StaffID] ' . session('user_id') . ' [Menu] Client ' . '[Action] Insert Spot Cash Pending Approval ' . '[Target] ' . $clientId);
-                        
+
                         // Check if request is AJAX
                         if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') == 'XMLHttpRequest') {
                             return response()->json([
@@ -1118,10 +1133,10 @@ class ClientController extends Controller
                                 'redirect' => '/client'
                             ]);
                         }
-                        
+
                         return redirect('/client')->with('success', 'Added new client! Spot cash payment submitted for approval.');
                     }
-                    
+
                     Payment::insert($insertPaymentData);
                     Log::channel('activity')->info('[StaffID] ' . session('user_id') . ' [Menu] Client ' . '[Action] Insert Payment' . '[Target] ' . $clientId);
 
@@ -1139,7 +1154,7 @@ class ClientController extends Controller
                 } catch (\Exception $e) {
                     Log::error('Error creating client: ' . $e->getMessage());
                     Log::error($e->getTraceAsString());
-                    
+
                     // Check if request is AJAX
                     if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') == 'XMLHttpRequest') {
                         return response()->json([
@@ -1147,20 +1162,20 @@ class ClientController extends Controller
                             'message' => 'An error occurred while creating the client: ' . $e->getMessage()
                         ], 500);
                     }
-                    
+
                     return redirect('/client')->with('error', 'An error occured while creating a new client: ' . $e->getMessage());
                 }
             } else {
                 // OR not available - determine WHY and provide specific error
                 $errorMessage = 'O.R not available.';
-                
+
                 // Check if OR exists at all
                 $orAnyStatus = OrBatch::select('tblorbatch.*', 'tblofficialreceipt.id')
                     ->leftJoin('tblofficialreceipt', 'tblorbatch.id', '=', 'tblofficialreceipt.orbatchid')
                     ->where('ornumber', $orNo)
                     ->where('seriescode', $orSeriesCode)
                     ->first();
-                
+
                 if (!$orAnyStatus) {
                     $errorMessage = 'O.R number ' . $orNo . ' not found in series ' . $orSeriesCode . '. Please select a different O.R number.';
                 } else {
@@ -1176,12 +1191,12 @@ class ClientController extends Controller
                         $statusText = $orAnyStatus->status == '1' ? 'available' : 'already used';
                         $issues[] = 'status is ' . $statusText;
                     }
-                    
+
                     if (count($issues) > 0) {
                         $errorMessage = 'O.R number ' . $orNo . ' cannot be used: ' . implode(', ', $issues) . '. Please select a different O.R number.';
                     }
                 }
-                
+
                 // Check if request is AJAX
                 if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') == 'XMLHttpRequest') {
                     return response()->json([
@@ -1189,7 +1204,7 @@ class ClientController extends Controller
                         'message' => $errorMessage
                     ], 422);
                 }
-                
+
                 return redirect()->back()->with('duplicate', $errorMessage)->withInput();
             }
         } else {
@@ -1200,7 +1215,7 @@ class ClientController extends Controller
                     'message' => 'Contract is not available or does not belong to the selected Region'
                 ], 422);
             }
-            
+
             return redirect()->back()->with('duplicate', 'Contract is not available or does not belong to the selected Region.')->withInput();
         }
     }
@@ -1362,7 +1377,7 @@ class ClientController extends Controller
             $beneficiary4Age = strip_tags($validatedData['beneficiary4age'] ?? '');
 
             $mobilenumber = '0' . $mobileNetwork . $mobileNo;
-            
+
             // Build complete email only if email is provided
             $emailcomplete = null;
             if (!empty($email) && !empty($emailAddress)) {
@@ -2154,6 +2169,8 @@ class ClientController extends Controller
                 'emailaddress' => 'nullable',
                 'principalbeneficiary' => 'nullable',
                 'principalbeneficiaryage' => 'nullable',
+                'principalbeneficiaryrelation' => 'nullable',
+                'principalbeneficiaryid' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048',
                 'beneficiary1' => 'nullable',
                 'beneficiary1age' => 'nullable',
                 'beneficiary2' => 'nullable',
@@ -2230,6 +2247,12 @@ class ClientController extends Controller
             $beneficiary3Age = strip_tags($validatedData['beneficiary3age'] ?? '');
             $beneficiary4 = strip_tags($validatedData['beneficiary4'] ?? '');
             $beneficiary4Age = strip_tags($validatedData['beneficiary4age'] ?? '');
+            $principalBeneficiaryRelation = strip_tags($validatedData['principalbeneficiaryrelation'] ?? '');
+
+            $principalBeneficiaryIdPath = null;
+            if ($request->hasFile('principalbeneficiaryid')) {
+                $principalBeneficiaryIdPath = $request->file('principalbeneficiaryid')->store('beneficiary_ids', 'public');
+            }
 
             // Home address fields
             $sameAsCurrentAddress = $request->has('same_as_current_address');
@@ -2563,7 +2586,7 @@ class ClientController extends Controller
                 Payment::where('clientid', $client->Id)->delete();
 
                 Log::channel('activity')->info('[StaffID] ' . session('user_id') . ' [Menu] Client ' . '[Action] Delete ' . '[Target] ' . $client->Id);
-                
+
                 // Return JSON for AJAX requests
                 if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') == 'XMLHttpRequest') {
                     return response()->json([
@@ -2572,7 +2595,7 @@ class ClientController extends Controller
                         'redirect' => '/client'
                     ]);
                 }
-                
+
                 return redirect('/client')->with('warning', 'Selected client has been deleted!');
             } else {
                 if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') == 'XMLHttpRequest') {
@@ -4425,21 +4448,21 @@ class ClientController extends Controller
     {
         Log::info('=== isSpotCashClient DEBUG ===');
         Log::info('Client ID: ' . $clientId);
-        
+
         $client = Client::select('PaymentTermId')->where('id', $clientId)->first();
         if (!$client) {
             Log::error('Client not found: ' . $clientId);
             return false;
         }
-        
+
         Log::info('Client PaymentTermId: ' . $client->PaymentTermId);
-        
+
         $paymentTerm = PaymentTerm::select('Term')->where('Id', $client->PaymentTermId)->first();
         Log::info('PaymentTerm: ' . ($paymentTerm ? $paymentTerm->Term : 'NULL'));
-        
+
         $isSpotCash = $paymentTerm && ($paymentTerm->Term === 'Spotcash' || $paymentTerm->Term === 'Spot-Cash');
         Log::info('Is Spotcash: ' . ($isSpotCash ? 'YES' : 'NO'));
-        
+
         return $isSpotCash;
     }
 }

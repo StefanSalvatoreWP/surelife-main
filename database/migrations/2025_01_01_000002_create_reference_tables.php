@@ -5,13 +5,17 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
+        // Drop existing tables to ensure a clean slate if re-running
+        Schema::dropIfExists('refbrgy');
+        Schema::dropIfExists('refcitymun');
+        Schema::dropIfExists('refprovince');
+
         // Create refprovince table
         Schema::create('refprovince', function (Blueprint $table) {
             $table->id();
@@ -29,8 +33,6 @@ return new class extends Migration
             $table->string('regDesc')->nullable();
             $table->string('provCode')->nullable();
             $table->string('citymunCode')->nullable();
-            $table->string('distCode')->nullable();
-            $table->string('citymunCode')->nullable();
         });
 
         // Create refbrgy table
@@ -41,7 +43,6 @@ return new class extends Migration
             $table->string('regCode')->nullable();
             $table->string('provCode')->nullable();
             $table->string('citymunCode')->nullable();
-            $table->string('distCode')->nullable();
         });
 
         // Import data from SQL files
@@ -76,30 +77,35 @@ return new class extends Migration
             }
 
             if (file_exists($file)) {
-                $sql = file_get_contents($file);
-                
-                // Remove CREATE TABLE statements and keep only INSERT statements
-                $sql = preg_replace('/CREATE TABLE.*?ENGINE=.*?;$/s', '', $sql);
-                $sql = preg_replace('/SET FOREIGN_KEY_CHECKS=.*?;$/s', '', $sql);
-                $sql = preg_replace('/DROP TABLE IF EXISTS.*?;$/s', '', $sql);
-                
-                // Split into individual statements
-                $statements = array_filter(array_map('trim', explode(';', $sql)));
-                
-                foreach ($statements as $statement) {
-                    if (empty($statement) || !str_starts_with($statement, 'INSERT')) {
-                        continue;
-                    }
-                    
+                \Log::info("Processing SQL file for table $table: $file");
+                $handle = fopen($file, 'r');
+                if ($handle) {
+                    DB::beginTransaction();
                     try {
-                        DB::statement($statement);
+                        $buffer = '';
+                        while (($line = fgets($handle)) !== false) {
+                            $trimmed = trim($line);
+                            if (empty($trimmed) || str_starts_with($trimmed, '--') || str_starts_with($trimmed, '/*')) {
+                                continue;
+                            }
+                            $buffer .= $line;
+                            if (str_ends_with($trimmed, ';')) {
+                                $statement = trim($buffer);
+                                if (str_starts_with(strtoupper($statement), 'INSERT')) {
+                                    DB::statement($statement);
+                                }
+                                $buffer = '';
+                            }
+                        }
+                        DB::commit();
+                        $count = DB::table($table)->count();
+                        \Log::info("Successfully imported $table. Total records: $count");
                     } catch (\Exception $e) {
-                        // Log error but continue with other statements
-                        \Log::warning("Failed to import reference data statement: " . $e->getMessage());
+                        DB::rollBack();
+                        \Log::error("Failed to import table $table: " . $e->getMessage());
                     }
+                    fclose($handle);
                 }
-                
-                \Log::info("Imported reference data for table: $table");
             } else {
                 \Log::warning("Reference SQL file not found: $file");
             }
