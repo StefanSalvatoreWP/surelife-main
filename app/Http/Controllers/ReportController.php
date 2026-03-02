@@ -929,7 +929,15 @@ class ReportController extends Controller
 
     private function getActiveReportData($branchId)
     {
-        $threeMonthsAgo = Carbon::now()->subMonths(3)->format('Y-m-d');
+        // Term + Grace lapse thresholds (in months):
+        // Monthly=2, Quarterly=6, Semi-Annual=12, Annual=24
+        $lapseInterval = "CASE pt.Term
+            WHEN 'Monthly'     THEN 3
+            WHEN 'Quarterly'   THEN 6
+            WHEN 'Semi-Annual' THEN 12
+            WHEN 'Annual'      THEN 24
+            ELSE 2
+        END";
 
         return DB::table('tblclient as c')
             ->leftJoin('tblbranch as b', 'c.branchid', '=', 'b.id')
@@ -947,7 +955,7 @@ class ReportController extends Controller
             ) as ps"), 'c.id', '=', 'ps.clientid')
             ->where('c.branchid', $branchId)
             ->where('c.status', '3')
-            ->where('ps.last_payment_date', '>=', $threeMonthsAgo)
+            ->whereRaw("ps.last_payment_date >= DATE_SUB(NOW(), INTERVAL ({$lapseInterval}) MONTH)")
             ->whereRaw("COALESCE(ps.total_paid, 0) < (
                 CASE
                     WHEN pt.Term = 'Spotcash'    THEN pt.Price
@@ -981,7 +989,15 @@ class ReportController extends Controller
 
     private function getLapseReportData($branchId)
     {
-        $threeMonthsAgo = Carbon::now()->subMonths(3)->format('Y-m-d');
+        // Term + Grace lapse thresholds (in months):
+        // Monthly=2, Quarterly=6, Semi-Annual=12, Annual=24
+        $lapseInterval = "CASE pt.Term
+            WHEN 'Monthly'     THEN 3
+            WHEN 'Quarterly'   THEN 6
+            WHEN 'Semi-Annual' THEN 12
+            WHEN 'Annual'      THEN 24
+            ELSE 2
+        END";
 
         return DB::table('tblclient as c')
             ->leftJoin('tblbranch as b', 'c.branchid', '=', 'b.id')
@@ -999,8 +1015,8 @@ class ReportController extends Controller
             ) as ps"), 'c.id', '=', 'ps.clientid')
             ->where('c.branchid', $branchId)
             ->where('c.status', '3')
-            ->where(function ($q) use ($threeMonthsAgo) {
-                $q->where('ps.last_payment_date', '<', $threeMonthsAgo)
+            ->where(function ($q) use ($lapseInterval) {
+                $q->whereRaw("ps.last_payment_date < DATE_SUB(NOW(), INTERVAL ({$lapseInterval}) MONTH)")
                     ->orWhereNull('ps.last_payment_date');
             })
             ->whereRaw("COALESCE(ps.total_paid, 0) < (

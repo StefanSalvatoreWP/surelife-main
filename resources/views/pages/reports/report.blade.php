@@ -128,7 +128,8 @@
                             <option value="0" hidden @if(!old('dailybranch')) selected @endif>-- Select Branch --</option>
                             @foreach($branch_list as $branch)
                                 <option value="{{ $branch->Id }}" @if(old('dailybranch') == $branch->Id) selected @endif>
-                                    {{ $branch->BranchName }}</option>
+                                    {{ $branch->BranchName }}
+                                </option>
                             @endforeach
                         </select>
                         @error('dailybranch')
@@ -157,7 +158,8 @@
                                     $formattedPeriod = $startDate->format('M d, Y') . ' - ' . $endDate->format('M d, Y');
                                 @endphp
                                 <option value="{{ $mcpr->Id }}" @if(old('dailymcpr') == $mcpr->Id) selected @endif>
-                                    {{ $formattedPeriod }}</option>
+                                    {{ $formattedPeriod }}
+                                </option>
                             @endforeach
                         </select>
                         @error('dailymcpr')
@@ -290,8 +292,8 @@
 
                     {{-- Info note about Active/Lapse --}}
                     <p class="text-xs text-gray-500 italic">
-                        * Active &amp; Lapse reports are based on payment activity within/beyond 3 months and do not require
-                        a date filter.
+                        * Active &amp; Lapse reports use term-aware thresholds: Monthly (2 mos), Quarterly (6 mos),
+                        Semi-Annual (12 mos), Annual (24 mos). No date filter required.
                     </p>
 
                     {{-- Export Buttons --}}
