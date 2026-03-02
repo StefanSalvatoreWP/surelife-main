@@ -186,6 +186,54 @@
         currentPaymentId = null;
     }
 
+    // Handle approval form submission
+    $('#approveForm').on('submit', function(e) {
+        e.preventDefault();
+        var form = $(this);
+        
+        $.ajax({
+            url: form.attr('action'),
+            method: 'PUT',
+            data: form.serialize(),
+            success: function(response) {
+                closeModal();
+                showSwiftModal('Success!', 'Payment approved successfully', 'success', [
+                    { text: 'OK', class: 'bg-green-600 text-white', action: function() {
+                        $('#spotcash-approval-table').DataTable().ajax.reload();
+                    }}
+                ]);
+            },
+            error: function(xhr) {
+                closeModal();
+                showSwiftModal('Error', xhr.responseJSON?.message || 'Failed to approve payment', 'error');
+            }
+        });
+    });
+
+    // Handle rejection form submission
+    $('#rejectForm').on('submit', function(e) {
+        e.preventDefault();
+        var form = $(this);
+        
+        $.ajax({
+            url: form.attr('action'),
+            method: 'PUT',
+            data: form.serialize(),
+            success: function(response) {
+                closeRejectionModal();
+                showSwiftModal('Rejected', 'Payment rejected successfully', 'success', [
+                    { text: 'OK', class: 'bg-green-600 text-white', action: function() {
+                        $('#spotcash-approval-table').DataTable().ajax.reload();
+                    }}
+                ]);
+            },
+            error: function(xhr) {
+                closeRejectionModal();
+                showSwiftModal('Error', xhr.responseJSON?.message || 'Failed to reject payment', 'error');
+            }
+        });
+    });
+
     // Close modals when clicking outside
     window.onclick = function(event) {
         let approvalModal = document.getElementById('approvalModal');

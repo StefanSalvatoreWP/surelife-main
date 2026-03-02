@@ -100,10 +100,21 @@ select[class*="appearance-none"]::-ms-expand {
     border-spacing: 0;
 }
 
+/* Payment page outer wrapper fix */
+.payment-section-wrapper {
+    width: 100% !important;
+}
+
+/* Payment page container fix */
+.payment-table-container {
+    width: 100% !important;
+}
+
 /* Ensure table container uses full width */
 #spotcash-approval-table_wrapper,
 #common_dataTable_wrapper {
     width: 100% !important;
+    max-width: 100% !important;
 }
 
 #spotcash-approval-table_wrapper .dataTables_container,
@@ -122,6 +133,8 @@ select[class*="appearance-none"]::-ms-expand {
 #spotcash-approval-table_wrapper table.dataTable,
 #common_dataTable_wrapper table.dataTable {
     width: 100% !important;
+    max-width: 100% !important;
+    table-layout: fixed !important;
 }
 
 #spotcash-approval-table_wrapper table.dataTable thead th,
@@ -129,6 +142,18 @@ select[class*="appearance-none"]::-ms-expand {
 #common_dataTable_wrapper table.dataTable thead th,
 #common_dataTable_wrapper table.dataTable tbody td {
     width: auto !important;
+}
+
+/* Additional fixes for payment page */
+#common_dataTable_wrapper .dataTables_wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+#common_dataTable_wrapper .dataTables_wrapper .row {
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
 }
 
 /* Table Header Styling */
