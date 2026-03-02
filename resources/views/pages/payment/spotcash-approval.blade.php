@@ -189,12 +189,23 @@
     // Handle approval form submission
     $('#approveForm').on('submit', function(e) {
         e.preventDefault();
+        e.stopPropagation();
+        
         var form = $(this);
+        var url = form.attr('action');
+        
+        if (!url || url === '') {
+            showSwiftModal('Error', 'Invalid payment ID', 'error');
+            return false;
+        }
         
         $.ajax({
-            url: form.attr('action'),
-            method: 'PUT',
+            url: url,
+            method: 'POST',
             data: form.serialize(),
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
             success: function(response) {
                 closeModal();
                 showSwiftModal('Success!', 'Payment approved successfully', 'success', [
@@ -208,17 +219,30 @@
                 showSwiftModal('Error', xhr.responseJSON?.message || 'Failed to approve payment', 'error');
             }
         });
+        
+        return false;
     });
 
     // Handle rejection form submission
     $('#rejectForm').on('submit', function(e) {
         e.preventDefault();
+        e.stopPropagation();
+        
         var form = $(this);
+        var url = form.attr('action');
+        
+        if (!url || url === '') {
+            showSwiftModal('Error', 'Invalid payment ID', 'error');
+            return false;
+        }
         
         $.ajax({
-            url: form.attr('action'),
-            method: 'PUT',
+            url: url,
+            method: 'POST',
             data: form.serialize(),
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
             success: function(response) {
                 closeRejectionModal();
                 showSwiftModal('Rejected', 'Payment rejected successfully', 'success', [
@@ -232,6 +256,8 @@
                 showSwiftModal('Error', xhr.responseJSON?.message || 'Failed to reject payment', 'error');
             }
         });
+        
+        return false;
     });
 
     // Close modals when clicking outside
