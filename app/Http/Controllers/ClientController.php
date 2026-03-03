@@ -3556,6 +3556,9 @@ class ClientController extends Controller
         $netLoanableAmount = $loanDetails['net_loan_amount'] ?? 0;
         $monthlyDue = $loanDetails['monthly_total_due'] ?? 0;
         $tier = $loanDetails['tier'] ?? 0;
+        $loanableAmount = $loanDetails['loanable_amount'] ?? 0;
+        $processingFee = $loanDetails['processing_fee'] ?? 0;
+        $monthlyContractPremium = $loanDetails['monthly_contract_premium'] ?? 0;
 
         return view('pages.client-home.client-loanrequest', [
             'loanStatus' => $loanStatus,
@@ -3565,7 +3568,11 @@ class ClientController extends Controller
             'monthlyLoanAmount' => $monthlyDue,
             'isEligible' => $isEligible,
             'eligibilityMessage' => $eligibilityMessage,
-            'tier' => $tier
+            'tier' => $tier,
+            'loanableAmount' => $loanableAmount,
+            'processingFee' => $processingFee,
+            'client' => $clientDetails,
+            'monthlyContractPremium' => $monthlyContractPremium
         ]);
     }
 
