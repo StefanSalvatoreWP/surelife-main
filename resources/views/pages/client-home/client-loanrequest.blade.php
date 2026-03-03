@@ -181,7 +181,7 @@
             </div>
 
             <!-- Modal Body -->
-            <div class="p-6">
+            <div class="p-6 bg-gradient-to-b from-slate-50 to-white">
 
                 <form id="loanApplicationForm" method="POST" action="/submit-client-loanrequest/{{ session('user_id') }}">
                     @csrf
@@ -189,20 +189,20 @@
                     <input type="hidden" name="signature_data" id="signatureData" value="">
 
                     <!-- Loan Details Section -->
-                    <div class="bg-blue-50 p-4 rounded-lg mb-6">
-                        <h4 class="font-semibold text-blue-900 mb-3 text-lg">Loan Details</h4>
-                        <div class="flex flex-row justify-between items-center gap-4">
-                            <div class="text-center">
-                                <p class="text-sm text-blue-600 mb-1">Loanable Amount</p>
-                                <p class="text-lg font-bold text-blue-900">₱ {{ number_format($loanableAmount ?? 0, 2) }}</p>
+                    <div class="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 p-5 rounded-xl mb-6 border border-slate-600 shadow-lg">
+                        <h4 class="font-semibold text-amber-400 mb-4 text-lg tracking-wide">Loan Details</h4>
+                        <div class="grid grid-cols-3 gap-3">
+                            <div class="text-center bg-gradient-to-br from-amber-500/20 to-amber-600/10 rounded-lg p-3 border border-amber-500/30">
+                                <p class="text-xs font-medium text-amber-300 mb-1 uppercase tracking-wide">Loanable Amount</p>
+                                <p class="text-lg font-bold text-white">₱ {{ number_format($loanableAmount ?? 0, 2) }}</p>
                             </div>
-                            <div class="text-center border-l border-blue-200">
-                                <p class="text-sm text-blue-600 mb-1">Processing Fee (10%)</p>
-                                <p class="text-lg font-bold text-blue-900">₱ {{ number_format($processingFee ?? 0, 2) }}</p>
+                            <div class="text-center bg-gradient-to-br from-amber-500/20 to-amber-600/10 rounded-lg p-3 border border-amber-500/30">
+                                <p class="text-xs font-medium text-amber-300 mb-1 uppercase tracking-wide">Processing Fee (10%)</p>
+                                <p class="text-lg font-bold text-white">₱ {{ number_format($processingFee ?? 0, 2) }}</p>
                             </div>
-                            <div class="text-center border-l border-blue-200">
-                                <p class="text-sm text-blue-600 mb-1">Net Amount</p>
-                                <p class="text-lg font-bold text-green-700">₱ {{ number_format($netLoanAmount ?? 0, 2) }}</p>
+                            <div class="text-center bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 rounded-lg p-3 border border-emerald-500/30">
+                                <p class="text-xs font-medium text-emerald-300 mb-1 uppercase tracking-wide">Net Amount</p>
+                                <p class="text-lg font-bold text-emerald-400">₱ {{ number_format($netLoanAmount ?? 0, 2) }}</p>
                             </div>
                         </div>
                     </div>
@@ -226,29 +226,30 @@
                     </div>
 
                     <!-- Monthly Payment Preview -->
-                    <div class="bg-purple-50 p-4 rounded-lg mb-6">
-                        <h4 class="font-semibold text-purple-900 mb-3 text-lg">Monthly Payment Breakdown</h4>
-                        <div class="flex flex-row justify-between items-center gap-4">
-                            <div class="text-center">
-                                <p class="text-sm text-purple-600 mb-1">Loan Payment</p>
-                                <p class="text-lg font-bold text-purple-900" id="monthlyLoanPayment">₱ 0.00</p>
+                    <div class="bg-gradient-to-r from-indigo-900 via-purple-900 to-indigo-900 p-5 rounded-xl mb-6 border border-purple-700 shadow-lg">
+                        <h4 class="font-semibold text-purple-300 mb-4 text-lg tracking-wide">Monthly Payment Breakdown</h4>
+                        <div class="grid grid-cols-3 gap-3">
+                            <div class="text-center bg-gradient-to-br from-purple-500/20 to-purple-600/10 rounded-lg p-3 border border-purple-500/30">
+                                <p class="text-xs font-medium text-purple-300 mb-1 uppercase tracking-wide">Loan Payment</p>
+                                <p class="text-lg font-bold text-white" id="monthlyLoanPayment">₱ 0.00</p>
                             </div>
-                            <div class="text-center border-l border-purple-200">
-                                <p class="text-sm text-purple-600 mb-1">Contract Premium</p>
-                                <p class="text-lg font-bold text-purple-900">₱ {{ number_format($monthlyContractPremium ?? 0, 2) }}</p>
+                            <div class="text-center bg-gradient-to-br from-purple-500/20 to-purple-600/10 rounded-lg p-3 border border-purple-500/30">
+                                <p class="text-xs font-medium text-purple-300 mb-1 uppercase tracking-wide">Contract Premium</p>
+                                <p class="text-lg font-bold text-white">₱ {{ number_format($monthlyContractPremium ?? 0, 2) }}</p>
                             </div>
-                            <div class="text-center border-l border-purple-200">
-                                <p class="text-sm text-purple-600 mb-1">Total Monthly Due</p>
-                                <p class="text-xl font-bold text-purple-900" id="totalMonthlyDue">₱ 0.00</p>
+                            <div class="text-center bg-gradient-to-br from-rose-500/20 to-rose-600/10 rounded-lg p-3 border border-rose-500/30">
+                                <p class="text-xs font-medium text-rose-300 mb-1 uppercase tracking-wide">Total Monthly Due</p>
+                                <p class="text-xl font-bold text-rose-400" id="totalMonthlyDue">₱ 0.00</p>
                             </div>
                         </div>
                     </div>
 
                     <!-- Waiver of Rights -->
-                    <div class="border-2 border-gray-300 rounded-lg p-6 pb-7 mb-6">
-                        <h4 class="font-semibold text-gray-900 mb-4 text-center text-lg uppercase tracking-wide">Waiver of Rights</h4>
-                        
-                        <div class="bg-gray-50 p-4 rounded mb-4 text-sm leading-relaxed">
+                    <div class="border border-slate-200 rounded-xl p-6 pb-7 mb-6 bg-white shadow-sm">
+                        <h4 class="font-semibold text-slate-900 mb-4 text-center text-lg uppercase tracking-widest">Waiver of Rights</h4>
+
+                        <div class="bg-gradient-to-br from-sky-50 via-white to-indigo-50/40 p-4 rounded-lg mb-4 text-sm leading-relaxed border border-sky-100">
+
                             <p class="mb-3">
                                 I <span id="waiverApplicantNameBlank" class="inline-block border-b border-gray-400 min-w-[140px] text-center font-semibold">&nbsp;</span> member of sure life care &amp; services with Contract Number <span id="waiverContractNumberBlank" class="inline-block border-b border-gray-400 min-w-[110px] text-center font-semibold">&nbsp;</span> applied for a loan in my Contract.
                             </p>
@@ -263,36 +264,68 @@
                                         <div class="relative" style="height: 20px;">
                                             <p class="font-bold text-gray-900 absolute bottom-0 w-full text-center leading-none mb-0">{{ strtoupper(date('F d, Y')) }}</p>
                                         </div>
-                                        <div class="border-b border-gray-400 pb-1"></div>
+                                        <div class="border-b-2 border-gray-500 pb-1"></div>
                                         <p class="text-xs text-gray-500 mt-1 text-center">DATE</p>
                                     </div>
                                     <div class="text-center" style="max-width: 250px;">
                                         <div class="relative" style="height: 20px;">
-                                            <p id="waiverPrintedName" class="font-bold text-gray-900 text-xs absolute bottom-0 w-full text-center leading-none mb-0 whitespace-nowrap overflow-visible">{{ ($client->firstname ?? '') . ' ' . ($client->lastname ?? '') }}</p>
-                                            <img id="waiverSignatureOverPrinted" class="hidden absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-[-32px]" style="max-height: 110px; z-index: 10;" alt="">
+                                            <p id="waiverPrintedName" class="font-bold text-gray-900 absolute bottom-0 w-full text-center leading-none mb-0 whitespace-nowrap overflow-hidden text-ellipsis text-[clamp(0.65rem,1.25vw,1rem)]">{{ ($client->firstname ?? '') . ' ' . ($client->lastname ?? '') }}</p>
+                                            <img id="waiverSignatureOverPrinted" class="hidden absolute bottom-0 z-10 pointer-events-none" style="left: 50%; transform: translate(-50%, -35px); max-height: 80px;" alt="">
                                         </div>
-                                        <div class="border-b border-gray-400 pb-1"></div>
+                                        <div class="border-b-2 border-gray-500 pb-1"></div>
                                         <p class="text-xs text-gray-500 mt-1 text-left bg-white px-1 inline-block">Applicant's Full name & signature:</p>
                                     </div>
                                 </div>
                             </div>
+
                         </div>
 
-                        <!-- Signature Canvas -->
-                        <div class="mt-6 mb-4">
+                        <!-- Signature Pad Trigger -->
+                        <div class="mt-6 mb-4 relative z-20">
                             <label class="block text-sm font-medium text-gray-700 mb-2">
                                 Digital Signature <span class="text-red-500">*</span>
                             </label>
-                            <p class="text-xs text-gray-500 mb-2">Please sign below using your mouse or touch screen:</p>
-                            <div id="signatureContainer" class="border-2 border-gray-200 rounded bg-gray-50 p-3" style="touch-action: none;">
-                                <div id="signaturePadSurface" class="border border-gray-200 rounded-md bg-white overflow-hidden" style="height: 120px;">
-                                    <canvas id="signatureCanvas" class="w-full h-full cursor-crosshair block"></canvas>
-                                </div>
-                                <div class="flex justify-start mt-2">
-                                    <button type="button" onclick="clearSignature()"
-                                        class="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-xs rounded transition-colors">
-                                        Clear
-                                    </button>
+                            <p class="text-xs text-gray-500 mb-2">Click to open the signature pad and sign:</p>
+                            <div class="flex items-center gap-3">
+                                <button type="button" id="openSignaturePadBtn" onclick="showSignaturePad()"
+                                    class="px-4 py-2 bg-blue-600 text-white border border-blue-600 rounded-md text-sm font-semibold hover:bg-blue-700 hover:border-blue-700 transition-colors shadow-sm">
+                                    Open Signature Pad
+                                </button>
+
+                                <span id="signatureStatus" class="text-xs text-gray-500">Not signed</span>
+                            </div>
+                        </div>
+
+                        <!-- Signature Pad Modal -->
+                        <div id="signaturePadModal" class="hidden fixed inset-0 z-[9999] bg-black/50">
+                            <div class="min-h-screen flex items-center justify-center p-4">
+                                <div class="bg-white rounded-lg w-full max-w-2xl shadow-lg">
+                                    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+                                        <h3 class="text-lg font-semibold text-gray-900">Signature Pad</h3>
+                                        <button type="button" onclick="closeSignaturePad()" class="text-gray-500 hover:text-gray-700">✕</button>
+                                    </div>
+                                    <div class="p-6">
+                                        <div id="signatureModalSurface" class="border border-gray-200 rounded-md bg-white overflow-hidden touch-none">
+                                            <canvas id="signatureModalCanvas" class="w-full h-[150px] cursor-crosshair block"></canvas>
+                                        </div>
+
+                                        <div class="flex items-center justify-between mt-4">
+                                            <button type="button" onclick="clearSignature()"
+                                                class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-sm rounded transition-colors">
+                                                Clear
+                                            </button>
+                                            <div class="flex items-center gap-3">
+                                                <button type="button" onclick="closeSignaturePad()"
+                                                    class="px-4 py-2 bg-white border border-gray-300 hover:bg-gray-50 text-sm rounded transition-colors">
+                                                    Cancel
+                                                </button>
+                                                <button type="button" onclick="confirmSignature()"
+                                                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-colors">
+                                                    Confirm Signature
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -349,7 +382,6 @@
         function showLoanRequestModal() {
             document.getElementById('loanApplicationModal').classList.remove('hidden');
             calculateMonthlyPayment();
-            initSignatureCanvas();
         }
 
         function closeLoanModal() {
@@ -373,20 +405,27 @@
         let signatureCanvas, ctx, isDrawing = false;
 
         function initSignatureCanvas() {
-            signatureCanvas = document.getElementById('signatureCanvas');
+            signatureCanvas = document.getElementById('signatureModalCanvas');
             ctx = signatureCanvas.getContext('2d');
 
-            const surface = document.getElementById('signaturePadSurface');
+            const surface = document.getElementById('signatureModalSurface');
             const rect = surface.getBoundingClientRect();
-            signatureCanvas.width = Math.max(300, Math.floor(rect.width));
-            signatureCanvas.height = Math.max(80, Math.floor(rect.height));
-            
+            const dpr = window.devicePixelRatio || 1;
+            const cssWidth = Math.max(600, Math.floor(rect.width));
+            const cssHeight = Math.max(150, Math.floor(rect.height));
+
+            signatureCanvas.width = cssWidth * dpr;
+            signatureCanvas.height = cssHeight * dpr;
+            signatureCanvas.style.width = cssWidth + 'px';
+            signatureCanvas.style.height = cssHeight + 'px';
+
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.scale(dpr, dpr);
             ctx.strokeStyle = '#000';
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 3;
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
-            
-            // Event listeners
+
             signatureCanvas.addEventListener('mousedown', startDrawing);
             signatureCanvas.addEventListener('mousemove', draw);
             signatureCanvas.addEventListener('mouseup', stopDrawing);
@@ -394,6 +433,19 @@
             signatureCanvas.addEventListener('touchstart', handleTouch);
             signatureCanvas.addEventListener('touchmove', handleTouch);
             signatureCanvas.addEventListener('touchend', stopDrawing);
+        }
+
+        function showSignaturePad() {
+            document.getElementById('signaturePadModal').classList.remove('hidden');
+            const openBtn = document.getElementById('openSignaturePadBtn');
+            if (openBtn) {
+                openBtn.textContent = hasSignature ? 'Edit Signature' : 'Open Signature Pad';
+            }
+            initSignatureCanvas();
+        }
+
+        function closeSignaturePad() {
+            document.getElementById('signaturePadModal').classList.add('hidden');
         }
 
         function getPos(e) {
@@ -424,13 +476,29 @@
 
         function stopDrawing() {
             isDrawing = false;
-            if (hasSignature) {
-                const preview = document.getElementById('waiverSignatureOverPrinted');
-                if (preview) {
-                    preview.src = signatureCanvas.toDataURL('image/png');
-                    preview.classList.remove('hidden');
-                }
+        }
+
+        function confirmSignature() {
+            if (!hasSignature) {
+                return;
             }
+
+            const dataUrl = signatureCanvas.toDataURL('image/png');
+            document.getElementById('signatureData').value = dataUrl;
+
+            const preview = document.getElementById('waiverSignatureOverPrinted');
+            if (preview) {
+                preview.src = dataUrl;
+                preview.classList.remove('hidden');
+            }
+
+            const status = document.getElementById('signatureStatus');
+            if (status) {
+                status.textContent = 'Signed';
+            }
+
+            closeSignaturePad();
+            updateSubmitButton();
         }
 
         function handleTouch(e) {
@@ -451,6 +519,11 @@
                 preview.src = '';
                 preview.classList.add('hidden');
             }
+            const status = document.getElementById('signatureStatus');
+            if (status) {
+                status.textContent = 'Not signed';
+            }
+            document.getElementById('signatureData').value = '';
             updateSubmitButton();
         }
 
@@ -492,8 +565,7 @@
                 return false;
             }
             
-            // Save signature data
-            document.getElementById('signatureData').value = signatureCanvas.toDataURL('image/png');
+            // Signature is saved on confirmSignature()
             document.getElementById('waiverSigned').value = '1';
             
             return true;
