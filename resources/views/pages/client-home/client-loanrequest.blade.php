@@ -267,7 +267,7 @@
                         <div class="bg-gradient-to-br from-sky-50 via-white to-indigo-50/40 p-4 rounded-lg mb-4 text-sm leading-relaxed border border-sky-100">
 
                             <p class="mb-3">
-                                I <span id="waiverApplicantNameBlank" class="inline-block border-b border-gray-400 min-w-[140px] text-center font-semibold">&nbsp;</span> member of sure life care &amp; services with Contract Number <span id="waiverContractNumberBlank" class="inline-block border-b border-gray-400 min-w-[110px] text-center font-semibold">&nbsp;</span> applied for a loan in my Contract.
+                                I <span id="waiverApplicantNameBlank" class="inline-block border-b border-gray-400 min-w-[140px] text-center font-semibold">{{ ($client->firstname ?? '') . ' ' . ($client->lastname ?? '') }}</span> member of sure life care &amp; services with Contract Number <span id="waiverContractNumberBlank" class="inline-block border-b border-gray-400 min-w-[110px] text-center font-semibold">{{ $client->contractnumber ?? '' }}</span> applied for a loan in my Contract.
                             </p>
                             <p class="mb-12">
                                 I understand that after applying for a loan , I waive my right of any benefits and privileges stated in the Contract as a member . In Case of loss of life, I also agreed that I have to pay the remaining balance of my loan to be rendered service.
@@ -346,21 +346,9 @@
                             </div>
                         </div>
 
-                        <!-- Applicant Full Name and Contract Number -->
-                        <div class="mt-6 mb-4">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label for="applicantFullNameInput" class="block text-xs text-gray-500 mb-1">Applicant Full Name</label>
-                                    <input type="text" id="applicantFullNameInput" value="{{ ($client->firstname ?? '') . ' ' . ($client->lastname ?? '') }}"
-                                        class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                </div>
-                                <div>
-                                    <label for="contractNumberInput" class="block text-xs text-gray-500 mb-1">Contract Number</label>
-                                    <input type="text" id="contractNumberInput" value="{{ $client->contractnumber ?? '' }}"
-                                        class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                </div>
-                            </div>
-                        </div>
+                        <!-- Hidden fields for JavaScript auto-fill -->
+                        <input type="hidden" id="applicantFullNameInput" value="{{ ($client->firstname ?? $client->FirstName ?? '') . ' ' . ($client->lastname ?? $client->LastName ?? '') }}">
+                        <input type="hidden" id="contractNumberInput" value="{{ $client->contractnumber ?? $client->ContractNumber ?? '' }}">
 
                         <!-- Agreement Checkbox -->
                         <div class="flex items-start mt-6 px-1">
@@ -398,6 +386,7 @@
         function showLoanRequestModal() {
             document.getElementById('loanApplicationModal').classList.remove('hidden');
             calculateMonthlyPayment();
+            updateWaiverFields(); // Auto-fill waiver fields when modal opens
         }
 
         function closeLoanModal() {
