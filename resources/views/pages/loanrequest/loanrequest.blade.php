@@ -5,40 +5,39 @@
 @section('styles')
     <link rel="stylesheet" href="{{ asset('css/client.css') }}?v={{ time() }}">
     <style>
-        /* Page-specific: Loading indicator centered on screen */
-        #common_dataTable_processing.dataTables_processing {
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            right: 0 !important;
-            bottom: 0 !important;
-            width: 100% !important;
-            height: 100% !important;
-            display: none !important;
-            z-index: 9999 !important;
-            background: rgba(255, 255, 255, 0.95) !important;
-            align-items: center !important;
-            justify-content: center !important;
-            font-size: 1.25rem !important;
-            font-weight: 600 !important;
-            color: #374151 !important;
+        /* Loan Request Table Header - Page Specific */
+        #loanrequest-table thead th {
+            background: linear-gradient(135deg, #dae4e1 0%, #c5cecb 100%) !important;
+            color: rgb(95, 89, 89) !important;
+            font-weight: 700 !important;
+            padding: 1rem 1.5rem !important;
+            border: none !important;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
         }
-        #common_dataTable_processing.dataTables_processing[style*="display: block"] {
-            display: flex !important;
+        #loanrequest-table tbody tr {
+            background: white !important;
+            transition: all 0.2s ease !important;
+            border-bottom: 1px solid #f3f4f6;
         }
-        /* Table width fix */
-        #common_dataTable {
-            width: 100% !important;
+        #loanrequest-table tbody tr:hover {
+            background: #faf5ff !important;
+            transform: translateX(4px) !important;
+            box-shadow: -4px 0 0 0 #9333ea, 0 2px 8px rgba(147, 51, 234, 0.1) !important;
         }
-        #common_dataTable_wrapper {
-            padding: 1rem;
+        #loanrequest-table tbody td {
+            padding: 1rem 1.5rem !important;
+            border: none !important;
+            vertical-align: middle !important;
+            color: #374151;
+            font-size: 0.875rem;
         }
     </style>
 @endsection
 
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-    <!-- Header Card -->
     <div class="bg-white rounded-xl border-2 border-blue-300 p-6 mb-6">
         <div class="flex items-center justify-between">
             <div>
@@ -81,21 +80,17 @@
         @endif
     </div>
 
-    <!-- Table Card -->
     <div class="bg-white rounded-xl shadow-lg overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
             <h3 class="text-lg font-semibold text-gray-800">All Loan Requests</h3>
         </div>
         <div class="overflow-x-auto">
-            <table id="common_dataTable" class="min-w-full divide-y divide-gray-200">
+            <table id="loanrequest-table" class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th scope="col" class="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden">Id</th>
                         <th scope="col" class="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Contract No.</th>
-                        <th scope="col" class="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Last Name</th>
-                        <th scope="col" class="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden sm:table-cell">First Name</th>
-                        <th scope="col" class="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden md:table-cell">Middle Name</th>
-                        <th scope="col" class="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Amount</th>
+                        <th scope="col" class="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Client Name</th>
+                        <th scope="col" class="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden sm:table-cell">Amount</th>
                         <th scope="col" class="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden md:table-cell">Date Requested</th>
                         <th scope="col" class="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
                         <th scope="col" class="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
@@ -153,7 +148,7 @@
 @section('scripts')
 <script>
     $(document).ready(function() {
-        var loadedTable = $('#common_dataTable').DataTable({
+        $('#loanrequest-table').DataTable({
             processing: true,
             serverSide: true,
             pageLength: 10,
@@ -164,65 +159,58 @@
                 type: 'GET'
             },
             columns: [
-                { data: 'Id', name: 'Id', visible: false },
                 { data: 'ContractNumber', name: 'tblclient.ContractNumber' },
-                { data: 'LastName', name: 'tblclient.LastName' },
-                { data: 'FirstName', name: 'tblclient.FirstName', className: 'hidden sm:table-cell' },
-                { data: 'MiddleName', name: 'tblclient.MiddleName', className: 'hidden md:table-cell' },
-                { 
-                    data: 'Amount', 
-                    name: 'Amount',
-                    render: function(data, type, row) {
-                        return '₱ ' + parseFloat(data).toLocaleString('en-US', {minimumFractionDigits: 2});
-                    }
-                },
+                { data: null, name: 'tblclient.LastName', render: function(data) {
+                    return data.LastName + ', ' + data.FirstName + ' ' + (data.MiddleName || '');
+                }},
+                { data: 'Amount', name: 'Amount', className: 'hidden sm:table-cell', render: function(data) {
+                    return '₱ ' + parseFloat(data).toLocaleString('en-US', {minimumFractionDigits: 2});
+                }},
                 { data: 'DateRequested', name: 'DateRequested', className: 'hidden md:table-cell' },
-                { 
-                    data: 'Status', 
-                    name: 'Status',
-                    render: function (data, type, row) {
-                        var status = row.Status;
-                        if (status == "Pending") {
-                            return '<span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-medium">' + status + '</span>';
-                        } else if (status == "Verified") {
-                            return '<span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">' + status + '</span>';
-                        } else if (status == "Approved") {
-                            return '<span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">' + status + '</span>';
-                        } else {
-                            return '<span class="bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs font-medium">' + status + '</span>';
-                        }
+                { data: 'Status', name: 'Status', render: function(data) {
+                    var status = data;
+                    if (status == "Pending") {
+                        return '<span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-medium">' + status + '</span>';
+                    } else if (status == "Verified") {
+                        return '<span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">' + status + '</span>';
+                    } else if (status == "Approved") {
+                        return '<span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">' + status + '</span>';
+                    } else {
+                        return '<span class="bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs font-medium">' + status + '</span>';
                     }
-                },
-                {
-                    data: null,
-                    orderable: false,
-                    render: function (data, type, row) {
-                        var viewBtn = '<a href="/req-loans/view/' + data.Id + '" class="inline-flex items-center px-3 py-1 bg-blue-500 hover:bg-blue-700 text-white text-xs font-medium rounded transition-colors">' +
-                            '<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
-                            '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />' +
-                            '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />' +
-                            '</svg>View</a>';
+                }},
+                { data: null, orderable: false, render: function(data) {
+                    var viewBtn = '<a href="/req-loans/view/' + data.Id + '" class="action-btn action-btn-view text-xs sm:text-sm">' +
+                        '<svg class="action-icon w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
+                        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />' +
+                        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />' +
+                        '</svg>' +
+                        '<span class="hidden sm:inline">View</span>' +
+                        '</a>';
 
-                        var remarksBtn = '';
-                        if (data.Remarks != null && data.Remarks != "" && data.Remarks != "Not available") {
-                            remarksBtn = '<button type="button" onclick="openRemarksModal(\'' + escapeHtml(data.Remarks) + '\')" class="inline-flex items-center px-3 py-1 bg-yellow-500 hover:bg-yellow-700 text-white text-xs font-medium rounded transition-colors">' +
-                                '<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
-                                '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />' +
-                                '</svg>Remarks</button>';
-                        }
-
-                        var deleteBtn = '<button type="button" onclick="openDeleteModal(' + data.Id + ')" class="inline-flex items-center px-3 py-1 bg-red-500 hover:bg-red-700 text-white text-xs font-medium rounded transition-colors">' +
-                            '<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
-                            '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />' +
-                            '</svg>Delete</button>';
-
-                        return '<div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">' + viewBtn + ' ' + remarksBtn + ' ' + deleteBtn + '</div>';
+                    var remarksBtn = '';
+                    if (data.Remarks != null && data.Remarks != "" && data.Remarks != "Not available") {
+                        remarksBtn = '<button type="button" onclick="openRemarksModal(\'' + escapeHtml(data.Remarks) + '\')" class="action-btn action-btn-note text-xs sm:text-sm">' +
+                            '<svg class="action-icon w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
+                            '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />' +
+                            '</svg>' +
+                            '<span class="hidden sm:inline">Remarks</span>' +
+                            '</button>';
                     }
-                }
+
+                    var deleteBtn = '<button type="button" onclick="openDeleteModal(' + data.Id + ')" class="action-btn action-btn-delete text-xs sm:text-sm">' +
+                        '<svg class="action-icon w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
+                        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />' +
+                        '</svg>' +
+                        '<span class="hidden sm:inline">Delete</span>' +
+                        '</button>';
+
+                    return '<div style="display: flex; gap: 0.5rem;" class="flex-col sm:flex-row">' + viewBtn + remarksBtn + deleteBtn + '</div>';
+                }}
             ],
             columnDefs: [
                 {
-                    targets: [8],
+                    targets: [5],
                     orderable: false,
                     width: '200px'
                 }
