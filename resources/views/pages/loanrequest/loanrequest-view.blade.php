@@ -200,6 +200,65 @@
             </div>
         </div>
     </div>
+
+    <!-- Waiver & Signature Section -->
+    @if($loanWaiver)
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden mt-6">
+        <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-purple-100">
+            <h3 class="text-lg font-semibold text-purple-800">Waiver of Rights & Digital Signature</h3>
+        </div>
+        <div class="p-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Waiver Info -->
+                <div class="space-y-4">
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Client Name</p>
+                        <p class="text-lg font-semibold text-gray-900">{{ $loanWaiver->client_name }}</p>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Contract Number</p>
+                        <p class="text-lg font-semibold text-gray-900">{{ $loanWaiver->contract_number }}</p>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Signed Date</p>
+                        <p class="text-lg font-semibold text-gray-900">{{ $loanWaiver->signed_date ? date('F d, Y h:i A', strtotime($loanWaiver->signed_date)) : 'N/A' }}</p>
+                    </div>
+                    <div class="bg-purple-50 rounded-lg p-4 border border-purple-200">
+                        <p class="text-xs text-purple-600 uppercase tracking-wide mb-1">Waiver Status</p>
+                        <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">Signed</span>
+                    </div>
+                </div>
+                <!-- Signature Image -->
+                <div class="flex flex-col items-center justify-center">
+                    <p class="text-xs text-gray-500 uppercase tracking-wide mb-2">Digital Signature</p>
+                    <div class="border-2 border-gray-300 rounded-lg p-4 bg-white w-full max-w-md">
+                        @if($loanWaiver->signature_data)
+                            <img src="{{ $loanWaiver->signature_data }}" alt="Client Signature" class="w-full h-auto max-h-32 object-contain">
+                        @else
+                            <p class="text-gray-400 text-center">No signature available</p>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @else
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden mt-6">
+        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <h3 class="text-lg font-semibold text-gray-800">Waiver of Rights</h3>
+        </div>
+        <div class="p-6">
+            <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-lg">
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 text-yellow-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                    </svg>
+                    <p class="text-yellow-700 font-medium">No waiver signature found for this loan request.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
 </div>
 
 <script src="{{ asset('js/req-loan.js') }}"></script>

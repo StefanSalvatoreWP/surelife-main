@@ -60,6 +60,9 @@ class LoanRequestController extends Controller
         $clientTerm = PaymentTerm::where('id', $clientDetails->PaymentTermId)->first();
         $clientInstallments = Payment::where('clientid', $clientDetails->Id)->count();
 
+        // Fetch waiver data
+        $loanWaiver = LoanWaiver::where('loan_request_id', $loanRequest->Id)->first();
+
         $annualPaymentAmount = floor($clientTerm->Price * $term) - (floor($clientTerm->Price * $term) * 0.10);
         $noOfYearsPaid = floor($clientInstallments / $term);
 
@@ -94,7 +97,8 @@ class LoanRequestController extends Controller
             'percentageInterest' => $percentageInterest,
             'interest' => $interest,
             'monthlyInterest' => $monthlyInterest,
-            'totalMonthlyDue' => $totalMonthlyDue
+            'totalMonthlyDue' => $totalMonthlyDue,
+            'loanWaiver' => $loanWaiver
         ]);
     }
 
@@ -254,6 +258,24 @@ class LoanRequestController extends Controller
         \Log::info('Insert data: ' . json_encode($insertData));
 
         LoanRequest::insert($insertData);
+
+        // Get the new loan request ID
+        $loanRequestId = \DB::getPdo()->lastInsertId();
+
+        // Save waiver signature to loan_waivers table
+        if ($request->signature_data) {
+            \Log::info('Saving waiver signature for loan request ID: ' . $loanRequestId);
+            
+            LoanWaiver::create([
+                'loan_request_id' => $loanRequestId,
+                'client_name' => ($client->firstname ?? $client->FirstName ?? '') . ' ' . ($client->lastname ?? $client->LastName ?? ''),
+                'contract_number' => $client->contractnumber ?? $client->ContractNumber ?? '',
+                'signature_data' => $request->signature_data,
+                'signed_date' => now()
+            ]);
+            
+            \Log::info('Waiver signature saved successfully');
+        }
 
         \Log::info('Loan request inserted successfully');
 
