@@ -1,305 +1,236 @@
-<!-- 2024 SilverDust) S. Maceren --> 
 @extends('layouts.main')
 
+@section('title', 'View Loan Request')
+
+@section('styles')
+    <link rel="stylesheet" href="{{ asset('css/client.css') }}?v={{ time() }}">
+@endsection
+
 @section('content')
-    <div class="m-3">
-        <div class="bg-white p-3">
-            <h3 class="text-dark">View Loan Request</h3>
-            <div class="alert alert-secondary mb-3" role="alert">
-                Manage loan request for this selected client.
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+    <!-- Header Card -->
+    <div class="bg-white rounded-xl border-2 border-blue-300 p-6 mb-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-blue-800 mb-2">View Loan Request</h1>
+                <p class="text-blue-600 text-sm">Manage loan request for this selected client</p>
             </div>
-            @if(session('error'))
-                <div class="alert alert-danger">
-                    {{ session('error') }}
+            <div class="hidden md:block">
+                <svg class="w-16 h-16 text-blue-500 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+            </div>
+        </div>
+        @if(session('error'))
+            <div class="mt-4 bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 text-red-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                    </svg>
+                    <p class="text-red-700 font-medium">{{ session('error') }}</p>
                 </div>
-            @elseif(session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
+            </div>
+        @elseif(session('success'))
+            <div class="mt-4 bg-green-50 border-l-4 border-green-500 p-4 rounded-lg">
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    <p class="text-green-700 font-medium">{{ session('success') }}</p>
                 </div>
-            @elseif(session('warning'))
-                <div class="alert alert-warning">
-                    {{ session('warning') }}
+            </div>
+        @elseif(session('warning'))
+            <div class="mt-4 bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-lg">
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 text-yellow-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                    </svg>
+                    <p class="text-yellow-700 font-medium">{{ session('warning') }}</p>
                 </div>
+            </div>
+        @endif
+        <div class="mt-4 flex flex-wrap gap-2">
+            <a href="/req-loans" class="inline-flex items-center px-4 py-2 bg-gray-500 hover:bg-gray-700 text-white text-sm font-medium rounded transition-colors min-h-[44px]">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                Return
+            </a>
+            @if($loanRequestDetails->Status == 'Pending')
+                <button onclick="showLoanRequestModal('{{ $loanRequestDetails->Id }}', 'verify')" class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-700 text-white text-sm font-medium rounded transition-colors min-h-[44px]">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Verify
+                </button>
+            @elseif($loanRequestDetails->Status == 'Verified')
+                <button onclick="showLoanRequestModal('{{ $loanRequestDetails->Id }}', 'approve')" class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-700 text-white text-sm font-medium rounded transition-colors min-h-[44px]">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Approve
+                </button>
             @endif
-            <div class="d-flex">
-                <a href="/req-loans" class="btn btn-outline-secondary btn-sm" role="button">Return</a>
-                @if($loanRequestDetails->Status == 'Pending')
-                    <a class="btn btn-success btn-sm ms-1" onclick="showLoanRequestModal('{{ $loanRequestDetails->Id }}', 'verify')" role="button">Verify</a>       
-                @elseif($loanRequestDetails->Status == 'Verified')
-                    <a class="btn btn-success btn-sm ms-1" onclick="showLoanRequestModal('{{ $loanRequestDetails->Id }}', 'approve')" role="button">Approve</a>       
-                @endif
+        </div>
+    </div>
+
+    <!-- Client Information Card -->
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
+        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <h3 class="text-lg font-semibold text-gray-800">Client Information</h3>
+        </div>
+        <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Contract Number</p>
+                    <p class="text-lg font-semibold text-gray-900">{{ $clientDetails->ContractNumber }}</p>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Client Name</p>
+                    <p class="text-lg font-semibold text-gray-900">{{ $clientDetails->LastName . ', ' . $clientDetails->FirstName . ' ' . $clientDetails->MiddleName }}</p>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Branch</p>
+                    <p class="text-lg font-semibold text-gray-900">{{ $clientBranch->BranchName }}</p>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Payment Mode</p>
+                    <p class="text-lg font-semibold text-gray-900">{{ $clientTerm->Term }}</p>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Amount</p>
+                    <p class="text-lg font-semibold text-green-600">₱ {{ number_format($clientTerm->Price, 2) }}</p>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Status</p>
+                    @php
+                        $statusColor = $loanRequestDetails->Status == 'Pending' ? 'yellow' : ($loanRequestDetails->Status == 'Verified' ? 'blue' : ($loanRequestDetails->Status == 'Approved' ? 'green' : 'gray'));
+                    @endphp
+                    <span class="bg-{{ $statusColor }}-100 text-{{ $statusColor }}-800 px-3 py-1 rounded-full text-sm font-medium">{{ $loanRequestDetails->Status }}</span>
+                </div>
             </div>
         </div>
-        <div class="row mt-3">
-            <div class="col">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-sm-1">
-                                Contract
-                            </div>
-                            <div class="col-sm-2">
-                                {{ $clientDetails->ContractNumber }}
-                            </div>
-                        </div>
-                        <div class="row mt-2">
-                            <div class="col-sm-1">
-                                Name
-                            </div>
-                            <div class="col-sm-2">
-                                {{ $clientDetails->LastName . ', ' . $clientDetails->FirstName . ' ' . $clientDetails->MiddleName }}
-                            </div>
-                        </div>
-                        <div class="row mt-2">
-                            <div class="col-sm-1">
-                                Branch
-                            </div>
-                            <div class="col-sm-2">
-                                {{ $clientBranch->BranchName }}
-                            </div>
-                        </div>
-                        <div class="row mt-2">
-                            <div class="col-sm-1">
-                                Mode
-                            </div>
-                            <div class="col-sm-2">
-                                {{ $clientTerm->Term }}
-                            </div>
-                        </div>
-                        <div class="row mt-2">
-                            <div class="col-sm-1">
-                                Amount
-                            </div>
-                            <div class="col-sm-2">
-                                ₱ {{ number_format($clientTerm->Price, 2) }}
-                            </div>
-                        </div>
+    </div>
+
+    <!-- Computation Cards -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Loanable Amount Computation -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-blue-100">
+                <h3 class="text-lg font-semibold text-blue-800">Computation of Loanable Amount</h3>
+            </div>
+            <div class="p-6">
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                        <span class="text-gray-600">Annual Payment</span>
+                        <span class="font-semibold text-gray-900">₱ {{ number_format($annualPaymentAmount, 2) }}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                        <span class="text-gray-600">No. of Years Paid</span>
+                        <span class="font-semibold text-gray-900">{{ $noOfYearsPaid }}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                        <span class="text-gray-600">Total Annual Payment</span>
+                        <span class="font-semibold text-gray-900">₱ {{ number_format($totalAnnualPayment, 2) }}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                        <span class="text-gray-600">Loanable Percentage (%)</span>
+                        <span class="font-semibold text-gray-900">{{ $totalNumYearsPaid }}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                        <span class="text-gray-600">Gross Loanable Amount</span>
+                        <span class="font-semibold text-gray-900">₱ {{ number_format($grossLoanableAmount, 2) }}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                        <span class="text-red-600">Less: Handling Fee (10%)</span>
+                        <span class="font-semibold text-red-600">₱ {{ number_format($handlingFee, 2) }}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-3 bg-blue-50 rounded-lg px-3 mt-2">
+                        <span class="font-bold text-blue-800">Net Loanable Amount</span>
+                        <span class="font-bold text-blue-800 text-lg">₱ {{ number_format($netLoanableAmount, 2) }}</span>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="row mt-3">
-            <div class="col">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col">
-                                <h5 class="font-sm"><strong>Computation of loanable amount</strong></h5>
-                            </div>
-                        </div>
-                        <div class="mx-3 my-5">
-                            <div class="row mt-3">
-                                <div class="col">
-                                    <h5 class="font-sm">Annual</h5>
-                                </div>
-                                <div class="col">
-                                    <div class="w-25 text-end">
-                                        <h5 class="font-sm">₱ {{ number_format($annualPaymentAmount, 2) }}</h5>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row mt-3">
-                                <div class="col">
-                                    <h5 class="font-sm">No. of years paid</h5>
-                                </div>
-                                <div class="col">
-                                    <div class="w-25 text-end">
-                                        <h5 class="font-sm">{{ $noOfYearsPaid }}</h5>
-                                    </div>
-                                </div>
-                            </div>
-                            <hr />
-                            <div class="row mt-3">
-                                <div class="col">
-                                    
-                                </div>
-                                <div class="col">
-                                    <div class="w-25 text-end">
-                                        <h5 class="font-sm">₱ {{ number_format($totalAnnualPayment, 2) }}</h5>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row mt-3">
-                                <div class="col">
-                                    <h5 class="font-sm">Loanable percentage (%)</h5>
-                                </div>
-                                <div class="col">
-                                    <div class="w-25 text-end">
-                                        <h5 class="font-sm">{{ $totalNumYearsPaid }}</h5>
-                                    </div>
-                                </div>
-                            </div>
-                            <hr />
-                            <div class="row mt-3">
-                                <div class="col">
-                                    <h5 class="font-sm">Gross loanable amount</h5>
-                                </div>
-                                <div class="col">
-                                    <div class="w-25 text-end">
-                                        <h5 class="font-sm">₱ {{ number_format($grossLoanableAmount, 2) }}</h5>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row mt-3">
-                                <div class="col">
-                                    <h5 class="text-danger font-sm">Less: Handling fee (10%)</h5>
-                                </div>
-                                <div class="col">
-                                    <div class="w-25 text-end">
-                                        <h5 class="font-sm">₱ {{ number_format($handlingFee, 2) }}</h5>
-                                    </div>
-                                </div>
-                            </div>
-                            <hr />
-                            <div class="row mt-3">
-                                <div class="col">
-                                    <h5 class="font-sm"><strong>Net loanable Amount</strong></h5>
-                                </div>
-                                <div class="col">
-                                    <div class="w-25 text-end">
-                                        <h5 class="font-sm"><strong> ₱ {{ number_format($netLoanableAmount, 2) }} </strong></h5>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
+        <!-- Monthly Dues Computation -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-green-50 to-green-100">
+                <h3 class="text-lg font-semibold text-green-800">Computation of Monthly Dues with Interest</h3>
             </div>
-            <div class="col">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="col">
-                            <h5 class="font-sm"><strong>Computation of monthly dues with interest</strong></h5>
-                        </div>
-                        <div class="mx-3 my-5">
-                            <div class="row mt-3">
-                                <div class="col">
-                                    <h5 class="font-sm">Gross loanable amount</h5>
-                                </div>
-                                <div class="col">
-                                    <div class="w-25 text-end">
-                                        <h5 class="font-sm">₱ {{ number_format($grossLoanableAmount , 2) }}</h5>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row mt-3">
-                                <div class="col">
-                                    <h5 class="font-sm">No. of months of payment</h5>
-                                </div>
-                                <div class="col">
-                                    <div class="w-25 text-end">
-                                        <h5 class="font-sm">{{ $noOfMonthPayments }}</h5>
-                                    </div>
-                                </div>
-                            </div>
-                            <hr />
-                            <div class="row mt-3">
-                                <div class="col">
-                                    <h5 class="font-sm">Loan monthly due</h5>
-                                </div>
-                                <div class="col">
-                                    <div class="w-25 text-end">
-                                        <h5 class="font-sm">₱ {{ number_format($loanMonthlyDue, 2) }}</h5>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row mt-3">
-                                <div class="col">
-                                    <h5 class="font-sm">Percentage of interest (%)</h5>
-                                </div>
-                                <div class="col">
-                                    <div class="w-25 text-end">
-                                        <h5 class="font-sm">{{ $percentageInterest * 100 }}</h5>
-                                    </div>
-                                </div>
-                            </div>
-                            <hr />
-                            <div class="row mt-3">
-                                <div class="col">
-                                    <h5 class="font-sm">Interest</h5>
-                                </div>
-                                <div class="col">
-                                    <div class="w-25 text-end">
-                                        <h5 class="font-sm">₱ {{ number_format($interest, 2) }}</h5>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row mt-3">
-                                <div class="col">
-                                    <h5 class="font-sm">Term</h5>
-                                </div>
-                                <div class="col">
-                                    <div class="w-25 text-end">
-                                        <h5 class="font-sm">{{ $term }}</h5>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row mt-3">
-                                <div class="col">
-                                    <h5 class="font-sm">Monthly interest</h5>
-                                </div>
-                                <div class="col">
-                                    <div class="w-25 text-end">
-                                        <h5 class="font-sm">₱ {{ number_format($monthlyInterest, 2) }}</h5>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row mt-3">
-                                <div class="col">
-                                    <h5 class="font-sm text-danger">Add: Loan Monthly Due</h5>
-                                </div>
-                                <div class="col">
-                                    <div class="w-25 text-end">
-                                        <h5 class="font-sm">₱ {{ number_format($loanMonthlyDue, 2) }}</h5>
-                                    </div>
-                                </div>
-                            </div>
-                            <hr />
-                            <div class="row mt-3">
-                                <div class="col">
-                                    <h5 class="font-sm"><strong>Total monthly due for 12 months</strong></h5>
-                                </div>
-                                <div class="col">
-                                    <div class="w-25 text-end">
-                                        <h5 class="font-sm"><strong>₱ {{ number_format($totalMonthlyDue, 2) }}</strong></h5>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+            <div class="p-6">
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                        <span class="text-gray-600">Gross Loanable Amount</span>
+                        <span class="font-semibold text-gray-900">₱ {{ number_format($grossLoanableAmount, 2) }}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                        <span class="text-gray-600">No. of Months of Payment</span>
+                        <span class="font-semibold text-gray-900">{{ $noOfMonthPayments }}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                        <span class="text-gray-600">Loan Monthly Due</span>
+                        <span class="font-semibold text-gray-900">₱ {{ number_format($loanMonthlyDue, 2) }}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                        <span class="text-gray-600">Percentage of Interest (%)</span>
+                        <span class="font-semibold text-gray-900">{{ $percentageInterest * 100 }}%</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                        <span class="text-gray-600">Interest</span>
+                        <span class="font-semibold text-gray-900">₱ {{ number_format($interest, 2) }}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                        <span class="text-gray-600">Term</span>
+                        <span class="font-semibold text-gray-900">{{ $term }} months</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                        <span class="text-gray-600">Monthly Interest</span>
+                        <span class="font-semibold text-gray-900">₱ {{ number_format($monthlyInterest, 2) }}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                        <span class="text-red-600">Add: Loan Monthly Due</span>
+                        <span class="font-semibold text-red-600">₱ {{ number_format($loanMonthlyDue, 2) }}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-3 bg-green-50 rounded-lg px-3 mt-2">
+                        <span class="font-bold text-green-800">Total Monthly Due (12 months)</span>
+                        <span class="font-bold text-green-800 text-lg">₱ {{ number_format($totalMonthlyDue, 2) }}</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <script src="{{ asset('js/req-loan.js') }}"></script>
-    <script>
-        function showLoanRequestModal(loanReqId, action) {
-            const actionText = action === 'verify' ? 'verify' : 'approve';
-            showSwiftModal('Confirmation', `You are going to ${actionText} this loan request.\n\nYou cannot undo this action. Continue?`, 'warning', [
-                {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitLoanRequest(' + loanReqId + ')'},
-                {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
-            ]);
-        }
+</div>
+
+<script src="{{ asset('js/req-loan.js') }}"></script>
+<script>
+    function showLoanRequestModal(loanReqId, action) {
+        const actionText = action === 'verify' ? 'verify' : 'approve';
+        showSwiftModal('Confirmation', `You are going to ${actionText} this loan request.\n\nYou cannot undo this action. Continue?`, 'warning', [
+            {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitLoanRequest(' + loanReqId + ')'},
+            {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+        ]);
+    }
+    
+    function submitLoanRequest(loanReqId) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/submit-loan-request-approval/' + loanReqId;
         
-        function submitLoanRequest(loanReqId) {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = '/submit-loan-request-approval/' + loanReqId;
-            
-            const csrfToken = document.createElement('input');
-            csrfToken.type = 'hidden';
-            csrfToken.name = '_token';
-            csrfToken.value = '{{ csrf_token() }}';
-            
-            const method = document.createElement('input');
-            method.type = 'hidden';
-            method.name = '_method';
-            method.value = 'PUT';
-            
-            form.appendChild(csrfToken);
-            form.appendChild(method);
-            document.body.appendChild(form);
-            form.submit();
-        }
-    </script>
+        const csrfToken = document.createElement('input');
+        csrfToken.type = 'hidden';
+        csrfToken.name = '_token';
+        csrfToken.value = '{{ csrf_token() }}';
+        
+        const method = document.createElement('input');
+        method.type = 'hidden';
+        method.name = '_method';
+        method.value = 'PUT';
+        
+        form.appendChild(csrfToken);
+        form.appendChild(method);
+        document.body.appendChild(form);
+        form.submit();
+    }
+</script>
 @endsection

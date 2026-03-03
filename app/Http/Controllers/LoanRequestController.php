@@ -128,7 +128,7 @@ class LoanRequestController extends Controller
             'code' => $loanRequestCode
         ];
 
-        LoanRequest::where('id', $loanRequest->Id)->update($updateData);
+        LoanRequest::where('Id', $loanRequest->Id)->update($updateData);
         Log::channel('activity')->info('[StaffID] ' . session('user_id') . ' [Menu] Loan Request ' . '[Action] Update ' . '[Target] ' . $loanRequest->Id);
 
         return redirect('/req-loans')->with('success', 'Selected loan request has been updated!');
@@ -144,7 +144,7 @@ class LoanRequestController extends Controller
             return redirect()->back()->with('error', 'You do not have access to this function.');
         }
 
-        LoanRequest::where('id', $loanRequest->Id)->delete();
+        LoanRequest::where('Id', $loanRequest->Id)->delete();
         Log::channel('activity')->info('[StaffID] ' . session('user_id') . ' [Menu] Loan Request ' . '[Action] Delete ' . '[Target] ' . $loanRequest->Id);
 
         return redirect('/req-loans')->with('warning', 'Selected loan request has been deleted!');

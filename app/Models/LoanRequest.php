@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class LoanRequest extends Model
 {
     protected $table = 'tblloanrequest';
+    protected $primaryKey = 'Id';
     public $timestamps = false;
 
     use HasFactory;
