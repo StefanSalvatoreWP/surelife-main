@@ -9,6 +9,7 @@ $(document).ready(function() {
         processing: true,
         serverSide: true,
         pageLength: 10,
+        autoWidth: false,
         lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
         searchDelay: 500,
         
@@ -23,10 +24,9 @@ $(document).ready(function() {
                 render: function (data, type, row) {
                     return data.LastName + ', ' + data.FirstName + ' ' + data.MiddleName;
                 },
-                width: '200px',
                 orderable: false
             },
-            { data: 'ContractNumber', name: 'ContractNumber', width: '100px', orderable: false },
+            { data: 'ContractNumber', name: 'ContractNumber', orderable: false },
             { data: 'ORNo', name: 'ORNo' },
             {
                 data: 'AmountPaid',

@@ -1,6 +1,10 @@
 <!-- 2023 SilverDust) S. Maceren --> 
 @extends('layouts.main')
 
+@section('styles')
+    <link rel="stylesheet" href="{{ asset('css/client.css') }}?v={{ time() }}">
+@endsection
+
 @section('content')
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Header Section -->
@@ -70,11 +74,11 @@
         </div>
 
         <!-- Table Section -->
-        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden payment-section-wrapper">
             <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
                 <h3 class="text-lg font-semibold text-gray-800">Payment Transactions</h3>
             </div>
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto payment-table-container">
                 <table id="common_dataTable" class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>

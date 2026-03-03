@@ -186,6 +186,80 @@
         currentPaymentId = null;
     }
 
+    // Handle approval form submission
+    $('#approveForm').on('submit', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        var form = $(this);
+        var url = form.attr('action');
+        
+        if (!url || url === '') {
+            showSwiftModal('Error', 'Invalid payment ID', 'error');
+            return false;
+        }
+        
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: form.serialize(),
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                closeModal();
+                showSwiftModal('Success!', 'Payment approved successfully', 'success', [
+                    { text: 'OK', class: 'bg-green-600 text-white', action: function() {
+                        $('#spotcash-approval-table').DataTable().ajax.reload();
+                    }}
+                ]);
+            },
+            error: function(xhr) {
+                closeModal();
+                showSwiftModal('Error', xhr.responseJSON?.message || 'Failed to approve payment', 'error');
+            }
+        });
+        
+        return false;
+    });
+
+    // Handle rejection form submission
+    $('#rejectForm').on('submit', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        var form = $(this);
+        var url = form.attr('action');
+        
+        if (!url || url === '') {
+            showSwiftModal('Error', 'Invalid payment ID', 'error');
+            return false;
+        }
+        
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: form.serialize(),
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                closeRejectionModal();
+                showSwiftModal('Rejected', 'Payment rejected successfully', 'success', [
+                    { text: 'OK', class: 'bg-green-600 text-white', action: function() {
+                        $('#spotcash-approval-table').DataTable().ajax.reload();
+                    }}
+                ]);
+            },
+            error: function(xhr) {
+                closeRejectionModal();
+                showSwiftModal('Error', xhr.responseJSON?.message || 'Failed to reject payment', 'error');
+            }
+        });
+        
+        return false;
+    });
+
     // Close modals when clicking outside
     window.onclick = function(event) {
         let approvalModal = document.getElementById('approvalModal');
