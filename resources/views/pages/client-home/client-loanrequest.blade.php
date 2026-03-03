@@ -188,58 +188,86 @@
                     <input type="hidden" name="waiver_signed" id="waiverSigned" value="0">
                     <input type="hidden" name="signature_data" id="signatureData" value="">
 
-                    <!-- Loan Details Section -->
-                    <div class="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 p-5 rounded-xl mb-6 border border-slate-600 shadow-lg">
-                        <h4 class="font-semibold text-amber-400 mb-4 text-lg tracking-wide">Loan Details</h4>
-                        <div class="grid grid-cols-3 gap-3">
-                            <div class="text-center bg-gradient-to-br from-amber-500/20 to-amber-600/10 rounded-lg p-3 border border-amber-500/30">
-                                <p class="text-xs font-medium text-amber-300 mb-1 uppercase tracking-wide">Loanable Amount</p>
-                                <p class="text-lg font-bold text-white">₱ {{ number_format($loanableAmount ?? 0, 2) }}</p>
+                    <!-- Loan Details + Monthly Payment Breakdown (Horizontal on Desktop) -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                        <!-- Loan Details Card -->
+                        <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl p-6 shadow-lg">
+                            <div class="flex items-center gap-3 mb-5">
+                                <div class="bg-white/20 rounded-full p-3">
+                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <h4 class="text-lg font-bold text-white tracking-wide">Loan Details</h4>
                             </div>
-                            <div class="text-center bg-gradient-to-br from-amber-500/20 to-amber-600/10 rounded-lg p-3 border border-amber-500/30">
-                                <p class="text-xs font-medium text-amber-300 mb-1 uppercase tracking-wide">Processing Fee (10%)</p>
-                                <p class="text-lg font-bold text-white">₱ {{ number_format($processingFee ?? 0, 2) }}</p>
+                            <div class="grid grid-cols-3 gap-4">
+                                <div class="bg-white rounded-xl p-4 shadow">
+                                    <p class="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">Loanable Amount</p>
+                                    <p class="text-xl font-bold text-blue-600">₱ {{ number_format($loanableAmount ?? 0, 2) }}</p>
+                                </div>
+                                <div class="bg-white rounded-xl p-4 shadow">
+                                    <p class="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">Processing Fee</p>
+                                    <p class="text-xl font-bold text-rose-600">₱ {{ number_format($processingFee ?? 0, 2) }}</p>
+                                </div>
+                                <div class="bg-white rounded-xl p-4 shadow">
+                                    <p class="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">Net Amount</p>
+                                    <p class="text-xl font-bold text-emerald-600">₱ {{ number_format($netLoanAmount ?? 0, 2) }}</p>
+                                </div>
                             </div>
-                            <div class="text-center bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 rounded-lg p-3 border border-emerald-500/30">
-                                <p class="text-xs font-medium text-emerald-300 mb-1 uppercase tracking-wide">Net Amount</p>
-                                <p class="text-lg font-bold text-emerald-400">₱ {{ number_format($netLoanAmount ?? 0, 2) }}</p>
+                        </div>
+
+                        <!-- Monthly Payment Card -->
+                        <div class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl p-6 shadow-lg">
+                            <div class="flex items-center gap-3 mb-5">
+                                <div class="bg-white/20 rounded-full p-3">
+                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                </div>
+                                <h4 class="text-lg font-bold text-white tracking-wide">Monthly Payment Breakdown</h4>
+                            </div>
+                            <div class="grid grid-cols-3 gap-4">
+                                <div class="bg-white rounded-xl p-4 shadow">
+                                    <p class="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">Loan Payment</p>
+                                    <p class="text-xl font-bold text-purple-600" id="monthlyLoanPayment">₱ 0.00</p>
+                                </div>
+                                <div class="bg-white rounded-xl p-4 shadow">
+                                    <p class="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">Contract Premium</p>
+                                    <p class="text-xl font-bold text-gray-700">₱ {{ number_format($monthlyContractPremium ?? 0, 2) }}</p>
+                                </div>
+                                <div class="bg-white rounded-xl p-4 shadow">
+                                    <p class="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">Total Monthly Due</p>
+                                    <p class="text-xl font-bold text-amber-600" id="totalMonthlyDue">₱ 0.00</p>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Term Selection -->
-                    <div class="mb-6">
-                        <label for="termMonths" class="block text-sm font-medium text-gray-700 mb-2">
-                            Select Loan Term <span class="text-red-500">*</span>
-                        </label>
-                        <select name="term_months" id="termMonths" required 
-                            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            onchange="calculateMonthlyPayment()">
-                            <option value="">-- Select Term --</option>
-                            <option value="2">2 months</option>
-                            <option value="3">3 months</option>
-                            <option value="6">6 months</option>
-                            <option value="9">9 months</option>
-                            <option value="12" selected>12 months</option>
-                        </select>
-                        <p class="text-sm text-gray-500 mt-1">Interest rate: 1.25% per month</p>
-                    </div>
-
-                    <!-- Monthly Payment Preview -->
-                    <div class="bg-gradient-to-r from-indigo-900 via-purple-900 to-indigo-900 p-5 rounded-xl mb-6 border border-purple-700 shadow-lg">
-                        <h4 class="font-semibold text-purple-300 mb-4 text-lg tracking-wide">Monthly Payment Breakdown</h4>
-                        <div class="grid grid-cols-3 gap-3">
-                            <div class="text-center bg-gradient-to-br from-purple-500/20 to-purple-600/10 rounded-lg p-3 border border-purple-500/30">
-                                <p class="text-xs font-medium text-purple-300 mb-1 uppercase tracking-wide">Loan Payment</p>
-                                <p class="text-lg font-bold text-white" id="monthlyLoanPayment">₱ 0.00</p>
+                    <!-- Select Loan Term (Above Waiver) -->
+                    <div class="bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl p-6 mb-6 shadow-lg">
+                        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                            <div class="flex items-center gap-3">
+                                <div class="bg-white/20 rounded-full p-3">
+                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-lg font-bold text-white tracking-wide">Select Loan Term</h4>
+                                    <p class="text-sm text-white/80">Interest rate: 1.25% per month</p>
+                                </div>
                             </div>
-                            <div class="text-center bg-gradient-to-br from-purple-500/20 to-purple-600/10 rounded-lg p-3 border border-purple-500/30">
-                                <p class="text-xs font-medium text-purple-300 mb-1 uppercase tracking-wide">Contract Premium</p>
-                                <p class="text-lg font-bold text-white">₱ {{ number_format($monthlyContractPremium ?? 0, 2) }}</p>
-                            </div>
-                            <div class="text-center bg-gradient-to-br from-rose-500/20 to-rose-600/10 rounded-lg p-3 border border-rose-500/30">
-                                <p class="text-xs font-medium text-rose-300 mb-1 uppercase tracking-wide">Total Monthly Due</p>
-                                <p class="text-xl font-bold text-rose-400" id="totalMonthlyDue">₱ 0.00</p>
+                            <div class="lg:w-64">
+                                <select name="term_months" id="termMonths" required
+                                    class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-800 font-semibold text-lg focus:outline-none focus:ring-2 focus:ring-amber-400"
+                                    onchange="calculateMonthlyPayment()">
+                                    <option value="">-- Select Term --</option>
+                                    <option value="2">2 months</option>
+                                    <option value="3">3 months</option>
+                                    <option value="6">6 months</option>
+                                    <option value="9">9 months</option>
+                                    <option value="12" selected>12 months</option>
+                                </select>
                             </div>
                         </div>
                     </div>
