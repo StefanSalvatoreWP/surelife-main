@@ -1066,86 +1066,144 @@
                     </div>
                     <div class="p-6">
                         @if($hasLoanRequest && $loanBalance > 0)
-                            <!-- Loan Payment Table -->
-                            <div class="bg-white rounded-lg border border-gray-200 overflow-hidden mb-4">
-                                <table id="loan_paymentsTable" class="table table-hover font-sm w-100">
-                                    <thead class="bg-gradient-to-r from-purple-50 to-indigo-50">
-                                        <tr>
-                                            <th scope="col"
-                                                class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
-                                                No</th>
-                                            <th scope="col"
-                                                class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
-                                                Series Code</th>
-                                            <th scope="col"
-                                                class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
-                                                OR No.</th>
-                                            <th scope="col"
-                                                class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
-                                                Amount Paid</th>
-                                            <th scope="col"
-                                                class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
-                                                Installment</th>
-                                            <th scope="col"
-                                                class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
-                                                Date</th>
-                                            <th scope="col"
-                                                class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
-                                                Status</th>
-                                            <th scope="col"
-                                                class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
-                                                Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($loanPayments as $lp)
-                                            <tr data-void="{{ $lp->status == 'void' ? '1' : '0' }}">
-                                                <td class="px-4 py-3 text-sm text-gray-900">{{ $lp->id }}</td>
-                                                <td class="px-4 py-3 text-sm text-gray-900">{{ $lp->SeriesCode ?? 'N/A' }}</td>
-                                                <td class="px-4 py-3 text-sm text-gray-900">{{ $lp->orno }}</td>
-                                                <td class="px-4 py-3 text-sm text-gray-900">₱ {{ number_format($lp->amount, 2) }}
-                                                </td>
-                                                <td class="px-4 py-3 text-sm text-gray-900">{{ $lp->installment ?? 'N/A' }}</td>
-                                                <td class="px-4 py-3 text-sm text-gray-900">{{ $lp->paymentdate }}</td>
-                                                <td class="px-4 py-3 text-sm text-gray-900">
-                                                    @if($lp->status == 'void')
-                                                        <span
-                                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Void</span>
-                                                    @else
-                                                        <span
-                                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 text-capitalize">{{ $lp->status }}</span>
-                                                    @endif
-                                                </td>
-                                                <td class="px-4 py-3 text-sm text-gray-900">
-                                                    @if($lp->status != 'void')
-                                                        <button
-                                                            class="action-void text-red-600 hover:text-red-900 font-medium cursor-pointer"
-                                                            onclick="showLoanPaymentVoidModal('{{ $lp->id }}', '{{ $lp->orno }}')">Void</button>
-                                                    @else
-                                                        <span class="text-gray-400">Locked</span>
-                                                    @endif
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
+                            <!-- Loan Summary Cards -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                                <!-- Total Loan Amount Card -->
+                                <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="text-sm text-purple-600 font-medium mb-1">Total Loan Amount</p>
+                                            <p class="text-2xl font-bold text-purple-900">₱ {{ number_format($hasLoanRequest->Amount, 2) }}</p>
+                                        </div>
+                                        <div class="bg-purple-200 rounded-full p-3">
+                                            <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Total Paid Card -->
+                                <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="text-sm text-green-600 font-medium mb-1">Total Paid</p>
+                                            <p class="text-2xl font-bold text-green-900">₱ {{ number_format($hasLoanRequest->Amount - $loanBalance, 2) }}</p>
+                                        </div>
+                                        <div class="bg-green-200 rounded-full p-3">
+                                            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Remaining Balance Card -->
+                                <div class="bg-gradient-to-br from-orange-50 to-red-100 rounded-lg p-4 border border-orange-200">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="text-sm text-orange-600 font-medium mb-1">Remaining Balance</p>
+                                            <p class="text-2xl font-bold text-orange-900">₱ {{ number_format($loanBalance, 2) }}</p>
+                                        </div>
+                                        <div class="bg-orange-200 rounded-full p-3">
+                                            <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <a href="/client-addloanpayment/{{ $clients->cid }}"
-                                class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out"
-                                role="button">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                </svg>
-                                Add Payment
-                            </a>
+
+                            <!-- Monthly Due Info -->
+                            <div class="bg-gray-50 rounded-lg p-4 mb-6 flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <svg class="w-5 h-5 text-gray-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <span class="text-gray-600 font-medium">Monthly Due:</span>
+                                </div>
+                                <span class="text-lg font-bold text-gray-800">₱ {{ number_format($hasLoanRequest->MonthlyAmount, 2) }}</span>
+                            </div>
+
+                            <!-- Payment History Table -->
+                            <div class="bg-white rounded-lg border border-gray-200 overflow-hidden mb-6">
+                                <div class="px-4 py-3 bg-gray-50 border-b border-gray-200">
+                                    <h4 class="font-semibold text-gray-700">Payment History</h4>
+                                </div>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full">
+                                        <thead class="bg-gradient-to-r from-purple-50 to-indigo-50">
+                                            <tr>
+                                                <th class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">No</th>
+                                                <th class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">Series Code</th>
+                                                <th class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">OR No.</th>
+                                                <th class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">Amount Paid</th>
+                                                <th class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">Installment</th>
+                                                <th class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">Date</th>
+                                                <th class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">Status</th>
+                                                <th class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-gray-200">
+                                            @foreach($loanPayments as $lp)
+                                                <tr class="hover:bg-gray-50 transition {{ $lp->status == 'void' ? 'bg-red-50 opacity-60' : '' }}">
+                                                    <td class="px-4 py-3 text-sm text-gray-900">{{ $lp->id }}</td>
+                                                    <td class="px-4 py-3 text-sm text-gray-900">{{ $lp->SeriesCode ?? 'N/A' }}</td>
+                                                    <td class="px-4 py-3 text-sm text-gray-900">{{ $lp->orno }}</td>
+                                                    <td class="px-4 py-3 text-sm font-semibold text-gray-900">₱ {{ number_format($lp->amount, 2) }}</td>
+                                                    <td class="px-4 py-3 text-sm text-gray-900">{{ $lp->installment ?? 'N/A' }}</td>
+                                                    <td class="px-4 py-3 text-sm text-gray-900">{{ $lp->paymentdate }}</td>
+                                                    <td class="px-4 py-3 text-sm">
+                                                        @if($lp->status == 'void')
+                                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                                </svg>
+                                                                Void
+                                                            </span>
+                                                        @else
+                                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                                                </svg>
+                                                                Active
+                                                            </span>
+                                                        @endif
+                                                    </td>
+                                                    <td class="px-4 py-3 text-sm">
+                                                        @if($lp->status != 'void')
+                                                            <button class="text-red-600 hover:text-red-800 font-medium hover:underline transition"
+                                                                onclick="showLoanPaymentVoidModal('{{ $lp->id }}', '{{ $lp->orno }}')">
+                                                                Void
+                                                            </button>
+                                                        @else
+                                                            <span class="text-gray-400 italic">Locked</span>
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Add Payment Button - Centered -->
+                            <div class="flex justify-center">
+                                <a href="/client-addloanpayment/{{ $clients->cid }}"
+                                    class="inline-flex items-center px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-200 ease-in-out">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                    </svg>
+                                    Add Payment
+                                </a>
+                            </div>
                         @else
-                            <div class="flex flex-col items-center justify-center py-12">
-                                <svg class="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
-                                <p class="text-gray-500 text-center">No recent loan request available</p>
+                            <div class="flex flex-col items-center justify-center py-16">
+                                <div class="bg-gray-100 rounded-full p-6 mb-4">
+                                    <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                </div>
+                                <p class="text-gray-500 text-center text-lg font-medium">No active loan request</p>
+                                <p class="text-gray-400 text-center text-sm mt-1">Apply for a loan to see payment details here</p>
                             </div>
                         @endif
                     </div>
