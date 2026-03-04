@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Role;
 use App\Models\Branch;
 use App\Models\Client;
+use App\Models\Contract;
 use App\Models\Actions;
 use App\Models\Payment;
 use App\Models\LoanRequest;
@@ -52,53 +53,66 @@ class LoanRequestController extends Controller
 
     public function viewLoanRequest(LoanRequest $loanRequest, Request $request)
     {
-
-        $term = 12;
-
         $clientDetails = Client::where('id', $loanRequest->ClientId)->first();
         $clientBranch = Branch::where('id', $clientDetails->BranchId)->first();
         $clientTerm = PaymentTerm::where('id', $clientDetails->PaymentTermId)->first();
-        $clientInstallments = Payment::where('clientid', $clientDetails->Id)->count();
 
         // Fetch waiver data
         $loanWaiver = LoanWaiver::where('loan_request_id', $loanRequest->Id)->first();
 
-        $annualPaymentAmount = floor($clientTerm->Price * $term) - (floor($clientTerm->Price * $term) * 0.10);
-        $noOfYearsPaid = floor($clientInstallments / $term);
+        // Fetch contract for additional details - try contract_id first, then get from client
+        $contract = null;
+        if ($loanRequest->contract_id) {
+            $contract = Contract::where('Id', $loanRequest->contract_id)->first();
+        }
+        // If no contract record, use client's package/payment data
+        if (!$contract) {
+            $contract = new \stdClass();
+            $contract->packageprice = $clientDetails->PackagePrice ?? $clientDetails->packageprice ?? 0;
+            $contract->paymenttermamount = $clientDetails->PaymentTermAmount ?? $clientDetails->paymenttermamount ?? 0;
+        }
+        
+        $totalPremiumsPaid = Payment::where('clientid', $clientDetails->Id)->sum('amountpaid');
 
-        $totalAnnualPayment = $annualPaymentAmount * $noOfYearsPaid;
-        $totalNumYearsPaid = $noOfYearsPaid * 10;
-        $grossLoanableAmount = $totalAnnualPayment * ($totalNumYearsPaid / 100);
-        $handlingFee = $grossLoanableAmount * 0.10;
-        $netLoanableAmount = $grossLoanableAmount - $handlingFee;
+        // Use saved loan data from database (note: column names are mixed case)
+        $grossLoanableAmount = $loanRequest->Amount ?? 0;
+        $processingFee = $loanRequest->processing_fee ?? 0;
+        $netLoanableAmount = $loanRequest->net_loan_amount ?? 0;
+        $termMonths = $loanRequest->term_months ?? 12;
+        $interestRate = $loanRequest->interest_rate ?? 1.25;
+        $totalRepayable = $loanRequest->total_repayable ?? 0;
+        $monthlyTotalDue = $loanRequest->MonthlyAmount ?? 0;
+        $premiumPaidPercent = $loanRequest->premium_paid_percent ?? 0;
 
-        $noOfMonthPayments = 12;
-        $loanMonthlyDue = $grossLoanableAmount / $noOfMonthPayments;
-        $percentageInterest = 1.25 / 100;
-        $interest = $loanMonthlyDue * $percentageInterest;
-        $monthlyInterest = $interest * $term;
-        $totalMonthlyDue = $loanMonthlyDue + $monthlyInterest;
+        // Calculate derived values for display
+        $totalInterest = $totalRepayable - $grossLoanableAmount;
+        $monthlyLoanPayment = $termMonths > 0 ? $totalRepayable / $termMonths : 0;
+        $monthlyInterest = $termMonths > 0 ? $totalInterest / $termMonths : 0;
+        $contractPrice = $contract->packageprice ?? 0;
+        $monthlyPremium = $contract->paymenttermamount ?? 0;
 
         return view('pages.loanrequest.loanrequest-view', [
-            'term' => $term,
             'loanRequestDetails' => $loanRequest,
             'clientDetails' => $clientDetails,
             'clientBranch' => $clientBranch,
             'clientTerm' => $clientTerm,
-            'annualPaymentAmount' => $annualPaymentAmount,
-            'noOfYearsPaid' => $noOfYearsPaid,
-            'totalAnnualPayment' => $totalAnnualPayment,
-            'totalNumYearsPaid' => $totalNumYearsPaid,
+            'loanWaiver' => $loanWaiver,
+            // Saved loan values from database
             'grossLoanableAmount' => $grossLoanableAmount,
-            'handlingFee' => $handlingFee,
+            'processingFee' => $processingFee,
             'netLoanableAmount' => $netLoanableAmount,
-            'noOfMonthPayments' => $noOfMonthPayments,
-            'loanMonthlyDue' => $loanMonthlyDue,
-            'percentageInterest' => $percentageInterest,
-            'interest' => $interest,
+            'termMonths' => $termMonths,
+            'interestRate' => $interestRate,
+            'totalRepayable' => $totalRepayable,
+            'monthlyTotalDue' => $monthlyTotalDue,
+            'premiumPaidPercent' => $premiumPaidPercent,
+            // Calculated display values
+            'totalInterest' => $totalInterest,
+            'monthlyLoanPayment' => $monthlyLoanPayment,
             'monthlyInterest' => $monthlyInterest,
-            'totalMonthlyDue' => $totalMonthlyDue,
-            'loanWaiver' => $loanWaiver
+            'contractPrice' => $contractPrice,
+            'monthlyPremium' => $monthlyPremium,
+            'totalPremiumsPaid' => $totalPremiumsPaid,
         ]);
     }
 

@@ -122,28 +122,33 @@
             <div class="p-6">
                 <div class="space-y-3">
                     <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                        <span class="text-gray-600">Annual Payment</span>
-                        <span class="font-semibold text-gray-900">₱ {{ number_format($annualPaymentAmount, 2) }}</span>
+                        <span class="text-gray-600">Contract Price</span>
+                        <span class="font-semibold text-gray-900">₱ {{ number_format($contractPrice, 2) }}</span>
                     </div>
                     <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                        <span class="text-gray-600">No. of Years Paid</span>
-                        <span class="font-semibold text-gray-900">{{ $noOfYearsPaid }}</span>
+                        <span class="text-gray-600">Total Premiums Paid</span>
+                        <span class="font-semibold text-gray-900">₱ {{ number_format($totalPremiumsPaid, 2) }}</span>
                     </div>
                     <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                        <span class="text-gray-600">Total Annual Payment</span>
-                        <span class="font-semibold text-gray-900">₱ {{ number_format($totalAnnualPayment, 2) }}</span>
+                        <span class="text-gray-600">Premium Paid Percentage (%)</span>
+                        <span class="font-semibold text-gray-900">{{ $premiumPaidPercent }}%</span>
                     </div>
                     <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                        <span class="text-gray-600">Loanable Percentage (%)</span>
-                        <span class="font-semibold text-gray-900">{{ $totalNumYearsPaid }}</span>
+                        <span class="text-gray-600">Loanable Percentage (Tier)</span>
+                        <span class="font-semibold text-gray-900">
+                            @php
+                                $tierPercentages = [60 => 30, 80 => 40, 100 => 45];
+                                echo ($tierPercentages[$premiumPaidPercent] ?? 0) . '%';
+                            @endphp
+                        </span>
                     </div>
                     <div class="flex justify-between items-center py-2 border-b border-gray-100">
                         <span class="text-gray-600">Gross Loanable Amount</span>
                         <span class="font-semibold text-gray-900">₱ {{ number_format($grossLoanableAmount, 2) }}</span>
                     </div>
                     <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                        <span class="text-red-600">Less: Handling Fee (10%)</span>
-                        <span class="font-semibold text-red-600">₱ {{ number_format($handlingFee, 2) }}</span>
+                        <span class="text-red-600">Less: Processing Fee (10%)</span>
+                        <span class="font-semibold text-red-600">₱ {{ number_format($processingFee, 2) }}</span>
                     </div>
                     <div class="flex justify-between items-center py-3 bg-blue-50 rounded-lg px-3 mt-2">
                         <span class="font-bold text-blue-800">Net Loanable Amount</span>
@@ -165,36 +170,36 @@
                         <span class="font-semibold text-gray-900">₱ {{ number_format($grossLoanableAmount, 2) }}</span>
                     </div>
                     <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                        <span class="text-gray-600">No. of Months of Payment</span>
-                        <span class="font-semibold text-gray-900">{{ $noOfMonthPayments }}</span>
+                        <span class="text-gray-600">Term (Months)</span>
+                        <span class="font-semibold text-gray-900">{{ $termMonths }} months</span>
                     </div>
                     <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                        <span class="text-gray-600">Loan Monthly Due</span>
-                        <span class="font-semibold text-gray-900">₱ {{ number_format($loanMonthlyDue, 2) }}</span>
+                        <span class="text-gray-600">Interest Rate</span>
+                        <span class="font-semibold text-gray-900">{{ $interestRate }}%</span>
                     </div>
                     <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                        <span class="text-gray-600">Percentage of Interest (%)</span>
-                        <span class="font-semibold text-gray-900">{{ $percentageInterest * 100 }}%</span>
+                        <span class="text-gray-600">Total Interest</span>
+                        <span class="font-semibold text-gray-900">₱ {{ number_format($totalInterest, 2) }}</span>
                     </div>
                     <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                        <span class="text-gray-600">Interest</span>
-                        <span class="font-semibold text-gray-900">₱ {{ number_format($interest, 2) }}</span>
+                        <span class="text-gray-600">Total Repayable</span>
+                        <span class="font-semibold text-gray-900">₱ {{ number_format($totalRepayable, 2) }}</span>
                     </div>
                     <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                        <span class="text-gray-600">Term</span>
-                        <span class="font-semibold text-gray-900">{{ $term }} months</span>
+                        <span class="text-gray-600">Monthly Loan Payment</span>
+                        <span class="font-semibold text-gray-900">₱ {{ number_format($monthlyLoanPayment, 2) }}</span>
                     </div>
                     <div class="flex justify-between items-center py-2 border-b border-gray-100">
                         <span class="text-gray-600">Monthly Interest</span>
                         <span class="font-semibold text-gray-900">₱ {{ number_format($monthlyInterest, 2) }}</span>
                     </div>
                     <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                        <span class="text-red-600">Add: Loan Monthly Due</span>
-                        <span class="font-semibold text-red-600">₱ {{ number_format($loanMonthlyDue, 2) }}</span>
+                        <span class="text-gray-600">Monthly Contract Premium</span>
+                        <span class="font-semibold text-gray-900">₱ {{ number_format($monthlyPremium, 2) }}</span>
                     </div>
                     <div class="flex justify-between items-center py-3 bg-green-50 rounded-lg px-3 mt-2">
-                        <span class="font-bold text-green-800">Total Monthly Due (12 months)</span>
-                        <span class="font-bold text-green-800 text-lg">₱ {{ number_format($totalMonthlyDue, 2) }}</span>
+                        <span class="font-bold text-green-800">Total Monthly Due ({{ $termMonths }} months)</span>
+                        <span class="font-bold text-green-800 text-lg">₱ {{ number_format($monthlyTotalDue, 2) }}</span>
                     </div>
                 </div>
             </div>
