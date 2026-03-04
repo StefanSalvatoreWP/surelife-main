@@ -13,19 +13,25 @@ class AddIndexesToPaymentTables extends Migration
      */
     public function up()
     {
-        Schema::table('tblpayment', function (Blueprint $table) {
-            $table->index('clientid', 'idx_payment_clientid');
-            $table->index('orid', 'idx_payment_orid');
-        });
+        if (Schema::hasTable('tblpayment')) {
+            Schema::table('tblpayment', function (Blueprint $table) {
+                $table->index('clientid', 'idx_payment_clientid');
+                $table->index('orid', 'idx_payment_orid');
+            });
+        }
 
-        Schema::table('tblloanrequest', function (Blueprint $table) {
-            $table->index('clientid', 'idx_loanrequest_clientid');
-        });
+        if (Schema::hasTable('tblloanrequest')) {
+            Schema::table('tblloanrequest', function (Blueprint $table) {
+                $table->index('clientid', 'idx_loanrequest_clientid');
+            });
+        }
 
-        Schema::table('tblloanpayment', function (Blueprint $table) {
-            $table->index('clientid', 'idx_loanpayment_clientid');
-            $table->index('loanrequestid', 'idx_loanpayment_requestid');
-        });
+        if (Schema::hasTable('tblloanpayment')) {
+            Schema::table('tblloanpayment', function (Blueprint $table) {
+                $table->index('clientid', 'idx_loanpayment_clientid');
+                $table->index('loanrequestid', 'idx_loanpayment_requestid');
+            });
+        }
     }
 
     /**
@@ -35,18 +41,24 @@ class AddIndexesToPaymentTables extends Migration
      */
     public function down()
     {
-        Schema::table('tblpayment', function (Blueprint $table) {
-            $table->dropIndex('idx_payment_clientid');
-            $table->dropIndex('idx_payment_orid');
-        });
+        if (Schema::hasTable('tblpayment')) {
+            Schema::table('tblpayment', function (Blueprint $table) {
+                $table->dropIndex('idx_payment_clientid');
+                $table->dropIndex('idx_payment_orid');
+            });
+        }
 
-        Schema::table('tblloanrequest', function (Blueprint $table) {
-            $table->dropIndex('idx_loanrequest_clientid');
-        });
+        if (Schema::hasTable('tblloanrequest')) {
+            Schema::table('tblloanrequest', function (Blueprint $table) {
+                $table->dropIndex('idx_loanrequest_clientid');
+            });
+        }
 
-        Schema::table('tblloanpayment', function (Blueprint $table) {
-            $table->dropIndex('idx_loanpayment_clientid');
-            $table->dropIndex('idx_loanpayment_requestid');
-        });
+        if (Schema::hasTable('tblloanpayment')) {
+            Schema::table('tblloanpayment', function (Blueprint $table) {
+                $table->dropIndex('idx_loanpayment_clientid');
+                $table->dropIndex('idx_loanpayment_requestid');
+            });
+        }
     }
 }

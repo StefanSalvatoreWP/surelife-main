@@ -11,8 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('tbluser')) {
+            return;
+        }
         Schema::table('tbluser', function (Blueprint $table) {
-            $table->string('AccessKey', 255)->nullable()->after('RoleId');
+            if (!Schema::hasColumn('tbluser', 'AccessKey')) {
+                $table->string('AccessKey', 255)->nullable()->after('RoleId');
+            }
         });
     }
 
@@ -21,8 +26,11 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (!Schema::hasTable('tbluser')) {
+            return;
+        }
         Schema::table('tbluser', function (Blueprint $table) {
-            //
+            $table->dropColumn(['AccessKey']);
         });
     }
 };

@@ -10,9 +10,16 @@ return new class extends Migration {
      */
     public function up(): void
     {
+        if (!Schema::hasTable('tblclient')) {
+            return;
+        }
         Schema::table('tblclient', function (Blueprint $table) {
-            $table->string('principalbeneficiaryrelation')->nullable()->after('principalbeneficiaryage');
-            $table->string('principalbeneficiaryid_path')->nullable()->after('principalbeneficiaryrelation');
+            if (!Schema::hasColumn('tblclient', 'principalbeneficiaryrelation')) {
+                $table->string('principalbeneficiaryrelation')->nullable()->after('principalbeneficiaryage');
+            }
+            if (!Schema::hasColumn('tblclient', 'principalbeneficiaryid_path')) {
+                $table->string('principalbeneficiaryid_path')->nullable()->after('principalbeneficiaryrelation');
+            }
         });
     }
 
@@ -21,6 +28,9 @@ return new class extends Migration {
      */
     public function down(): void
     {
+        if (!Schema::hasTable('tblclient')) {
+            return;
+        }
         Schema::table('tblclient', function (Blueprint $table) {
             $table->dropColumn(['principalbeneficiaryrelation', 'principalbeneficiaryid_path']);
         });

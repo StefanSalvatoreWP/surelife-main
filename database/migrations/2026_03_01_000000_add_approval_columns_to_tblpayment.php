@@ -13,6 +13,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('tblpayment')) {
+            return;
+        }
         // Check if columns exist before adding them
         $columns = DB::select("SHOW COLUMNS FROM tblpayment");
         $columnNames = array_map(fn($col) => $col->Field, $columns);
@@ -45,6 +48,9 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (!Schema::hasTable('tblpayment')) {
+            return;
+        }
         Schema::table('tblpayment', function (Blueprint $table) {
             $table->dropColumn(['approval_status', 'approved_by', 'approved_at', 'approval_remarks']);
         });
