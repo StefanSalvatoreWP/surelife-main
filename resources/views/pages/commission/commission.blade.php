@@ -9,17 +9,17 @@
                 View commissions based on payments made by clients.
             </div>
             @if(session('error'))
-                <div class="alert alert-danger">
-                    {{ session('error') }}
-                </div>
+                @push('scripts')
+                    <script>showSwiftModal('Error', '{{ session('error') }}');</script>
+                @endpush
             @elseif(session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
+                @push('scripts')
+                    <script>showSwiftModal('Success!', '{{ session('success') }}');</script>
+                @endpush
             @elseif(session('warning'))
-                <div class="alert alert-warning">
-                    {{ session('warning') }}
-                </div>
+                @push('scripts')
+                    <script>showSwiftModal('Warning', '{{ session('warning') }}');</script>
+                @endpush
             @endif
             <div class="d-flex">
                 <button id="request-cancel-btn" onclick="showSwiftModal('Cancel Requests', 'Cancel all requests?', 'warning', [{text: 'Confirm', class: 'bg-red-500 hover:bg-red-600 text-white', action: 'submitCancelComsRequest()'}, {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}])" class="btn btn-outline-danger btn-sm me-2">Cancel</button>

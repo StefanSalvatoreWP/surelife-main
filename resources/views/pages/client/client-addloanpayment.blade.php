@@ -1,113 +1,134 @@
-<!-- 2023 SilverDust) S. Maceren --> 
+<!-- 2023 SilverDust) S. Maceren -->
 @extends('layouts.main')
 
 @section('content')
-    <div class="m-3">
-        <div class="bg-white p-3">
-            <h3 class="text-dark">New Loan Payment ( {{ $clients->LastName . ', ' . $clients->FirstName }} )</h3>
-            <div class="alert alert-dark mb-3" role="alert">
-                Create a new loan payment for the selected client.
-            </div>
-            @if(session('duplicate'))
-                <div class="alert alert-danger">
-                    {{ session('duplicate') }}
+    <div class="max-w-4xl mx-auto p-6">
+        <!-- Header -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
+            <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-indigo-50">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            New Loan Payment
+                        </h3>
+                        <p class="text-sm text-gray-500 mt-1">{{ $clients->LastName . ', ' . $clients->FirstName }}</p>
+                    </div>
+                    <a href="/client-view/{{ $clients->Id }}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        Back
+                    </a>
                 </div>
-            @endif
-            <a href="/client-view/{{ $clients->Id }}" class="btn btn-outline-secondary btn-sm" role="button">Return</a>
-        </div>
-        <div class="bg-white mt-3 p-3 w-50">
-            <div class="card">
-                <form class="m-3" action="/client-submit-loanpayment/{{ $clients->Id }}" method="POST">
-                    @csrf
-                    <div class="mb-3">
-                        <input type="hidden" name="clientbranch" value={{ $clients->BranchId }} />
-                        <input type="hidden" name="clientregion" value={{ $clients->RegionId }} />
-
-                        <div class="row">
-                            <div class="col">
-                                <label for="totalLoanAmount" class="form-label">Total Loan Amount</label>
-                                <input type="text" class="form-control font-sm" id="orSeriesCode" name="orseriescode" maxlength="30" value="{{ $loanRequestData->Amount }}" disabled />
-                            </div>
-                            <div class="col">
-                                <label for="totalLoanAmount" class="form-label">Loan Balance</label>
-                                <input type="text" class="form-control font-sm" id="orSeriesCode" name="orseriescode" maxlength="30" value="{{ $loanBalance }}" disabled />
-                            </div>
-                        </div>          
-                    </div>
-                    <div class="mb-3">
-                        <div class="row">
-                            <div class="col">
-                                <label for="paymentAmount" class="form-label">Payment Amount</label>
-                                <select class="form-control font-sm" id="paymentAmount" name="paymentamount">
-                                    @php
-                                        $selectedPaymentAmount = old('paymentamount');
-                                    @endphp
-                                    @foreach($amounts as $amount)
-                                        <option value="{{ $amount }}">{{ $amount }}</option>
-                                    @endforeach
-                                </select>
-                                @error('paymentamount')
-                                    <p class="text-danger">{{ $message }}</p>
-                                @enderror
-                            </div>
-                            <div class="col">
-                                <label for="paymentMethod" class="form-label">Payment Method</label>
-                                <select class="form-control font-sm" id="paymentMethod" name="paymentmethod">
-                                    @php
-                                        $selectedPaymentMethod = old('paymentmethod');
-                                    @endphp
-                                    <option value="Cash" {{ $selectedPaymentMethod === 'Cash' ? 'selected' : '' }}>Cash</option>
-                                </select>
-                                @error('paymentmethod')
-                                    <p class="text-danger">{{ $message }}</p>
-                                @enderror
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <div class="row">
-                            <div class="col">
-                                @php 
-                                    $prevOrSeriesCode = old('orseriescode'); 
-                                @endphp
-                                <label for="orSeriesCode" class="form-label">O.R Series Code</label>
-                                <input type="text" class="form-control font-sm" id="orSeriesCode" name="orseriescode" maxlength="30" value="{{ $prevOrSeriesCode }}" />
-                                    @error('orseriescode')
-                                        <p class="text-danger">{{ $message }}</p>
-                                    @enderror
-                            </div>
-                            <div class="col">
-                                @php 
-                                    $prevOrNo = old('orno'); 
-                                @endphp
-                                <label for="orNo" class="form-label">O.R No.</label>
-                                <input type="text" class="form-control font-sm" id="orNo" name="orno" maxlength="30" value="{{ $prevOrNo }}" />
-                                    @error('orno')
-                                        <p class="text-danger">{{ $message }}</p>
-                                    @enderror
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <div class="row">       
-                            <div class="col">
-                                @php
-                                    $prevPaymentDate = old('paymentdate');
-                                @endphp
-                                <label for="paymentDate" class="form-label">Payment Date</label>
-                                <input type="date" class="form-control font-sm" id="paymentDate" name="paymentdate" maxlength="30" value="{{ $prevPaymentDate }}" />
-                                    @error('paymentdate')
-                                    <p class="text-danger">{{ $message }}</p>
-                                    @enderror
-                            </div>
-                            <div class="col"></div>
-                        </div>
-                    </div>
-                    <div class="text-center">
-                        <button type="submit" class="btn btn-success btn-sm w-25 mt-3">Submit</button>
-                    </div>
-                </form>
             </div>
+        </div>
+
+        @if(session('duplicate'))
+            @push('scripts')
+                <script>
+                    showSwiftModal('Error', '{{ session('duplicate') }}');
+                </script>
+            @endpush
+        @endif
+
+        <!-- Loan Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-purple-600 font-medium mb-1">Total Loan Amount</p>
+                        <p class="text-2xl font-bold text-purple-900">₱ {{ number_format($loanRequestData->Amount, 2) }}</p>
+                    </div>
+                    <div class="bg-purple-200 rounded-full p-3">
+                        <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gradient-to-br from-orange-50 to-red-100 rounded-lg p-4 border border-orange-200">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-orange-600 font-medium mb-1">Loan Balance</p>
+                        <p class="text-2xl font-bold text-orange-900">₱ {{ number_format($loanBalance, 2) }}</p>
+                    </div>
+                    <div class="bg-orange-200 rounded-full p-3">
+                        <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Form -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                <h4 class="font-semibold text-gray-700">Payment Details</h4>
+            </div>
+            <form action="/client-submit-loanpayment/{{ $clients->Id }}" method="POST" class="p-6">
+                @csrf
+                <input type="hidden" name="clientbranch" value="{{ $clients->BranchId }}" />
+                <input type="hidden" name="clientregion" value="{{ $clients->RegionId }}" />
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <!-- Payment Amount -->
+                    <div>
+                        <label for="paymentAmount" class="block text-sm font-medium text-gray-700 mb-2">Payment Amount</label>
+                        <select class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition" id="paymentAmount" name="paymentamount">
+                            @php $selectedPaymentAmount = old('paymentamount'); @endphp
+                            @foreach($amounts as $amount)
+                                <option value="{{ $amount }}" {{ $selectedPaymentAmount == $amount ? 'selected' : '' }}>₱ {{ number_format($amount, 2) }}</option>
+                            @endforeach
+                        </select>
+                        @error('paymentamount')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
+                    </div>
+
+                    <!-- Payment Method -->
+                    <div>
+                        <label for="paymentMethod" class="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
+                        <select class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition" id="paymentMethod" name="paymentmethod">
+                            @php $selectedPaymentMethod = old('paymentmethod'); @endphp
+                            <option value="Cash" {{ $selectedPaymentMethod === 'Cash' ? 'selected' : '' }}>Cash</option>
+                        </select>
+                        @error('paymentmethod')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
+                    </div>
+
+                    <!-- O.R Series Code -->
+                    <div>
+                        <label for="orSeriesCode" class="block text-sm font-medium text-gray-700 mb-2">O.R Series Code</label>
+                        <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition" id="orSeriesCode" name="orseriescode" maxlength="30" value="{{ old('orseriescode') }}" placeholder="Enter series code" />
+                        @error('orseriescode')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
+                    </div>
+
+                    <!-- O.R No. -->
+                    <div>
+                        <label for="orNo" class="block text-sm font-medium text-gray-700 mb-2">O.R No.</label>
+                        <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition" id="orNo" name="orno" maxlength="30" value="{{ old('orno') }}" placeholder="Enter O.R number" />
+                        @error('orno')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
+                    </div>
+
+                    <!-- Payment Date -->
+                    <div class="md:col-span-2">
+                        <label for="paymentDate" class="block text-sm font-medium text-gray-700 mb-2">Payment Date</label>
+                        <input type="date" class="w-full md:w-1/2 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition" id="paymentDate" name="paymentdate" value="{{ old('paymentdate') }}" />
+                        @error('paymentdate')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="flex justify-center pt-4 border-t border-gray-200">
+                    <button type="submit" class="inline-flex items-center px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-200 ease-in-out">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Submit Payment
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 @endsection

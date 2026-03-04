@@ -72,8 +72,26 @@ class TestClientSeeder extends Seeder
                 'SeriesCode' => 'TEST',
                 'RegionId' => $region->Id,
                 'BranchId' => $branch->Id,
+                'Type' => '1', // Payment type
             ]);
             $orBatch = DB::table('tblorbatch')->find($orBatchId);
+        }
+
+        // Step 6.5: Create Official Receipt records for loan payment validation
+        $existingORs = DB::table('tblofficialreceipt')
+            ->where('orbatchid', $orBatch->Id)
+            ->count();
+        
+        if ($existingORs == 0) {
+            // Create OR numbers 10001-10100 for payments
+            for ($i = 10001; $i <= 10100; $i++) {
+                DB::table('tblofficialreceipt')->insert([
+                    'orbatchid' => $orBatch->Id,
+                    'ornumber' => (string)$i,
+                    'status' => '1', // Available
+                    'type' => '1', // Payment type
+                ]);
+            }
         }
 
         // Step 7: Create Various Payments

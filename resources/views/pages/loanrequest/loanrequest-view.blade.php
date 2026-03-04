@@ -56,6 +56,12 @@
                 </svg>
                 Return
             </a>
+            <a href="/client-view/{{ $clientDetails->Id }}" class="inline-flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-700 text-white text-sm font-medium rounded transition-colors min-h-[44px]">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                </svg>
+                View Client
+            </a>
             @if($loanRequestDetails->Status == 'Pending')
                 <button onclick="showLoanRequestModal('{{ $loanRequestDetails->Id }}', 'verify')" class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-700 text-white text-sm font-medium rounded transition-colors min-h-[44px]">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -279,7 +285,7 @@
     function submitLoanRequest(loanReqId) {
         const form = document.createElement('form');
         form.method = 'POST';
-        form.action = '/submit-loan-request-approval/' + loanReqId;
+        form.action = '/submit-req-loan/' + loanReqId;
         
         const csrfToken = document.createElement('input');
         csrfToken.type = 'hidden';

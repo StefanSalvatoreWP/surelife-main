@@ -9,17 +9,17 @@
                 Manage privilege levels.
             </div>
             @if(session('error'))
-                <div class="alert alert-danger">
-                    {{ session('error') }}
-                </div>
+                @push('scripts')
+                    <script>showSwiftModal('Error', '{{ session('error') }}');</script>
+                @endpush
             @elseif(session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
+                @push('scripts')
+                    <script>showSwiftModal('Success!', '{{ session('success') }}');</script>
+                @endpush
             @elseif(session('warning'))
-                <div class="alert alert-warning">
-                    {{ session('warning') }}
-                </div>
+                @push('scripts')
+                    <script>showSwiftModal('Warning', '{{ session('warning') }}');</script>
+                @endpush
             @endif
             <a href="/privilege-create" class="btn btn-outline-primary btn-sm" role="button">Create new branch</a>
         </div>

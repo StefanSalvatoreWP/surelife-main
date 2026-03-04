@@ -9,17 +9,17 @@
                 View selected encashment request.
             </div>
             @if(session('error'))
-                <div class="alert alert-danger">
-                    {{ session('error') }}
-                </div>
+                @push('scripts')
+                    <script>showSwiftModal('Error', '{{ session('error') }}');</script>
+                @endpush
             @elseif(session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
+                @push('scripts')
+                    <script>showSwiftModal('Success!', '{{ session('success') }}');</script>
+                @endpush
             @elseif(session('warning'))
-                <div class="alert alert-warning">
-                    {{ session('warning') }}
-                </div>
+                @push('scripts')
+                    <script>showSwiftModal('Warning', '{{ session('warning') }}');</script>
+                @endpush
             @endif
             <div class="d-flex">
                 <a href="/req-encashments" class="btn btn-outline-secondary btn-sm" role="button">Return</a>

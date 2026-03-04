@@ -9,9 +9,9 @@
                 Add incentives and adjustments to the encashment request.
             </div>
             @if(session('duplicate'))
-                <div class="alert alert-danger">
-                    {{ session('duplicate') }}
-                </div>
+                @push('scripts')
+                    <script>showSwiftModal('Error', '{{ session('duplicate') }}');</script>
+                @endpush
             @endif
             <a href="/view-req-encashment/{{ $encashmentData->Id }}" class="btn btn-outline-secondary btn-sm" role="button">Return</a>
         </div>

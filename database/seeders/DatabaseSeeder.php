@@ -16,13 +16,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             AddressSeeder::class,
             ReferenceTablesSeeder::class, // Ensure reference tables are always populated
+            TestClientSeeder::class, // Test accounts with OR records for loan testing
         ]);
-        
-        // Test data seeders (optional - only for development/testing)
-        // Uncomment below if you need test data
-        // $this->call([
-        //     TestClientSeeder::class,
-        //     TestUsersSeeder::class,
-        // ]);
     }
 }
