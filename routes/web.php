@@ -39,6 +39,7 @@ use App\Http\Controllers\EncashmentReqController;
 use App\Http\Controllers\OfficialReceiptController;
 use App\Http\Controllers\ExpenseDescriptionController;
 use App\Http\Controllers\AddressController;
+use App\Http\Controllers\ChangelogController;
 
 /*
 |--------------------------------------------------------------------------
@@ -54,21 +55,21 @@ use App\Http\Controllers\AddressController;
 /* 2023 SilverDust) S. Maceren */
 
 /* ----- LOGIN -----*/
-Route::get('/', function () {
-    return view('pages.login');
-});
+Route::middleware('guest')->group(function () {
+    Route::get('/', function () {
+        return view('pages.login');
+    });
 
-Route::get('/login', function () {
-    return view('pages.login');
+    Route::get('/login', function () {
+        return view('pages.login');
+    });
 });
 
 Route::post('/logout', [UserController::class, 'logout']);
 Route::post('/login', [UserController::class, 'login']);
 
 /* ----- HOME -----*/
-Route::get('/home', function () {
-    return view('pages.home');
-});
+Route::get('/home', [ChangelogController::class, 'index']);
 
 /* ----- DASHBOARD -----*/
 Route::get('/dashboard', [DashboardController::class, 'getDashboard']);
