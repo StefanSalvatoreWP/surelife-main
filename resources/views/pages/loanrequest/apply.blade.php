@@ -9,9 +9,13 @@
             Apply for a loan based on your premium payments. Minimum 60% premiums paid required.
         </div>
         @if(session('error'))
-            <div class="alert alert-danger">{{ session('error') }}</div>
+            @push('scripts')
+                <script>showSwiftModal('Error', '{{ session('error') }}');</script>
+            @endpush
         @elseif(session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
+            @push('scripts')
+                <script>showSwiftModal('Success!', '{{ session('success') }}');</script>
+            @endpush
         @endif
     </div>
 

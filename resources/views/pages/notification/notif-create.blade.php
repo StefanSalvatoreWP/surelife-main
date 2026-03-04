@@ -9,13 +9,13 @@
                 Send notifications to staffs or clients.
             </div>
             @if(session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
+                @push('scripts')
+                    <script>showSwiftModal('Success!', '{{ session('success') }}');</script>
+                @endpush
             @elseif(session('error'))
-                <div class="alert alert-danger">
-                    {{ session('error') }}
-                </div>
+                @push('scripts')
+                    <script>showSwiftModal('Error', '{{ session('error') }}');</script>
+                @endpush
             @endif
         </div>
         <div class="bg-white mt-3 p-3 w-50">
