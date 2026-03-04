@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Sms;
 use App\Models\Client;
+use App\Models\Branch;
 use App\Models\OrBatch;
 use App\Models\Payment;
 use App\Models\Encashment;
@@ -39,9 +40,11 @@ class PaymentController extends Controller
                     'tblclient.LastName',
                     'tblclient.FirstName',
                     'tblclient.MiddleName',
-                    'tblclient.ContractNumber'
+                    'tblclient.ContractNumber',
+                    'tblbranch.BranchName'
                 )
-                ->leftJoin('tblclient', 'tblpayment.clientid', '=', 'tblclient.id');
+                ->leftJoin('tblclient', 'tblpayment.clientid', '=', 'tblclient.id')
+                ->leftJoin('tblbranch', 'tblclient.branchid', '=', 'tblbranch.id');
 
             return DataTables::of($query)
                 ->filter(function ($query) use ($request) {
@@ -60,11 +63,16 @@ class PaymentController extends Controller
                             $query->where('tblclient.LastName', 'like', "$searchTerm%");
                         }
                     }
+
+                    if (!empty($request->input('branch'))) {
+                        $query->where('tblbranch.BranchName', $request->input('branch'));
+                    }
                 })
                 ->toJson();
         }
+        $branches = Branch::orderBy("branchname", "asc")->get();
 
-        return view('pages.payment.payment');
+        return view('pages.payment.payment', ['branches' => $branches]);
     }
 
     // search payment history - selected client
@@ -312,19 +320,19 @@ class PaymentController extends Controller
 
             // Check if client has Spotcash payment term - requires approval
             $isSpotCash = $this->isSpotCashClient($client->Id);
-            
+
             if ($isSpotCash) {
                 // For Spotcash payments, set approval status to Pending
                 $insertPaymentData['approval_status'] = 'Pending';
                 $insertPaymentData['approved_by'] = null;
                 $insertPaymentData['approved_at'] = null;
                 $insertPaymentData['approval_remarks'] = null;
-                
+
                 // Do NOT mark OR as used yet - wait for approval
                 Payment::insert($insertPaymentData);
-                
+
                 Log::channel('activity')->info('[StaffID] ' . session('user_id') . ' [Menu] Payment ' . '[Action] Insert Spot Cash Pending Approval ' . '[Target] ' . $client->Id);
-                
+
                 return redirect('/client-view/' . $client->Id)->with('info', 'Spot cash payment submitted for approval. An approver or admin must approve this payment before it is processed.');
             }
 
@@ -850,7 +858,8 @@ class PaymentController extends Controller
     private function isSpotCashClient($clientId)
     {
         $client = Client::select('PaymentTermId')->where('id', $clientId)->first();
-        if (!$client) return false;
+        if (!$client)
+            return false;
 
         $paymentTerm = PaymentTerm::select('Term')->where('Id', $client->PaymentTermId)->first();
         return $paymentTerm && ($paymentTerm->Term === 'Spotcash' || $paymentTerm->Term === 'Spot-Cash');
@@ -875,9 +884,9 @@ class PaymentController extends Controller
             )
             ->leftJoin('tblclient', 'tblpayment.clientid', '=', 'tblclient.id')
             ->where('tblpayment.approval_status', 'Pending')
-            ->where(function($q) {
+            ->where(function ($q) {
                 $q->where('tblpayment.voidstatus', '<>', 1)
-                  ->orWhereNull('tblpayment.voidstatus');
+                    ->orWhereNull('tblpayment.voidstatus');
             })
             ->orderBy('tblpayment.datecreated', 'desc');
 
