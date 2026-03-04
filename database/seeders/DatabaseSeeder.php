@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -12,11 +11,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Address data seeder - runs first to populate Philippine address data
+        // Essential seeders
         $this->call([
             AddressSeeder::class,
-            ReferenceTablesSeeder::class, // Ensure reference tables are always populated
-            TestClientSeeder::class, // Test accounts with OR records for loan testing
+            ReferenceTablesSeeder::class,
+            LoanMenuSeeder::class,
+            TestClientSeeder::class,
         ]);
     }
 }
