@@ -185,7 +185,30 @@ class LoanRequestController extends Controller
         \Log::info('=== LOAN REQUEST SUBMISSION ===');
         \Log::info('Client ID: ' . $client->Id);
         \Log::info('Request data: ' . json_encode($request->all()));
-        
+
+        // Check client status eligibility per supervisor rule
+        // Status: 1=Pending, 2=Verified, 3=Approved/Active
+        if ($client->Status == '1') {
+            \Log::warning('Client status is Pending - not eligible for loan');
+            return back()->with('error', 'Pending clients are not eligible for loan. Please wait for account verification.');
+        }
+
+        // Check if client is lapsed (91+ days overdue for Approved clients)
+        if ($client->Status == '3') {
+            $lastPayment = Payment::where('clientid', $client->Id)
+                ->whereNotNull('paymentdate')
+                ->orderBy('paymentdate', 'desc')
+                ->first();
+
+            if ($lastPayment) {
+                $daysSinceLastPayment = now()->diffInDays($lastPayment->paymentdate);
+                if ($daysSinceLastPayment > 91) {
+                    \Log::warning('Client is lapsed (' . $daysSinceLastPayment . ' days since last payment) - not eligible');
+                    return back()->with('error', 'Lapsed clients are not eligible for loan. Please settle overdue payments first.');
+                }
+            }
+        }
+
         // Get contract data - use client's own contract info if no separate contract record
         $contract = \App\Models\Contract::where('clientid', $client->Id)->first();
         

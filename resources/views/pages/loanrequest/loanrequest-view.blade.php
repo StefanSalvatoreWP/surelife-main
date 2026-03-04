@@ -279,7 +279,7 @@
     function submitLoanRequest(loanReqId) {
         const form = document.createElement('form');
         form.method = 'POST';
-        form.action = '/submit-loan-request-approval/' + loanReqId;
+        form.action = '/submit-req-loan/' + loanReqId;
         
         const csrfToken = document.createElement('input');
         csrfToken.type = 'hidden';

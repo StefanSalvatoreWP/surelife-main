@@ -346,8 +346,8 @@ class ClientController extends Controller
 
         // loan payments
         $hasLoanRequest = LoanRequest::query()
-            ->where('clientid', $client->Id)
-            ->where('status', 'Approved')
+            ->where('ClientId', $client->Id)
+            ->where('Status', 'Approved')
             ->where('remarks', '<>', 'Completed')
             ->first();
 
@@ -361,12 +361,12 @@ class ClientController extends Controller
                 )
                 ->leftJoin('tblofficialreceipt', 'tblloanpayment.orid', '=', 'tblofficialreceipt.id')
                 ->leftJoin('tblorbatch', 'tblofficialreceipt.orbatchid', '=', 'tblorbatch.id')
-                ->where('tblloanpayment.clientid', $hasLoanRequest->clientid)
-                ->where('tblloanpayment.loanrequestid', $hasLoanRequest->id)
+                ->where('tblloanpayment.clientid', $hasLoanRequest->ClientId)
+                ->where('tblloanpayment.loanrequestid', $hasLoanRequest->Id)
                 ->get();
 
             $totalLoanPayments = $loanPayments->sum('amount');
-            $loanBalance = $hasLoanRequest->amount - $totalLoanPayments;
+            $loanBalance = $hasLoanRequest->Amount - $totalLoanPayments;
         }
 
         // get details of the assigned member from the client
@@ -449,8 +449,8 @@ class ClientController extends Controller
 
             // get loan payments data
             $hasLoanRequest = LoanRequest::query()
-                ->where('clientid', $client->Id)
-                ->where('status', 'Approved')
+                ->where('ClientId', $client->Id)
+                ->where('Status', 'Approved')
                 ->where('remarks', '<>', 'Completed')
                 ->first();
 
