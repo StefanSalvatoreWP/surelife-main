@@ -1,4 +1,4 @@
-<!-- 2023 SilverDust) S. Maceren --> 
+<!-- 2024 SilverDust) S. Maceren -->
 @extends('layouts.main')
 
 @section('content')
@@ -13,110 +13,145 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                         </svg>
                         <h2 class="text-xl font-bold text-white">What's New?</h2>
-                        <span class="ml-auto bg-blue-500 text-white text-xs font-semibold px-3 py-1 rounded-full">v1.7.0</span>
+                        @if($latestVersion ?? null)
+                            <span class="ml-auto bg-blue-500 text-white text-xs font-semibold px-3 py-1 rounded-full">v{{ $latestVersion['version'] }}</span>
+                        @endif
                     </div>
                 </div>
                 
-                <div class="p-6">
-                    <div class="space-y-4">
-                        <!-- Activity Log -->
-                        <div class="flex items-start space-x-3 p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition duration-200">
-                            <div class="flex-shrink-0 mt-1">
-                                <div class="w-2 h-2 bg-blue-600 rounded-full"></div>
-                            </div>
-                            <div>
-                                <h3 class="font-semibold text-gray-900">Activity Log</h3>
-                                <p class="text-sm text-gray-600 mt-1">This feature logs every action on the server, allowing for the identification of who performed each action within the system.</p>
-                            </div>
+                <div class="p-6 max-h-[500px] overflow-y-auto">
+                    @if($error ?? false)
+                        <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
+                            <p class="text-red-700">{{ $error }}</p>
                         </div>
-
-                        <!-- Loan Admin View -->
-                        <div class="flex items-start space-x-3 p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition duration-200">
-                            <div class="flex-shrink-0 mt-1">
-                                <div class="w-2 h-2 bg-blue-600 rounded-full"></div>
-                            </div>
-                            <div>
-                                <h3 class="font-semibold text-gray-900">Loan (Admin View)</h3>
-                                <p class="text-sm text-gray-600 mt-1">New feature where admins manage loan requests.</p>
-                            </div>
-                        </div>
-
-                        <!-- Loan Client View -->
-                        <div class="flex items-start space-x-3 p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition duration-200">
-                            <div class="flex-shrink-0 mt-1">
-                                <div class="w-2 h-2 bg-blue-600 rounded-full"></div>
-                            </div>
-                            <div>
-                                <h3 class="font-semibold text-gray-900">Loan (Client View)</h3>
-                                <p class="text-sm text-gray-600 mt-1">New feature where eligible clients can make loan requests.</p>
-                            </div>
-                        </div>
-
-                        <!-- Completed Memorial -->
-                        <div class="flex items-start space-x-3 p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition duration-200">
-                            <div class="flex-shrink-0 mt-1">
-                                <div class="w-2 h-2 bg-blue-600 rounded-full"></div>
-                            </div>
-                            <div>
-                                <h3 class="font-semibold text-gray-900">Completed Memorial</h3>
-                                <p class="text-sm text-gray-600 mt-1">This action marks the selected client's memorial plan as served.</p>
-                            </div>
-                        </div>
-
-                        <!-- Certificate of Full Payment -->
-                        <div class="flex items-start space-x-3 p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition duration-200">
-                            <div class="flex-shrink-0 mt-1">
-                                <div class="w-2 h-2 bg-blue-600 rounded-full"></div>
-                            </div>
-                            <div>
-                                <h3 class="font-semibold text-gray-900">Certificate of Full Payment</h3>
-                                <p class="text-sm text-gray-600 mt-1">Added <span class="font-bold text-gray-700">"Not valid without seal"</span> text.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Bug Fixes Section -->
-                    <div class="mt-8">
-                        <div class="flex items-center space-x-2 mb-4">
-                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            <h3 class="text-lg font-bold text-gray-900">Bug Fixes</h3>
-                            <span class="bg-green-100 text-green-800 text-xs font-semibold px-2 py-1 rounded">v1.7.1</span>
-                        </div>
-                        
-                        <div class="space-y-3">
-                            <div class="flex items-start space-x-3 p-3 bg-green-50 rounded-lg">
-                                <svg class="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                                </svg>
-                                <div>
-                                    <h4 class="font-semibold text-sm text-gray-900">Client View</h4>
-                                    <p class="text-xs text-gray-600 mt-0.5">Selected tab will remain active when performing actions instead of returning to the 'Client Information'.</p>
+                    @elseif(empty($changelog))
+                        <p class="text-gray-500 text-center py-8">No changelog entries available.</p>
+                    @else
+                        @foreach($changelog as $version)
+                            <!-- Version Section -->
+                            <div class="{{ $loop->first ? '' : 'mt-8 pt-6 border-t border-gray-200' }}">
+                                
+                                <!-- Version Header -->
+                                <div class="flex items-center space-x-2 mb-4">
+                                    @if($loop->first)
+                                        <span class="bg-green-100 text-green-800 text-xs font-semibold px-2 py-1 rounded">Latest</span>
+                                    @endif
+                                    <h3 class="text-base font-bold text-gray-900">
+                                        @if($version['version'] === 'Unreleased')
+                                            Coming Soon
+                                        @else
+                                            v{{ $version['version'] }}
+                                        @endif
+                                    </h3>
+                                    @if($version['date'])
+                                        <span class="text-xs text-gray-400">{{ $version['date'] }}</span>
+                                    @endif
                                 </div>
-                            </div>
 
-                            <div class="flex items-start space-x-3 p-3 bg-green-50 rounded-lg">
-                                <svg class="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                                </svg>
-                                <div>
-                                    <h4 class="font-semibold text-sm text-gray-900">Payment History</h4>
-                                    <p class="text-xs text-gray-600 mt-0.5">Fixed issues where void payments is not displayed when selected.</p>
-                                </div>
-                            </div>
+                                <!-- Added Section -->
+                                @if(isset($version['sections']['added']) && !empty($version['sections']['added']))
+                                    <div class="space-y-3 mb-4">
+                                        @foreach($version['sections']['added'] as $item)
+                                            <div class="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg {{ $loop->first ? '' : 'hover:bg-blue-100 transition duration-200' }}">
+                                                <div class="flex-shrink-0 mt-1">
+                                                    <div class="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                                </div>
+                                                <div>
+                                                    @if($item['has_bold'] ?? false)
+                                                        <h4 class="font-semibold text-sm text-gray-900">{{ $item['title'] }}</h4>
+                                                        <p class="text-xs text-gray-600 mt-0.5">{{ $item['description'] }}</p>
+                                                    @else
+                                                        <p class="text-xs text-gray-700">{!! $item['description'] !!}</p>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
 
-                            <div class="flex items-start space-x-3 p-3 bg-green-50 rounded-lg">
-                                <svg class="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                                </svg>
-                                <div>
-                                    <h4 class="font-semibold text-sm text-gray-900">Statement of Accounts (SOA)</h4>
-                                    <p class="text-xs text-gray-600 mt-0.5">Fixed issues where void payments is still visible under payments history.</p>
-                                </div>
+                                <!-- Changed Section -->
+                                @if(isset($version['sections']['changed']) && !empty($version['sections']['changed']))
+                                    <div class="mb-4">
+                                        <div class="flex items-center space-x-2 mb-2">
+                                            <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                            </svg>
+                                            <span class="text-xs font-semibold text-amber-700">Improvements</span>
+                                        </div>
+                                        <div class="space-y-2 ml-6">
+                                            @foreach($version['sections']['changed'] as $item)
+                                                <div class="flex items-start space-x-2 p-2 bg-amber-50 rounded">
+                                                    <span class="text-amber-400">—</span>
+                                                    <p class="text-xs text-gray-600">
+                                                        @if($item['has_bold'] ?? false)
+                                                            <strong class="font-medium text-gray-800">{{ $item['title'] }}</strong> — {{ $item['description'] }}
+                                                        @else
+                                                            {!! $item['description'] !!}
+                                                        @endif
+                                                    </p>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endif
+
+                                <!-- Fixed Section -->
+                                @if(isset($version['sections']['fixed']) && !empty($version['sections']['fixed']))
+                                    <div class="mb-4">
+                                        <div class="flex items-center space-x-2 mb-2">
+                                            <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                            <span class="text-xs font-semibold text-green-700">Bug Fixes</span>
+                                        </div>
+                                        <div class="space-y-2 ml-6">
+                                            @foreach($version['sections']['fixed'] as $item)
+                                                <div class="flex items-start space-x-3 p-2 bg-green-50 rounded-lg">
+                                                    <svg class="w-3 h-3 text-green-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                                    </svg>
+                                                    <div>
+                                                        @if($item['has_bold'] ?? false)
+                                                            <h4 class="font-semibold text-xs text-gray-900">{{ $item['title'] }}</h4>
+                                                            <p class="text-xs text-gray-600">{{ $item['description'] }}</p>
+                                                        @else
+                                                            <p class="text-xs text-gray-600">{!! $item['description'] !!}</p>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endif
+
+                                <!-- Security Section -->
+                                @if(isset($version['sections']['security']) && !empty($version['sections']['security']))
+                                    <div class="mb-4">
+                                        <div class="flex items-center space-x-2 mb-2">
+                                            <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                                            </svg>
+                                            <span class="text-xs font-semibold text-red-700">Security</span>
+                                        </div>
+                                        <div class="space-y-2 ml-6">
+                                            @foreach($version['sections']['security'] as $item)
+                                                <div class="flex items-start space-x-2 p-2 bg-red-50 rounded">
+                                                    <span class="text-red-400">—</span>
+                                                    <p class="text-xs text-gray-600">
+                                                        @if($item['has_bold'] ?? false)
+                                                            <strong class="font-medium text-gray-800">{{ $item['title'] }}</strong> — {{ $item['description'] }}
+                                                        @else
+                                                            {!! $item['description'] !!}
+                                                        @endif
+                                                    </p>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endif
                             </div>
-                        </div>
-                    </div>
+                        @endforeach
+                    @endif
                 </div>
             </div>
 
