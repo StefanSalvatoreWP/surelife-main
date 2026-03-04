@@ -2,10 +2,14 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
     public function up(): void
     {
+        if (!Schema::hasTable('tbladdress')) {
+            return;
+        }
         // Use raw SQL so we can specify prefix lengths for TEXT/VARCHAR columns
         // MySQL requires prefix length for TEXT columns in indexes
         try {
@@ -20,6 +24,9 @@ return new class extends Migration {
 
     public function down(): void
     {
+        if (!Schema::hasTable('tbladdress')) {
+            return;
+        }
         try {
             DB::statement('DROP INDEX idx_tbladdress_code_type ON tbladdress');
         } catch (\Exception $e) {

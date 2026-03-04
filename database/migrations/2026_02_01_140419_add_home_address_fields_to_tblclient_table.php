@@ -10,13 +10,28 @@ return new class extends Migration {
      */
     public function up(): void
     {
+        if (!Schema::hasTable('tblclient')) {
+            return;
+        }
         Schema::table('tblclient', function (Blueprint $table) {
-            $table->string('HomeRegion', 100)->nullable()->after('Street');
-            $table->string('HomeProvince', 100)->nullable()->after('HomeRegion');
-            $table->string('HomeCity', 100)->nullable()->after('HomeProvince');
-            $table->string('HomeBarangay', 100)->nullable()->after('HomeCity');
-            $table->string('homezipcode', 10)->nullable()->after('homebarangay');
-            $table->string('HomeStreet', 100)->nullable()->after('homezipcode');
+            if (!Schema::hasColumn('tblclient', 'HomeRegion')) {
+                $table->string('HomeRegion', 100)->nullable()->after('Street');
+            }
+            if (!Schema::hasColumn('tblclient', 'HomeProvince')) {
+                $table->string('HomeProvince', 100)->nullable()->after('HomeRegion');
+            }
+            if (!Schema::hasColumn('tblclient', 'HomeCity')) {
+                $table->string('HomeCity', 100)->nullable()->after('HomeProvince');
+            }
+            if (!Schema::hasColumn('tblclient', 'HomeBarangay')) {
+                $table->string('HomeBarangay', 100)->nullable()->after('HomeCity');
+            }
+            if (!Schema::hasColumn('tblclient', 'homezipcode')) {
+                $table->string('homezipcode', 10)->nullable()->after('homebarangay');
+            }
+            if (!Schema::hasColumn('tblclient', 'HomeStreet')) {
+                $table->string('HomeStreet', 100)->nullable()->after('homezipcode');
+            }
         });
     }
 
@@ -25,6 +40,9 @@ return new class extends Migration {
      */
     public function down(): void
     {
+        if (!Schema::hasTable('tblclient')) {
+            return;
+        }
         Schema::table('tblclient', function (Blueprint $table) {
             $table->dropColumn([
                 'HomeRegion',

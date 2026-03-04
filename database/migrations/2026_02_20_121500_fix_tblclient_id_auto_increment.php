@@ -11,6 +11,9 @@ return new class extends Migration {
      */
     public function up(): void
     {
+        if (!Schema::hasTable('tblclient')) {
+            return;
+        }
         // Disable strict mode to allow invalid dates (e.g. 0000-00-00) during table rebuild
         DB::statement("SET SESSION sql_mode = 'NO_ENGINE_SUBSTITUTION'");
 
@@ -24,6 +27,9 @@ return new class extends Migration {
      */
     public function down(): void
     {
+        if (!Schema::hasTable('tblclient')) {
+            return;
+        }
         // Reverting this is tricky without knowing exact previous state, 
         // but assuming it was just BIGINT NOT NULL without auto-inc/PK
         DB::statement("ALTER TABLE tblclient MODIFY Id BIGINT(20) NOT NULL");
