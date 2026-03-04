@@ -12,7 +12,7 @@
 // ==========================================
 // LOCAL DATABASE CONFIGURATION
 $host = 'localhost';
-$dbname = 'surelife';
+$dbname = 'slc_db';
 $username = 'root';
 $password = '';
 // ==========================================
