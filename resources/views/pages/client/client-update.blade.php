@@ -939,9 +939,9 @@
 
     <!-- Hidden inputs for home address cascading system -->
     <input type="hidden" id="oldHomeRegion" value="{{ $clients->HomeRegion ?? '' }}" />
-    <input type="hidden" id="oldHomeProvince" value="{{ $clients->HomeProvinceDisplay ?? $clients->HomeProvince ?? '' }}" />
-    <input type="hidden" id="oldHomeCity" value="{{ $clients->HomeCityDisplay ?? $clients->HomeCity ?? '' }}" />
-    <input type="hidden" id="oldHomeBarangay" value="{{ $clients->HomeBarangayDisplay ?? $clients->HomeBarangay ?? '' }}" />
+    <input type="hidden" id="oldHomeProvince" value="{{ $clients->HomeProvince ?? '' }}" />
+    <input type="hidden" id="oldHomeCity" value="{{ $clients->HomeCity ?? '' }}" />
+    <input type="hidden" id="oldHomeBarangay" value="{{ $clients->HomeBarangay ?? '' }}" />
 
     <script src="{{ asset('js/client-update.js') }}?v={{ time() }}"></script>
     <script src="{{ asset('js/client-address-cascading.js') }}"></script>

@@ -1202,6 +1202,9 @@
                     })
                     .catch(error => {
                         console.error('Submission error:', error);
+                        console.error('Error data:', error.data);
+                        console.error('Error data.errors:', error.data?.errors);
+                        console.error('Error data.message:', error.data?.message);
                         
                         let errorMessage = 'An unexpected error occurred.';
                         let firstErrorField = null;
