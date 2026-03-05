@@ -77,11 +77,25 @@ if %ERRORLEVEL% neq 0 (
 )
 echo.
 
+echo Step 5.5: Fixing Orphaned Barangays...
+echo ----------------------------------------
+php database/tools/address/fix_orphaned_barangays.php
+echo.
+
+echo Step 6: Propagating Zip Codes to Barangays...
+echo ----------------------------------------
+php database/tools/address/propagate_barangay_zips.php
+if %ERRORLEVEL% neq 0 (
+    echo WARNING: Zip code propagation returned non-zero exit code
+)
+echo.
+
 echo ============================================
 echo   SETUP COMPLETE
 echo ============================================
 echo.
 echo All migrations and seeders have been executed.
+echo All zip codes have been merged and propagated.
 echo.
 echo If you encountered any errors, please check:
 echo 1. Database connection in .env file
