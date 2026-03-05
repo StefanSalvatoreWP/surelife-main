@@ -178,9 +178,21 @@ class LoanPaymentController extends Controller
                 ->where('ornumber', $orNo)
                 ->update($updateORData);
 
-            // update loan remarks
-            $updated_totalAmount = $loanRequestData->Amount - $paymentAmount;
-            if ($updated_totalAmount <= 0) {
+            // Calculate remaining balance correctly
+            // Sum all non-void payments for this loan
+            $totalPaid = LoanPayment::where('clientid', $client->Id)
+                ->where('loanrequestid', $loanRequestData->Id)
+                ->where('status', '<>', 'Void')
+                ->sum('amount');
+
+            // Add current payment to total
+            $totalPaid += $paymentAmount;
+
+            // Calculate remaining balance from TotalRepayable (principal + interest)
+            $remainingBalance = $loanRequestData->TotalRepayable - $totalPaid;
+
+            // update loan remarks if fully paid
+            if ($remainingBalance <= 0) {
                 $remarks = 'Completed';
                 $updateLoanRequestData = [
                     'remarks' => $remarks

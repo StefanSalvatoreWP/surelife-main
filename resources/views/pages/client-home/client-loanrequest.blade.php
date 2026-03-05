@@ -102,44 +102,51 @@
                 </div>
             </div>
 
-            <!-- Status Card -->
-            <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-6 border border-green-200">
+            <!-- Loan Term Card -->
+            <div class="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-lg p-6 border border-indigo-200">
                 <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-indigo-600 font-medium mb-2">Loan Term</p>
+                        <p class="text-3xl font-bold text-indigo-900">{{ $termMonths ?? 12 }} months</p>
+                        <p class="text-sm text-indigo-500 mt-1">Interest: 1.25%/month</p>
+                    </div>
+                    <div class="bg-indigo-200 rounded-full p-4">
+                        <svg class="w-10 h-10 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Card with Tracker -->
+            <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-6 border border-green-200">
+                <div class="flex items-center justify-between mb-4">
                     <div>
                         <p class="text-sm text-green-600 font-medium mb-2">Status</p>
                         @if($loanStatus == 'Pending')
-                            <span
-                                class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-gray-200 text-gray-700">
+                            <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-gray-200 text-gray-700">
                                 <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
-                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-                                        clip-rule="evenodd" />
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
                                 </svg>
                                 {{ $loanStatus }}
                             </span>
                         @elseif($loanStatus == 'Verified')
-                            <span
-                                class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-blue-200 text-blue-700">
+                            <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-blue-200 text-blue-700">
                                 <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
-                                        d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                        clip-rule="evenodd" />
+                                    <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                                 </svg>
                                 {{ $loanStatus }}
                             </span>
                         @elseif($loanStatus == 'Approved')
-                            <span
-                                class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-green-200 text-green-700">
+                            <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-green-200 text-green-700">
                                 <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
-                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                        clip-rule="evenodd" />
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                                 </svg>
                                 {{ $loanStatus }}
                             </span>
                         @else
-                            <span
-                                class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-gray-200 text-gray-700">{{ $loanStatus }}</span>
+                            <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-gray-200 text-gray-700">{{ $loanStatus }}</span>
                         @endif
                     </div>
                     <div class="bg-green-200 rounded-full p-4">
@@ -149,19 +156,69 @@
                         </svg>
                     </div>
                 </div>
+                @if($loanRequest)
+                <!-- Status Tracker -->
+                <div class="mt-4 pt-4 border-t border-green-200">
+                    <div class="flex items-center justify-between">
+                        @php
+                            $steps = ['Pending', 'Verified', 'Approved', 'Completed'];
+                            $currentStep = array_search($loanStatus, $steps);
+                            if ($currentStep === false) $currentStep = 0;
+                        @endphp
+                        @foreach($steps as $index => $step)
+                            <div class="flex flex-col items-center flex-1">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center {{ $index <= $currentStep ? 'bg-green-500' : 'bg-gray-300' }}">
+                                    @if($index < $currentStep)
+                                        <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                        </svg>
+                                    @elseif($index == $currentStep)
+                                        <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                                        </svg>
+                                    @else
+                                        <span class="text-gray-500 font-semibold text-xs">{{ $index + 1 }}</span>
+                                    @endif
+                                </div>
+                                <span class="mt-1 text-xs font-medium {{ $index <= $currentStep ? 'text-green-600' : 'text-gray-400' }}">{{ $step }}</span>
+                            </div>
+                            @if($index < count($steps) - 1)
+                                <div class="flex-1 h-0.5 mx-1 {{ $index < $currentStep ? 'bg-green-500' : 'bg-gray-300' }}"></div>
+                            @endif
+                        @endforeach
+                    </div>
+                </div>
+                @endif
             </div>
 
             <!-- Balance Card -->
             <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-6 border border-orange-200">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm text-orange-600 font-medium mb-2">Balance</p>
+                        <p class="text-sm text-orange-600 font-medium mb-2">Remaining Balance</p>
                         <p class="text-3xl font-bold text-orange-900">₱ {{ number_format($loanBalance, 2) }}</p>
                     </div>
                     <div class="bg-orange-200 rounded-full p-4">
                         <svg class="w-10 h-10 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interest Info Card -->
+            <div class="bg-gradient-to-br from-amber-50 to-amber-100 rounded-lg p-6 border border-amber-200">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-amber-600 font-medium mb-2">Interest Information</p>
+                        <p class="text-xl font-bold text-amber-900">1.25% per month</p>
+                        <p class="text-sm text-amber-600 mt-1">Total: ₱ {{ number_format(($loanableAmount ?? 0) * 0.0125 * ($termMonths ?? 12), 2) }}</p>
+                    </div>
+                    <div class="bg-amber-200 rounded-full p-4">
+                        <svg class="w-10 h-10 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                         </svg>
                     </div>
                 </div>

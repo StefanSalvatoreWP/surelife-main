@@ -86,6 +86,7 @@
             <h3 class="text-lg font-semibold text-gray-800">Client Information</h3>
         </div>
         <div class="p-6">
+            <!-- Client Info Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div class="bg-gray-50 rounded-lg p-4">
                     <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Contract Number</p>
@@ -113,6 +114,11 @@
                         $statusColor = $loanRequestDetails->Status == 'Pending' ? 'yellow' : ($loanRequestDetails->Status == 'Verified' ? 'blue' : ($loanRequestDetails->Status == 'Approved' ? 'green' : 'gray'));
                     @endphp
                     <span class="bg-{{ $statusColor }}-100 text-{{ $statusColor }}-800 px-3 py-1 rounded-full text-sm font-medium">{{ $loanRequestDetails->Status }}</span>
+                </div>
+                <div class="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                    <p class="text-xs text-blue-600 uppercase tracking-wide mb-1">Loan Term Selected</p>
+                    <p class="text-2xl font-bold text-blue-800">{{ $termMonths }} months</p>
+                    <p class="text-sm text-blue-600 mt-1">Interest Rate: {{ $interestRate }}%/month</p>
                 </div>
             </div>
         </div>
@@ -196,12 +202,16 @@
                         <span class="font-semibold text-gray-900">₱ {{ number_format($monthlyLoanPayment, 2) }}</span>
                     </div>
                     <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                        <span class="text-gray-600">Monthly Interest</span>
-                        <span class="font-semibold text-gray-900">₱ {{ number_format($monthlyInterest, 2) }}</span>
+                        <span class="text-amber-600 font-medium">Interest Rate per Month</span>
+                        <span class="font-semibold text-amber-600">{{ $interestRate }}%</span>
                     </div>
                     <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                        <span class="text-gray-600">Monthly Contract Premium</span>
-                        <span class="font-semibold text-gray-900">₱ {{ number_format($monthlyPremium, 2) }}</span>
+                        <span class="text-amber-600 font-medium">Total Interest ({{ $termMonths }} months)</span>
+                        <span class="font-semibold text-amber-600">₱ {{ number_format($totalInterest, 2) }}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                        <span class="text-gray-600">Monthly Interest</span>
+                        <span class="font-semibold text-gray-900">₱ {{ number_format($monthlyInterest, 2) }}</span>
                     </div>
                     <div class="flex justify-between items-center py-3 bg-green-50 rounded-lg px-3 mt-2">
                         <span class="font-bold text-green-800">Total Monthly Due ({{ $termMonths }} months)</span>

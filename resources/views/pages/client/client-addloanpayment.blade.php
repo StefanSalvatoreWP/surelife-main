@@ -52,7 +52,7 @@
             <div class="bg-gradient-to-br from-orange-50 to-red-100 rounded-lg p-4 border border-orange-200">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm text-orange-600 font-medium mb-1">Loan Balance</p>
+                        <p class="text-sm text-orange-600 font-medium mb-1">Remaining Balance</p>
                         <p class="text-2xl font-bold text-orange-900">₱ {{ number_format($loanBalance, 2) }}</p>
                     </div>
                     <div class="bg-orange-200 rounded-full p-3">
@@ -60,6 +60,42 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
                         </svg>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Info Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
+                <p class="text-sm text-blue-600 font-medium mb-1">Monthly Payment</p>
+                <p class="text-xl font-bold text-blue-900">₱ {{ number_format($loanRequestData->MonthlyAmount, 2) }}</p>
+            </div>
+            <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
+                <p class="text-sm text-green-600 font-medium mb-1">Interest Rate</p>
+                <p class="text-xl font-bold text-green-900">{{ $loanRequestData->InterestRate ?? 1.25 }}%/mo</p>
+            </div>
+            <div class="bg-gradient-to-br from-amber-50 to-amber-100 rounded-lg p-4 border border-amber-200">
+                <p class="text-sm text-amber-600 font-medium mb-1">Term Remaining</p>
+                <p class="text-xl font-bold text-amber-900">{{ $loanRequestData->TermMonths ?? 12 }} months</p>
+            </div>
+        </div>
+
+        <!-- Advance Payment Preview (Dynamic) -->
+        <div id="advancePaymentPreview" class="hidden bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg p-4 border border-indigo-200 mb-6">
+            <div class="flex items-center mb-2">
+                <svg class="w-5 h-5 text-indigo-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                </svg>
+                <span class="text-sm font-semibold text-indigo-700">Advance Payment Preview</span>
+            </div>
+            <div class="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                    <p class="text-indigo-600">Months Covered:</p>
+                    <p class="font-bold text-indigo-900" id="monthsCovered">-</p>
+                </div>
+                <div>
+                    <p class="text-indigo-600">Balance After Payment:</p>
+                    <p class="font-bold text-indigo-900" id="balanceAfterPayment">-</p>
                 </div>
             </div>
         </div>
@@ -147,5 +183,13 @@
             </form>
         </div>
     </div>
+    <script>
+        // Pass PHP variables to JavaScript
+        window.loanPaymentConfig = {
+            monthlyPayment: {{ $loanRequestData->MonthlyAmount ?? 0 }},
+            remainingBalance: {{ $loanBalance ?? 0 }},
+            totalRepayable: {{ $loanRequestData->TotalRepayable ?? $loanRequestData->Amount ?? 0 }}
+        };
+    </script>
     <script src="{{ asset('js/client-addloanpayment.js') }}"></script>
 @endsection

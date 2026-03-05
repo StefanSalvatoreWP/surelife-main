@@ -2,6 +2,52 @@
 
 $(document).ready(function () {
 
+    // *** ADVANCE PAYMENT PREVIEW CALCULATION ***
+    
+    // Get config from blade template (set in client-addloanpayment.blade.php)
+    const config = window.loanPaymentConfig || {
+        monthlyPayment: 0,
+        remainingBalance: 0,
+        totalRepayable: 0
+    };
+    
+    const monthlyPayment = config.monthlyPayment;
+    const totalRepayable = config.totalRepayable;
+    
+    const paymentAmountSelect = $('#paymentAmount');
+    const advancePreview = $('#advancePaymentPreview');
+    const monthsCoveredEl = $('#monthsCovered');
+    const balanceAfterPaymentEl = $('#balanceAfterPayment');
+    
+    // Calculate advance payment preview when payment amount changes
+    paymentAmountSelect.on('change', function() {
+        const paymentAmount = parseFloat($(this).val()) || 0;
+        
+        if (paymentAmount > 0) {
+            // Calculate months covered (rounded up)
+            const monthsCovered = Math.ceil(paymentAmount / monthlyPayment);
+            
+            // Calculate balance after payment
+            const balanceAfter = Math.max(0, totalRepayable - paymentAmount);
+            
+            // Show preview
+            monthsCoveredEl.text(monthsCovered + ' month' + (monthsCovered > 1 ? 's' : ''));
+            balanceAfterPaymentEl.text('₱ ' + balanceAfter.toLocaleString('en-PH', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+            
+            // Show/hide advance payment preview
+            if (paymentAmount > monthlyPayment) {
+                advancePreview.removeClass('hidden');
+            } else {
+                advancePreview.addClass('hidden');
+            }
+        } else {
+            advancePreview.addClass('hidden');
+        }
+    });
+    
+    // Trigger on page load if value is pre-selected
+    paymentAmountSelect.trigger('change');
+
     // *** O.R SERIES CODE DROPDOWN FUNCTIONALITY ***
 
     // Get client branch and region from hidden inputs

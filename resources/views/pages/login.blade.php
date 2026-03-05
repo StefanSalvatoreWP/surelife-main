@@ -169,6 +169,15 @@
                                 {{ $message }}
                             </p>
                         @enderror
+                        <!-- Caps Lock Warning -->
+                        <div id="capsLockWarning" class="hidden mt-2 bg-amber-50 border-l-4 border-amber-400 p-2 rounded" role="alert" aria-live="polite">
+                            <div class="flex items-center">
+                                <svg class="w-4 h-4 text-amber-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                </svg>
+                                <span class="text-amber-700 text-sm font-medium">Caps Lock is ON</span>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Access Key -->
@@ -268,6 +277,45 @@
                 console.log('===================');
             @endif
         });
+
+        // Caps Lock detection (IIFE to avoid global scope pollution)
+        (function() {
+            const passwordInput = document.getElementById('passWord');
+            const capsWarning = document.getElementById('capsLockWarning');
+
+            if (!passwordInput || !capsWarning) return;
+
+            /**
+             * Check Caps Lock state using modern getModifierState API
+             * Falls back gracefully for older browsers
+             */
+            function checkCapsLock(event) {
+                // Modern API (Chrome 33+, Firefox 15+, Safari 10.1+, Edge 12+)
+                if (typeof event.getModifierState === 'function') {
+                    const isCapsLockOn = event.getModifierState('CapsLock');
+                    capsWarning.classList.toggle('hidden', !isCapsLockOn);
+                }
+            }
+
+            /**
+             * Check Caps Lock on focus (requires user interaction first)
+             * Uses a probe keydown event to detect state
+             */
+            function checkCapsLockOnFocus() {
+                // getModifierState only works during keyboard events
+                // We'll detect on next keypress
+            }
+
+            // Bind events
+            passwordInput.addEventListener('keydown', checkCapsLock);
+            passwordInput.addEventListener('keyup', checkCapsLock);
+            passwordInput.addEventListener('focus', checkCapsLockOnFocus);
+
+            // Hide warning when leaving the field
+            passwordInput.addEventListener('blur', function() {
+                capsWarning.classList.add('hidden');
+            });
+        })();
     </script>
 </body>
 
