@@ -25,6 +25,11 @@ class RedirectIfAuthenticated
             }
         }
 
+        // Check custom session authentication used by this application
+        if (session()->has('user_id') && session()->has('user_roleid')) {
+            return redirect(RouteServiceProvider::HOME);
+        }
+
         return $next($request);
     }
 }

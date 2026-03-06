@@ -899,8 +899,7 @@
                 { id: 'addressCity', name: 'City', section: 'PERSONAL' },
                 { id: 'addressBarangay', name: 'Barangay', section: 'PERSONAL' },
                 // Beneficiary age fields validation
-                { id: 'principalBeneficiaryAge', name: 'Principal Beneficiary Age', section: 'BENEFICIARY' },
-                { id: 'beneficiary1age', name: 'Beneficiary 1 Age', section: 'BENEFICIARY' }
+                { id: 'principalBeneficiaryAge', name: 'Principal Beneficiary Age', section: 'BENEFICIARY' }
                 // mobileNumber removed from required fields - handled by contact validation
             ];
 
@@ -1202,6 +1201,9 @@
                     })
                     .catch(error => {
                         console.error('Submission error:', error);
+                        console.error('Error data:', error.data);
+                        console.error('Error data.errors:', error.data?.errors);
+                        console.error('Error data.message:', error.data?.message);
                         
                         let errorMessage = 'An unexpected error occurred.';
                         let firstErrorField = null;

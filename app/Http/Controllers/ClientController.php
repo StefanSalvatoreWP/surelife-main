@@ -344,10 +344,10 @@ class ClientController extends Controller
             }
         }
 
-        // loan payments
+        // loan payments - include Verified and Approved statuses
         $hasLoanRequest = LoanRequest::query()
             ->where('ClientId', $client->Id)
-            ->where('Status', 'Approved')
+            ->whereIn('Status', ['Verified', 'Approved'])
             ->where('remarks', '<>', 'Completed')
             ->first();
 
@@ -365,7 +365,7 @@ class ClientController extends Controller
                 ->where('tblloanpayment.loanrequestid', $hasLoanRequest->Id)
                 ->get();
 
-            $totalLoanPayments = $loanPayments->sum('amount');
+            $totalLoanPayments = $loanPayments->sum('Amount');
             $loanBalance = $hasLoanRequest->Amount - $totalLoanPayments;
         }
 
@@ -452,10 +452,10 @@ class ClientController extends Controller
         $actions = Actions::query()->where('action', '=', 'Add Payment')->first();
         if ($roleLevel->Level <= $actions->RoleLevel) {
 
-            // get loan payments data
+            // get loan payments data - include Verified and Approved statuses
             $hasLoanRequest = LoanRequest::query()
                 ->where('ClientId', $client->Id)
-                ->where('Status', 'Approved')
+                ->whereIn('Status', ['Verified', 'Approved'])
                 ->where('remarks', '<>', 'Completed')
                 ->first();
 

@@ -29,7 +29,20 @@
             </div>
 
             <!-- Eligibility Alert -->
-            @if($isEligible)
+            @if($loanRequest)
+                {{-- Loan request exists - show status info --}}
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 text-blue-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-3a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                clip-rule="evenodd" />
+                        </svg>
+                        <p class="text-blue-700 font-medium">Loan request submitted at {{ $tier }}% tier. Status: {{ $loanStatus }}</p>
+                    </div>
+                </div>
+            @elseif($isEligible)
+                {{-- No loan request, but eligible - show eligibility --}}
                 <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-lg">
                     <div class="flex items-center">
                         <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
@@ -41,6 +54,7 @@
                     </div>
                 </div>
             @else
+                {{-- No loan request, not eligible - show reason --}}
                 <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-lg">
                     <div class="flex items-center">
                         <svg class="w-5 h-5 text-yellow-500 mr-3" fill="currentColor" viewBox="0 0 20 20">

@@ -323,7 +323,7 @@
                                         value="{{ $clients->BestTimeToCollect }}" readonly />
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Client Status</label>
                                     <div
                                         class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 flex items-center h-[42px] cursor-default">
                                         @if($clients->Status == '1')
@@ -946,10 +946,20 @@
                                             </td>
                                             <td class="px-4 py-3 text-sm text-gray-900">
                                                 @if($payment->VoidStatus != 1)
-                                                    <a class="action-void text-red-600 hover:text-red-900 font-medium cursor-pointer"
-                                                        onclick="showPaymentVoidModal('{{ $payment->Id }}', '{{ $payment->ORNo }}')">Void</a>
+                                                    <button type="button" class="inline-flex items-center px-3 py-1.5 bg-red-100 hover:bg-red-200 border border-red-300 text-red-700 hover:text-red-800 text-xs font-semibold rounded-md shadow-sm transition duration-150 ease-in-out"
+                                                        onclick="showPaymentVoidModal('{{ $payment->Id }}', '{{ $payment->ORNo }}')">
+                                                        <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
+                                                        </svg>
+                                                        Void
+                                                    </button>
                                                 @else
-                                                    <span class="text-gray-400">Locked</span>
+                                                    <span class="inline-flex items-center px-3 py-1.5 bg-gray-100 border border-gray-300 text-gray-500 text-xs font-semibold rounded-md">
+                                                        <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                                        </svg>
+                                                        Locked
+                                                    </span>
                                                 @endif
                                             </td>
                                         </tr>
@@ -1056,16 +1066,26 @@
                 aria-labelledby="loan-payments-tab">
                 <div class="bg-white rounded-xl shadow-lg overflow-hidden">
                     <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-indigo-50">
-                        <h3 class="text-lg font-semibold text-gray-800 flex items-center">
-                            <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            Loan Payments
-                        </h3>
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+                                <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Loan Payments
+                            </h3>
+                            @if($hasLoanRequest)
+                                @php
+                                    $loanStatusColor = $hasLoanRequest->Status == 'Verified' ? 'blue' : ($hasLoanRequest->Status == 'Approved' ? 'green' : 'gray');
+                                @endphp
+                                <span class="px-3 py-1 rounded-full text-xs font-semibold bg-{{ $loanStatusColor }}-200 text-{{ $loanStatusColor }}-700">
+                                    Loan: {{ $hasLoanRequest->Status }}
+                                </span>
+                            @endif
+                        </div>
                     </div>
                     <div class="p-6">
-                        @if($hasLoanRequest && $loanBalance > 0)
+                        @if($hasLoanRequest && $hasLoanRequest->Status == 'Approved' && $loanBalance > 0)
                             <!-- Loan Summary Cards -->
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                                 <!-- Total Loan Amount Card -->
@@ -1145,22 +1165,22 @@
                                         <tbody class="divide-y divide-gray-200">
                                             @foreach($loanPayments as $lp)
                                                 <tr class="hover:bg-gray-50 transition {{ $lp->status == 'void' ? 'bg-red-50 opacity-60' : '' }}">
-                                                    <td class="px-4 py-3 text-sm text-gray-900">{{ $lp->id }}</td>
-                                                    <td class="px-4 py-3 text-sm text-gray-900">{{ $lp->SeriesCode ?? 'N/A' }}</td>
-                                                    <td class="px-4 py-3 text-sm text-gray-900">{{ $lp->orno }}</td>
-                                                    <td class="px-4 py-3 text-sm font-semibold text-gray-900">₱ {{ number_format($lp->amount, 2) }}</td>
-                                                    <td class="px-4 py-3 text-sm text-gray-900">{{ $lp->installment ?? 'N/A' }}</td>
-                                                    <td class="px-4 py-3 text-sm text-gray-900">{{ $lp->paymentdate }}</td>
+                                                    <td class="px-4 py-3 text-sm text-gray-900" style="padding-left: 22px;">{{ $lp->Id }}</td>
+                                                    <td class="px-4 py-3 text-sm text-gray-900" style="padding-left: 37px;">{{ $lp->SeriesCode ?? 'N/A' }}</td>
+                                                    <td class="px-4 py-3 text-sm text-gray-900" style="padding-left: 25px;">{{ $lp->ORNo }}</td>
+                                                    <td class="px-4 py-3 text-sm font-semibold text-gray-900" style="padding-left: 30px;">₱ {{ number_format($lp->Amount, 2) }}</td>
+                                                    <td class="px-4 py-3 text-sm text-gray-500" style="padding-left: 50px;">{{ $lp->Installment ?? 'N/A' }}</td>
+                                                    <td class="px-4 py-3 text-sm text-gray-900" style="padding-left: 2px;">{{ $lp->PaymentDate }}</td>
                                                     <td class="px-4 py-3 text-sm">
                                                         @if($lp->status == 'void')
-                                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800" style="margin-left: 40px;">
                                                                 <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                                                     <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
                                                                 </svg>
                                                                 Void
                                                             </span>
                                                         @else
-                                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800" style="margin-left: -13px;">
                                                                 <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                                                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                                                                 </svg>
@@ -1170,12 +1190,20 @@
                                                     </td>
                                                     <td class="px-4 py-3 text-sm">
                                                         @if($lp->status != 'void')
-                                                            <button class="text-red-600 hover:text-red-800 font-medium hover:underline transition"
-                                                                onclick="showLoanPaymentVoidModal('{{ $lp->id }}', '{{ $lp->orno }}')">
+                                                            <button type="button" class="inline-flex items-center px-3 py-1.5 bg-red-100 hover:bg-red-200 border border-red-300 text-red-700 hover:text-red-800 text-xs font-semibold rounded-md shadow-sm transition duration-150 ease-in-out"
+                                                                onclick="showLoanPaymentVoidModal('{{ $lp->Id }}', '{{ $lp->ORNo }}')">
+                                                                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
+                                                                </svg>
                                                                 Void
                                                             </button>
                                                         @else
-                                                            <span class="text-gray-400 italic">Locked</span>
+                                                            <span class="inline-flex items-center px-3 py-1.5 bg-gray-100 border border-gray-300 text-gray-500 text-xs font-semibold rounded-md">
+                                                                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                                                </svg>
+                                                                Locked
+                                                            </span>
                                                         @endif
                                                     </td>
                                                 </tr>

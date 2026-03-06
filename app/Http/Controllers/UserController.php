@@ -214,9 +214,18 @@ class UserController extends Controller
         }
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
+        // Clear custom session variables (used by login)
+        $request->session()->forget(['user_id', 'user_name', 'user_roleid']);
+        
+        // Also attempt Laravel auth logout (for any middleware)
         auth()->logout();
+        
+        // Invalidate and regenerate session
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        
         return redirect('/');
     }
 

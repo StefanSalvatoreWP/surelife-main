@@ -100,14 +100,30 @@
                     <!-- O.R Series Code -->
                     <div>
                         <label for="orSeriesCode" class="block text-sm font-medium text-gray-700 mb-2">O.R Series Code</label>
-                        <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition" id="orSeriesCode" name="orseriescode" maxlength="30" value="{{ old('orseriescode') }}" placeholder="Enter series code" />
+                        <p class="text-xs text-gray-500 mb-1">Select O.R Series for loan payment</p>
+                        <div class="relative">
+                            <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition" id="orSeriesCode" name="orseriescode" maxlength="30" value="{{ old('orseriescode') }}" placeholder="Type or select O.R Series Code" autocomplete="off" />
+                            <div id="orSeriesCodeDropdown" class="hidden absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
+                                <!-- Dropdown options will be populated here -->
+                            </div>
+                        </div>
+                        <div id="orSeriesCodeLoading" class="hidden text-sm text-gray-500 mt-1">Loading O.R series codes...</div>
+                        <div id="orSeriesCodeError" class="hidden text-sm text-red-600 mt-1"></div>
                         @error('orseriescode')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
                     </div>
 
                     <!-- O.R No. -->
                     <div>
                         <label for="orNo" class="block text-sm font-medium text-gray-700 mb-2">O.R No.</label>
-                        <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition" id="orNo" name="orno" maxlength="30" value="{{ old('orno') }}" placeholder="Enter O.R number" />
+                        <p class="text-xs text-gray-500 mb-1">Select available O.R Number</p>
+                        <div class="relative">
+                            <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition" id="orNo" name="orno" maxlength="30" value="{{ old('orno') }}" placeholder="Type or select O.R Number" autocomplete="off" />
+                            <div id="orNoDropdown" class="hidden absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
+                                <!-- Dropdown options will be populated here -->
+                            </div>
+                        </div>
+                        <div id="orNoLoading" class="hidden text-sm text-gray-500 mt-1">Loading O.R numbers...</div>
+                        <div id="orNoError" class="hidden text-sm text-red-600 mt-1"></div>
                         @error('orno')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
                     </div>
 
@@ -131,4 +147,5 @@
             </form>
         </div>
     </div>
+    <script src="{{ asset('js/client-addloanpayment.js') }}"></script>
 @endsection

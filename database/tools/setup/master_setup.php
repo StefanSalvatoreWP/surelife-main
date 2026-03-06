@@ -60,81 +60,79 @@ echo "│ STEP 5: Merging Zip Codes                                    │\n";
 echo "└──────────────────────────────────────────────────────────────┘\n";
 $smartMergePath = __DIR__ . '/../address/smart_merge_zips.php';
 if (file_exists($smartMergePath)) {
-    // We need to run this with the correct database name
-    // Update the script to use the Laravel database config
     echo "Running smart_merge_zips.php...\n";
-    
-    // Read .env file for database config
-    $envPath = dirname(__DIR__, 2) . '/.env';
-    if (file_exists($envPath)) {
-        $envContent = file_get_contents($envPath);
-        preg_match('/DB_HOST=(.+)/', $envContent, $hostMatch);
-        preg_match('/DB_DATABASE=(.+)/', $envContent, $dbMatch);
-        preg_match('/DB_USERNAME=(.+)/', $envContent, $userMatch);
-        preg_match('/DB_PASSWORD=(.+)/', $envContent, $passMatch);
-        
-        $dbHost = trim($hostMatch[1] ?? 'localhost');
-        $dbName = trim($dbMatch[1] ?? 'slc_db');
-        $dbUser = trim($userMatch[1] ?? 'root');
-        $dbPass = trim($passMatch[1] ?? '');
-        
-        // Run the merge script with dynamic config
-        $mergeScript = <<<PHP
-<?php
-\$host = '{$dbHost}';
-\$dbname = '{$dbName}';
-\$username = '{$dbUser}';
-\$password = '{$dbPass}';
-
-\$pdo = new PDO("mysql:host=\$host;dbname=\$dbname;charset=utf8mb4", \$username, \$password);
-\$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-echo "Database: {\$host} / {\$dbname}\n\n";
-
-\$sqlFile = dirname(__DIR__) . '/address/philippine_provinces_and_cities.sql';
-\$content = file_get_contents(\$sqlFile);
-preg_match_all("/\\(\\d+, '([^']+)', \\d+, '([^']*)'\\)/", \$content, \$matches, PREG_SET_ORDER);
-
-\$updateCount = 0;
-\$variationCount = 0;
-
-\$stmtUpdate = \$pdo->prepare("UPDATE tbladdress SET zipcode = ? WHERE address_type = 'citymun' AND description = ?");
-
-foreach (\$matches as \$m) {
-    \$cityName = trim(\$m[1]);
-    \$zipcode = trim(\$m[2]);
-    
-    if (empty(\$zipcode)) continue;
-    
-    \$stmtUpdate->execute([\$zipcode, \$cityName]);
-    
-    if (\$stmtUpdate->rowCount() > 0) {
-        \$updateCount++;
-    } else {
-        if (stripos(\$cityName, ' City') !== false) {
-            \$baseName = trim(str_ireplace(' City', '', \$cityName));
-            \$variation1 = "CITY OF " . strtoupper(\$baseName);
-            \$stmtUpdate->execute([\$zipcode, \$variation1]);
-            if (\$stmtUpdate->rowCount() > 0) {
-                \$variationCount++;
-            }
-        }
-    }
-}
-
-echo "Direct Matches: \$updateCount\n";
-echo "Variation Matches: \$variationCount\n";
-echo "Total Updated: " . (\$updateCount + \$variationCount) . "\n";
-PHP;
-        
-        // Write temp script and run it
-        $tempScript = __DIR__ . '/temp_merge.php';
-        file_put_contents($tempScript, $mergeScript);
-        passthru("php " . escapeshellarg($tempScript));
-        unlink($tempScript);
-    }
+    passthru("php " . escapeshellarg($smartMergePath));
 } else {
     echo "⚠ smart_merge_zips.php not found at $smartMergePath\n";
+}
+echo "\n";
+
+// Step 5.5: Fix Orphaned Barangays (wrong citymun_code references)
+echo "┌──────────────────────────────────────────────────────────────┐\n";
+echo "│ STEP 5.5: Fixing Orphaned Barangays                          │\n";
+echo "└──────────────────────────────────────────────────────────────┘\n";
+echo "Fixing barangays with wrong citymun_code references...\n";
+
+// Read .env for database config (path is 3 levels up from this script)
+$envPath = dirname(__DIR__, 3) . '/.env';
+if (file_exists($envPath)) {
+    $envContent = file_get_contents($envPath);
+    preg_match('/DB_HOST=(.+)/', $envContent, $hostMatch);
+    preg_match('/DB_DATABASE=(.+)/', $envContent, $dbMatch);
+    preg_match('/DB_USERNAME=(.+)/', $envContent, $userMatch);
+    preg_match('/DB_PASSWORD=(.+)/', $envContent, $passMatch);
+    
+    $dbHost = trim($hostMatch[1] ?? 'localhost');
+    $dbName = trim($dbMatch[1] ?? 'slc_db');
+    $dbUser = trim($userMatch[1] ?? 'root');
+    $dbPass = trim($passMatch[1] ?? '');
+    
+    try {
+        $pdo = new PDO("mysql:host=$dbHost;dbname=$dbName", $dbUser, $dbPass);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        
+        // Fix orphaned barangays
+        $fixes = [
+            ['124710', '124702', 'CARMEN (Cotabato)'],
+            ['126316', '126319', 'LAKE SEBU (South Cotabato)'],
+            ['175306', '175303', 'BROOKE\'S POINT (Palawan)'],
+        ];
+        
+        $totalFixed = 0;
+        foreach ($fixes as $fix) {
+            $wrongCode = $fix[0];
+            $correctCode = $fix[1];
+            $cityName = $fix[2];
+            
+            $stmt = $pdo->prepare("UPDATE tbladdress SET citymun_code = ? WHERE address_type = 'barangay' AND citymun_code = ?");
+            $stmt->execute([$correctCode, $wrongCode]);
+            $fixed = $stmt->rowCount();
+            if ($fixed > 0) {
+                $totalFixed += $fixed;
+                echo "Fixed $fixed barangays: $wrongCode -> $correctCode ($cityName)\n";
+            }
+        }
+        
+        if ($totalFixed == 0) {
+            echo "No orphaned barangays found.\n";
+        }
+        
+    } catch (PDOException $e) {
+        echo "Error: " . $e->getMessage() . "\n";
+    }
+}
+echo "\n";
+
+// Step 6: Propagate Zip Codes to Barangays
+echo "┌──────────────────────────────────────────────────────────────┐\n";
+echo "│ STEP 6: Propagating Zip Codes to Barangays                   │\n";
+echo "└──────────────────────────────────────────────────────────────┘\n";
+$propagatePath = __DIR__ . '/../address/propagate_barangay_zips.php';
+if (file_exists($propagatePath)) {
+    echo "Running propagate_barangay_zips.php...\n";
+    passthru("php " . escapeshellarg($propagatePath));
+} else {
+    echo "⚠ propagate_barangay_zips.php not found at $propagatePath\n";
 }
 echo "\n";
 
@@ -152,7 +150,8 @@ echo "║  ✓ Migrations                                                ║\n";
 echo "║  ✓ AddressSeeder                                             ║\n";
 echo "║  ✓ ReferenceTablesSeeder                                     ║\n";
 echo "║  ✓ LoanMenuSeeder                                            ║\n";
-echo "║  ✓ Zip Code Merge                                            ║\n";
+echo "║  ✓ Zip Code Merge (Cities)                                   ║\n";
+echo "║  ✓ Zip Code Propagation (Barangays)                          ║\n";
 echo "╚══════════════════════════════════════════════════════════════╝\n\n";
 
 /**
