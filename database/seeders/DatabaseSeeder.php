@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             ReferenceTablesSeeder::class,
             LoanMenuSeeder::class,
             TestClientSeeder::class,
+            FsaAssignerRoleSeeder::class,
         ]);
     }
 }

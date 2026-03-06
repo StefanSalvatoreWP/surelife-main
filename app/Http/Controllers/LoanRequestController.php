@@ -249,8 +249,8 @@ class LoanRequestController extends Controller
         $termMonths = $request->input('term_months', 12);
         $waiverSigned = $request->input('waiver_signed', 1);
 
-        // Validate term
-        if (!in_array($termMonths, [2, 3, 6, 9, 12])) {
+        // Validate term (2-12 months)
+        if (!in_array($termMonths, [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])) {
             $termMonths = 12;
         }
 

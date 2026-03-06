@@ -428,11 +428,16 @@ class ClientController extends Controller
                 ->orderBy('installment', 'desc')
                 ->get();
 
+            // get branch name for display
+            $clientBranch = Branch::where('id', $client->BranchId)->first();
+            $branchName = $clientBranch ? $clientBranch->BranchName : 'N/A';
+
             return view('pages.client.client-addpayment', [
                 'clients' => $client,
                 'client_terms' => $clientTerm,
                 'payments' => $payments,
-                'assignedMemberData' => $assignedMemberData
+                'assignedMemberData' => $assignedMemberData,
+                'branchName' => $branchName
             ]);
         } else {
             return redirect()->back()->with('error', 'You do not have access to this function.');
@@ -3530,12 +3535,12 @@ class ClientController extends Controller
 
         // Use LoanCalculator for eligibility (same as actual loan request)
         $contract = \App\Models\Contract::where('clientid', $clientDetails->Id)->first();
-        
+
         // If no separate contract record, create virtual contract from client data
         if (!$contract) {
             $package = \App\Models\Package::find($clientDetails->PackageId ?? $clientDetails->packageid);
             $paymentTerm = \App\Models\PaymentTerm::find($clientDetails->PaymentTermId ?? $clientDetails->paymenttermid);
-            
+
             $contract = new \stdClass();
             $contract->Id = null;
             $contract->clientid = $clientDetails->Id;
@@ -3547,7 +3552,7 @@ class ClientController extends Controller
         }
 
         $totalPremiumsPaid = Payment::where('clientid', $clientDetails->Id)->sum('amountpaid');
-        
+
         $calculator = new \App\Services\LoanCalculator();
         $loanDetails = $calculator->calculateLoanDetails($contract, $totalPremiumsPaid, 12);
 

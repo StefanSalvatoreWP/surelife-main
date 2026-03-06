@@ -34,6 +34,12 @@
                         <input type="hidden" name="clientbranch" value={{ $clients->BranchId }} />
                         <input type="hidden" name="clientregion" value={{ $clients->RegionId }} />
 
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Branch</label>
+                                <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-100 text-gray-700 cursor-not-allowed" value="{{ $branchName ?? 'N/A' }}" readonly />
+                                <p class="text-gray-500 text-xs mt-1">O.R Series Codes are filtered based on this branch.</p>
+                            </div>
+
                             <div>
                                 <label for="paymentType" class="block text-sm font-medium text-gray-700 mb-2">Payment Type</label>
                                 @if($assignedMemberData != null)
@@ -96,12 +102,30 @@
                                     
                                     if ($lastValidPayment) {
                                         $lastPaymentDate = \Carbon\Carbon::parse($lastValidPayment->Date);
-                                        $ninetyDaysAgo = \Carbon\Carbon::now()->subDays(90);
                                         
-                                        // Check if the last payment is OLDER than 90 days ago
-                                        // If lastPaymentDate < ninetyDaysAgo, it is lapsed
-                                        // Future dates (e.g. 2028) are NOT less than ninetyDaysAgo, so they are Active
-                                        if ($lastPaymentDate->lt($ninetyDaysAgo)) {
+                                        // Determine lapse interval in months based on payment term
+                                        $lapseMonths = 3; // Default for Monthly and others
+                                        if (isset($client_terms)) {
+                                            switch($client_terms->Term) {
+                                                case "Quarterly":
+                                                    $lapseMonths = 6;
+                                                    break;
+                                                case "Semi-Annual":
+                                                    $lapseMonths = 12;
+                                                    break;
+                                                case "Annual":
+                                                    $lapseMonths = 24;
+                                                    break;
+                                                case "Monthly":
+                                                    $lapseMonths = 3;
+                                                    break;
+                                            }
+                                        }
+                                        
+                                        $lapseThreshold = \Carbon\Carbon::now()->subMonths($lapseMonths);
+                                        
+                                        // Check if the last payment is OLDER than calculated threshold
+                                        if ($lastPaymentDate->lt($lapseThreshold)) {
                                             $isLapsed = true;
                                         }
                                     } else {

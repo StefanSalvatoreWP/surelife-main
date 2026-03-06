@@ -29,8 +29,8 @@ $(document).ready(function() {
                 if (filterValue === 'clear') return true;
                 if (filterValue === 'Void') return isVoid;
                 
-                // "Plan" includes null, Standard, and Partial
-                let isPlan = (remarks === '' || remarks === null || remarks === 'Standard' || remarks === 'Partial');
+                // "Plan" includes null, Standard, Partial, and Custom
+                let isPlan = (remarks === '' || remarks === null || remarks === 'Standard' || remarks === 'Partial' || remarks === 'Custom');
                 
                 if (filterValue === 'Plan') return !isVoid && isPlan;
                 if (filterValue === 'Others') return !isVoid && !isPlan;

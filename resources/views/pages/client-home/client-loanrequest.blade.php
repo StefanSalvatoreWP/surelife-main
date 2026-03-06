@@ -38,22 +38,10 @@
                                 d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-3a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
                                 clip-rule="evenodd" />
                         </svg>
-                        <p class="text-blue-700 font-medium">Loan request submitted at {{ $tier }}% tier. Status: {{ $loanStatus }}</p>
+                        <p class="text-blue-700 font-medium">Loan request submitted. Status: {{ $loanStatus }}</p>
                     </div>
                 </div>
-            @elseif($isEligible)
-                {{-- No loan request, but eligible - show eligibility --}}
-                <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-lg">
-                    <div class="flex items-center">
-                        <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                clip-rule="evenodd" />
-                        </svg>
-                        <p class="text-green-700 font-medium">You are eligible for loan request! ({{ $tier }}% tier)</p>
-                    </div>
-                </div>
-            @else
+            @elseif(!$isEligible)
                 {{-- No loan request, not eligible - show reason --}}
                 <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-lg">
                     <div class="flex items-center">
@@ -69,18 +57,48 @@
 
         </div>
         <!-- Loan Details Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <!-- Loan Amount Card -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            <!-- Tier Qualified Card -->
+            <div class="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-lg p-6 border border-indigo-200">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-indigo-600 font-medium mb-2">Tier Qualified</p>
+                        <p class="text-3xl font-bold text-indigo-900">{{ $tier ?? 0 }}%</p>
+                    </div>
+                    <div class="bg-indigo-200 rounded-full p-4">
+                        <svg class="w-10 h-10 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m7 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loanable Amount Card -->
             <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 border border-blue-200">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm text-blue-600 font-medium mb-2">Loan Request Amount</p>
-                        <p class="text-3xl font-bold text-blue-900">₱ {{ number_format($netLoanAmount, 2) }}</p>
+                        <p class="text-sm text-blue-600 font-medium mb-2">Loanable Amount</p>
+                        <p class="text-3xl font-bold text-blue-900">₱ {{ number_format($loanableAmount, 2) }}</p>
                     </div>
                     <div class="bg-blue-200 rounded-full p-4">
                         <svg class="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Net Amount Card -->
+            <div class="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-lg p-6 border border-emerald-200">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-emerald-600 font-medium mb-2">Net Amount</p>
+                        <p class="text-3xl font-bold text-emerald-900">₱ {{ number_format($netLoanAmount, 2) }}</p>
+                        <p class="text-xs text-emerald-500 mt-1">After 10% fee</p>
+                    </div>
+                    <div class="bg-emerald-200 rounded-full p-4">
+                        <svg class="w-10 h-10 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                         </svg>
                     </div>
                 </div>
@@ -90,13 +108,32 @@
             <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-6 border border-purple-200">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm text-purple-600 font-medium mb-2">Amount to Pay Every Month</p>
+                        <p class="text-sm text-purple-600 font-medium mb-2">Monthly Due</p>
                         <p class="text-3xl font-bold text-purple-900">₱ {{ number_format($monthlyLoanAmount, 2) }}</p>
+                        <p class="text-xs text-purple-500 mt-1">1.25% interest/mo</p>
                     </div>
                     <div class="bg-purple-200 rounded-full p-4">
                         <svg class="w-10 h-10 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Processing Fee & Status Row -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <!-- Processing Fee Card -->
+            <div class="bg-gradient-to-br from-amber-50 to-amber-100 rounded-lg p-6 border border-amber-200">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-amber-600 font-medium mb-2">Processing Fee (10%)</p>
+                        <p class="text-3xl font-bold text-amber-900">₱ {{ number_format($processingFee, 2) }}</p>
+                        <p class="text-xs text-amber-500 mt-1">Deducted from loanable amount</p>
+                    </div>
+                    <div class="bg-amber-200 rounded-full p-4">
+                        <svg class="w-10 h-10 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2zM10 8.5a.5.5 0 11-1 0 .5.5 0 011 0zm5 5a.5.5 0 11-1 0 .5.5 0 011 0z" />
                         </svg>
                     </div>
                 </div>
@@ -259,11 +296,19 @@
                                 </div>
                                 <h4 class="text-lg font-bold text-white tracking-wide">Loan Details</h4>
                             </div>
-                            <div class="grid grid-cols-3 gap-4">
+                            <!-- Row 1: Tier, Loanable -->
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div class="bg-white rounded-xl p-4 shadow">
+                                    <p class="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">Tier Qualified</p>
+                                    <p class="text-xl font-bold text-indigo-600">{{ $tier ?? 0 }}%</p>
+                                </div>
                                 <div class="bg-white rounded-xl p-4 shadow">
                                     <p class="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">Loanable Amount</p>
                                     <p class="text-xl font-bold text-blue-600">₱ {{ number_format($loanableAmount ?? 0, 2) }}</p>
                                 </div>
+                            </div>
+                            <!-- Row 2: Processing Fee, Net Amount, Total Repayable -->
+                            <div class="grid grid-cols-3 gap-4">
                                 <div class="bg-white rounded-xl p-4 shadow">
                                     <p class="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">Processing Fee</p>
                                     <p class="text-xl font-bold text-rose-600">₱ {{ number_format($processingFee ?? 0, 2) }}</p>
@@ -271,6 +316,10 @@
                                 <div class="bg-white rounded-xl p-4 shadow">
                                     <p class="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">Net Amount</p>
                                     <p class="text-xl font-bold text-emerald-600">₱ {{ number_format($netLoanAmount ?? 0, 2) }}</p>
+                                </div>
+                                <div class="bg-white rounded-xl p-4 shadow">
+                                    <p class="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">Total Repayable</p>
+                                    <p class="text-xl font-bold text-amber-600" id="totalRepayable">₱ 0.00</p>
                                 </div>
                             </div>
                         </div>
@@ -291,12 +340,22 @@
                                     <p class="text-xl font-bold text-purple-600" id="monthlyLoanPayment">₱ 0.00</p>
                                 </div>
                                 <div class="bg-white rounded-xl p-4 shadow">
-                                    <p class="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">Contract Premium</p>
-                                    <p class="text-xl font-bold text-gray-700">₱ {{ number_format($monthlyContractPremium ?? 0, 2) }}</p>
+                                    <p class="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">Interest/Mo</p>
+                                    <p class="text-xl font-bold text-rose-600" id="monthlyInterest">₱ 0.00</p>
+                                </div>
+                                <div class="bg-white rounded-xl p-4 shadow">
+                                    <p class="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">Principal/Mo</p>
+                                    <p class="text-xl font-bold text-emerald-600" id="monthlyPrincipal">₱ 0.00</p>
+                                </div>
+                            </div>
+                            <div class="mt-4 grid grid-cols-2 gap-4">
+                                <div class="bg-white rounded-xl p-4 shadow">
+                                    <p class="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">Total Interest</p>
+                                    <p class="text-xl font-bold text-rose-600" id="totalInterest">₱ 0.00</p>
                                 </div>
                                 <div class="bg-white rounded-xl p-4 shadow">
                                     <p class="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">Total Monthly Due</p>
-                                    <p class="text-xl font-bold text-amber-600" id="totalMonthlyDue">₱ 0.00</p>
+                                    <p class="text-2xl font-bold text-amber-600" id="totalMonthlyDue">₱ 0.00</p>
                                 </div>
                             </div>
                         </div>
@@ -323,8 +382,14 @@
                                     <option value="">-- Select Term --</option>
                                     <option value="2">2 months</option>
                                     <option value="3">3 months</option>
+                                    <option value="4">4 months</option>
+                                    <option value="5">5 months</option>
                                     <option value="6">6 months</option>
+                                    <option value="7">7 months</option>
+                                    <option value="8">8 months</option>
                                     <option value="9">9 months</option>
+                                    <option value="10">10 months</option>
+                                    <option value="11">11 months</option>
                                     <option value="12" selected>12 months</option>
                                 </select>
                             </div>
@@ -471,10 +536,18 @@
             const totalInterest = loanableAmount * interestRate * termMonths;
             const totalRepayable = loanableAmount + totalInterest;
             const monthlyLoanPayment = totalRepayable / termMonths;
-            const totalMonthlyDue = monthlyLoanPayment + monthlyContractPremium;
+            const monthlyInterest = totalInterest / termMonths;
+            const monthlyPrincipal = monthlyLoanPayment - monthlyInterest;
             
+            // Update Loan Details
+            document.getElementById('totalRepayable').textContent = '₱ ' + totalRepayable.toFixed(2);
+            
+            // Update Monthly Payment Breakdown (loan-only)
             document.getElementById('monthlyLoanPayment').textContent = '₱ ' + monthlyLoanPayment.toFixed(2);
-            document.getElementById('totalMonthlyDue').textContent = '₱ ' + totalMonthlyDue.toFixed(2);
+            document.getElementById('monthlyInterest').textContent = '₱ ' + monthlyInterest.toFixed(2);
+            document.getElementById('monthlyPrincipal').textContent = '₱ ' + monthlyPrincipal.toFixed(2);
+            document.getElementById('totalInterest').textContent = '₱ ' + totalInterest.toFixed(2);
+            document.getElementById('totalMonthlyDue').textContent = '₱ ' + monthlyLoanPayment.toFixed(2);
         }
 
         // Signature Canvas

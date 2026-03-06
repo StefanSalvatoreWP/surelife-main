@@ -1133,14 +1133,45 @@
                             </div>
 
                             <!-- Monthly Due Info -->
-                            <div class="bg-gray-50 rounded-lg p-4 mb-6 flex items-center justify-between">
-                                <div class="flex items-center">
-                                    <svg class="w-5 h-5 text-gray-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
-                                    <span class="text-gray-600 font-medium">Monthly Due:</span>
+                            <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    <div class="flex items-center">
+                                        <svg class="w-5 h-5 text-gray-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        <div>
+                                            <p class="text-xs text-gray-500">Monthly Due</p>
+                                            <p class="text-lg font-bold text-gray-800">₱ {{ number_format($hasLoanRequest->MonthlyAmount, 2) }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <svg class="w-5 h-5 text-indigo-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z" />
+                                        </svg>
+                                        <div>
+                                            <p class="text-xs text-gray-500">Interest Rate</p>
+                                            <p class="text-lg font-bold text-indigo-600">{{ $hasLoanRequest->InterestRate ?? 1.25 }}% <span class="text-xs font-normal">/mo</span></p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <svg class="w-5 h-5 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        <div>
+                                            <p class="text-xs text-gray-500">Term</p>
+                                            <p class="text-lg font-bold text-blue-600">{{ $hasLoanRequest->TermMonths ?? 12 }} months</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        <div>
+                                            <p class="text-xs text-gray-500">Total Repayable</p>
+                                            <p class="text-lg font-bold text-green-600">₱ {{ number_format($hasLoanRequest->TotalRepayable ?? $hasLoanRequest->Amount, 2) }}</p>
+                                        </div>
+                                    </div>
                                 </div>
-                                <span class="text-lg font-bold text-gray-800">₱ {{ number_format($hasLoanRequest->MonthlyAmount, 2) }}</span>
                             </div>
 
                             <!-- Payment History Table -->
