@@ -899,8 +899,7 @@
                 { id: 'addressCity', name: 'City', section: 'PERSONAL' },
                 { id: 'addressBarangay', name: 'Barangay', section: 'PERSONAL' },
                 // Beneficiary age fields validation
-                { id: 'principalBeneficiaryAge', name: 'Principal Beneficiary Age', section: 'BENEFICIARY' },
-                { id: 'beneficiary1age', name: 'Beneficiary 1 Age', section: 'BENEFICIARY' }
+                { id: 'principalBeneficiaryAge', name: 'Principal Beneficiary Age', section: 'BENEFICIARY' }
                 // mobileNumber removed from required fields - handled by contact validation
             ];
 

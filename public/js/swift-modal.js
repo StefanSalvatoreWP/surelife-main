@@ -42,7 +42,12 @@ function showSwiftModal(title, message, type = 'error', buttons = []) {
 
     // Set content
     titleEl.textContent = title;
-    messageEl.textContent = message;
+    // Support both plain text (with \n) and HTML content
+    if (message && (message.includes('<') || message.includes('&lt;'))) {
+        messageEl.innerHTML = message;
+    } else {
+        messageEl.textContent = message;
+    }
 
     // Set buttons
     actionsEl.innerHTML = '';
@@ -51,7 +56,7 @@ function showSwiftModal(title, message, type = 'error', buttons = []) {
         console.log('=== runAction called ===');
         console.log('Action type:', typeof action);
         console.log('Action value:', action);
-        
+
         if (!action) {
             console.log('No action provided, returning');
             return;
@@ -110,10 +115,10 @@ function hideSwiftModal() {
 }
 
 // Close modal on backdrop click
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const modal = document.getElementById('swiftModal');
     if (modal) {
-        modal.addEventListener('click', function(e) {
+        modal.addEventListener('click', function (e) {
             if (e.target === this) {
                 hideSwiftModal();
             }
@@ -122,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Close modal on Escape key
-document.addEventListener('keydown', function(e) {
+document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') {
         hideSwiftModal();
     }
