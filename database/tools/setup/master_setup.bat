@@ -90,6 +90,22 @@ if %ERRORLEVEL% neq 0 (
 )
 echo.
 
+echo Step 7: Building Frontend Assets...
+echo ----------------------------------------
+npm run build
+if %ERRORLEVEL% neq 0 (
+    echo WARNING: npm run build returned non-zero exit code
+)
+echo.
+
+echo Step 8: Clearing Laravel Cache...
+echo ----------------------------------------
+php artisan cache:clear
+php artisan config:clear
+php artisan view:clear
+php artisan route:clear
+echo.
+
 echo ============================================
 echo   SETUP COMPLETE
 echo ============================================

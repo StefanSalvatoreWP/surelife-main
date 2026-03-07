@@ -136,6 +136,23 @@ if (file_exists($propagatePath)) {
 }
 echo "\n";
 
+// Step 7: Build Frontend Assets
+echo "┌──────────────────────────────────────────────────────────────┐\n";
+echo "│ STEP 7: Building Frontend Assets (npm run build)            │\n";
+echo "└──────────────────────────────────────────────────────────────┘\n";
+runCommand("npm run build");
+echo "\n";
+
+// Step 8: Clear Laravel Cache
+echo "┌──────────────────────────────────────────────────────────────┐\n";
+echo "│ STEP 8: Clearing Laravel Cache                               │\n";
+echo "└──────────────────────────────────────────────────────────────┘\n";
+runCommand("php artisan cache:clear");
+runCommand("php artisan config:clear");
+runCommand("php artisan view:clear");
+runCommand("php artisan route:clear");
+echo "\n";
+
 // Summary
 $endTime = microtime(true);
 $duration = round($endTime - $startTime, 2);
@@ -152,6 +169,8 @@ echo "║  ✓ ReferenceTablesSeeder                                     ║\n";
 echo "║  ✓ LoanMenuSeeder                                            ║\n";
 echo "║  ✓ Zip Code Merge (Cities)                                   ║\n";
 echo "║  ✓ Zip Code Propagation (Barangays)                          ║\n";
+echo "║  ✓ Frontend Build (npm run build)                            ║\n";
+echo "║  ✓ Laravel Cache Cleared                                     ║\n";
 echo "╚══════════════════════════════════════════════════════════════╝\n\n";
 
 /**
