@@ -86,6 +86,10 @@
                         <h4 class="text-sm font-bold text-purple-700 uppercase tracking-wide mb-3 pb-2 border-b-2 border-purple-200">Identification</h4>
                         <div class="space-y-2">
                             <div class="flex justify-between py-2 hover:bg-purple-50 px-2 rounded transition">
+                                <span class="text-gray-600 font-medium">Username</span>
+                                <span class="text-gray-900">{{ $staff->IdNumber }}</span>
+                            </div>
+                            <div class="flex justify-between py-2 hover:bg-purple-50 px-2 rounded transition">
                                 <span class="text-gray-600 font-medium">Position</span>
                                 <span class="text-gray-900">{{ $staff->Role }}</span>
                             </div>

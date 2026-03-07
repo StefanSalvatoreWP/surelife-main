@@ -728,8 +728,8 @@ class ReportController extends Controller
         $fields = Validator::make($request->all(), [
             'statusreporttype' => 'not_in:0',
             'statusbranch' => 'not_in:0',
-            'statusdatefrom' => 'nullable|date',
-            'statusdateto' => 'nullable|date|after_or_equal:statusdatefrom',
+            'statusdatefrom' => 'required|date',
+            'statusdateto' => 'required|date|after_or_equal:statusdatefrom',
         ], $messages);
 
         if ($fields->fails()) {
@@ -770,8 +770,8 @@ class ReportController extends Controller
         $fields = Validator::make($request->all(), [
             'statusreporttype' => 'not_in:0',
             'statusbranch' => 'not_in:0',
-            'statusdatefrom' => 'nullable|date',
-            'statusdateto' => 'nullable|date|after_or_equal:statusdatefrom',
+            'statusdatefrom' => 'required|date',
+            'statusdateto' => 'required|date|after_or_equal:statusdatefrom',
         ], $messages);
 
         if ($fields->fails()) {
@@ -844,9 +844,9 @@ class ReportController extends Controller
             case 'Completed':
                 return $this->getCompletedReportData($branchId, $dateFrom, $dateTo);
             case 'Active':
-                return $this->getActiveReportData($branchId);
+                return $this->getActiveReportData($branchId, $dateFrom, $dateTo);
             case 'Lapse':
-                return $this->getLapseReportData($branchId);
+                return $this->getLapseReportData($branchId, $dateFrom, $dateTo);
             default:
                 return [];
         }
@@ -927,7 +927,7 @@ class ReportController extends Controller
         return $query->orderBy('c.dateaccomplished', 'desc')->get()->map(fn($r) => (array) $r)->toArray();
     }
 
-    private function getActiveReportData($branchId)
+    private function getActiveReportData($branchId, $dateFrom, $dateTo)
     {
         // Term + Grace lapse thresholds (in months):
         // Monthly=2, Quarterly=6, Semi-Annual=12, Annual=24
@@ -939,7 +939,7 @@ class ReportController extends Controller
             ELSE 2
         END";
 
-        return DB::table('tblclient as c')
+        $query = DB::table('tblclient as c')
             ->leftJoin('tblbranch as b', 'c.branchid', '=', 'b.id')
             ->leftJoin('tblstaff as s', 'c.recruitedby', '=', 's.id')
             ->leftJoin('tblpackage as p', 'c.packageid', '=', 'p.id')
@@ -983,11 +983,19 @@ class ReportController extends Controller
                     ELSE pt.Price * 60
                 END) - COALESCE(ps.total_paid, 0) as outstanding_balance")
             )
-            ->orderBy('c.lastname')
-            ->get()->map(fn($r) => (array) $r)->toArray();
+            ->orderBy('c.lastname');
+
+        if ($dateFrom) {
+            $query->where('c.dateaccomplished', '>=', $dateFrom);
+        }
+        if ($dateTo) {
+            $query->where('c.dateaccomplished', '<=', $dateTo);
+        }
+
+        return $query->get()->map(fn($r) => (array) $r)->toArray();
     }
 
-    private function getLapseReportData($branchId)
+    private function getLapseReportData($branchId, $dateFrom, $dateTo)
     {
         // Term + Grace lapse thresholds (in months):
         // Monthly=2, Quarterly=6, Semi-Annual=12, Annual=24
@@ -999,7 +1007,7 @@ class ReportController extends Controller
             ELSE 2
         END";
 
-        return DB::table('tblclient as c')
+        $query = DB::table('tblclient as c')
             ->leftJoin('tblbranch as b', 'c.branchid', '=', 'b.id')
             ->leftJoin('tblstaff as s', 'c.recruitedby', '=', 's.id')
             ->leftJoin('tblpackage as p', 'c.packageid', '=', 'p.id')
@@ -1046,7 +1054,15 @@ class ReportController extends Controller
                     ELSE pt.Price * 60
                 END) - COALESCE(ps.total_paid, 0) as outstanding_balance")
             )
-            ->orderBy('c.lastname')
-            ->get()->map(fn($r) => (array) $r)->toArray();
+            ->orderBy('c.lastname');
+
+        if ($dateFrom) {
+            $query->where('c.dateaccomplished', '>=', $dateFrom);
+        }
+        if ($dateTo) {
+            $query->where('c.dateaccomplished', '<=', $dateTo);
+        }
+
+        return $query->get()->map(fn($r) => (array) $r)->toArray();
     }
 }
