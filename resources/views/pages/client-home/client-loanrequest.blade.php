@@ -4,7 +4,7 @@
 @section('content')
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <!-- Header Card -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <div class="bg-gradient-to-br from-slate-50 to-slate-100 rounded-lg shadow-sm border border-slate-200 p-6 mb-6">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-2xl font-bold text-gray-800">Loan Request</h3>
                 @if(!$loanRequest)
@@ -285,8 +285,8 @@
     </div>
 
     <!-- LOAN APPLICATION MODAL -->
-    <div id="loanApplicationModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
-        <div class="relative top-20 mx-auto p-0 border w-full max-w-2xl shadow-xl rounded-lg bg-white">
+    <div id="loanApplicationModal" class="fixed inset-0 hidden overflow-y-auto h-full w-full z-50" style="background-color: rgba(0, 0, 0, 0.85);">
+        <div class="relative top-20 mx-auto p-0 border w-full max-w-2xl rounded-lg bg-white" style="box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9);">
             <!-- Modal Header -->
             <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gray-50 rounded-t-lg">
                 <h3 class="text-xl font-bold text-gray-900">Loan Application</h3>
@@ -298,15 +298,15 @@
             </div>
 
             <!-- Modal Body -->
-            <div class="p-6 bg-gradient-to-b from-slate-50 to-white">
+            <div class="p-6 bg-gradient-to-b from-slate-200 to-slate-300">
 
                 <form id="loanApplicationForm" method="POST" action="/submit-client-loanrequest/{{ session('user_id') }}">
                     @csrf
                     <input type="hidden" name="waiver_signed" id="waiverSigned" value="0">
                     <input type="hidden" name="signature_data" id="signatureData" value="">
 
-                    <!-- Loan Details + Monthly Payment Breakdown (Horizontal on Desktop) -->
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <!-- Loan Details + Monthly Payment Breakdown (Vertical Stack) -->
+                    <div class="grid grid-cols-1 gap-6 mb-6">
                         <!-- Loan Details Card -->
                         <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl p-6 shadow-lg">
                             <div class="flex items-center gap-3 mb-5">
@@ -360,11 +360,7 @@
                                 </div>
                                 <h4 class="text-lg font-bold text-white tracking-wide">Monthly Payment Breakdown</h4>
                             </div>
-                            <div class="grid grid-cols-3 gap-4">
-                                <div class="bg-white rounded-xl p-4 shadow">
-                                    <p class="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">Loan Payment</p>
-                                    <p class="text-xl font-bold text-purple-600" id="monthlyLoanPayment">₱ 0.00</p>
-                                </div>
+                            <div class="grid grid-cols-2 gap-4">
                                 <div class="bg-white rounded-xl p-4 shadow">
                                     <p class="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">Interest/Mo</p>
                                     <p class="text-xl font-bold text-rose-600" id="monthlyInterest">₱ 0.00</p>
@@ -423,10 +419,10 @@
                     </div>
 
                     <!-- Waiver of Rights -->
-                    <div class="border border-slate-200 rounded-xl p-6 pb-7 mb-6 bg-white shadow-sm">
+                    <div class="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl p-6 mb-6 border border-slate-200 shadow-sm">
                         <h4 class="font-semibold text-slate-900 mb-4 text-center text-lg uppercase tracking-widest">Waiver of Rights</h4>
 
-                        <div class="bg-gradient-to-br from-sky-50 via-white to-indigo-50/40 p-4 rounded-lg mb-4 text-sm leading-relaxed border border-sky-100">
+                        <div class="bg-white p-4 rounded-lg mb-4 text-sm leading-relaxed border border-slate-100">
 
                             <p class="mb-3">
                                 I <span id="waiverApplicantNameBlank" class="inline-block border-b border-gray-400 min-w-[140px] text-center font-semibold">{{ ($client->firstname ?? '') . ' ' . ($client->lastname ?? '') }}</span> member of sure life care &amp; services with Contract Number <span id="waiverContractNumberBlank" class="inline-block border-b border-gray-400 min-w-[110px] text-center font-semibold">{{ $client->contractnumber ?? '' }}</span> applied for a loan in my Contract.
@@ -438,20 +434,20 @@
                             <!-- Applicant's Full name & signature - Fixed alignment -->
                             <div class="mt-8 mb-8">
                                 <div class="flex justify-between items-end gap-12">
-                                    <div class="text-center" style="min-width: 180px;">
+                                    <div class="text-center" style="width: 150px;">
                                         <div class="relative" style="height: 20px;">
                                             <p class="font-bold text-gray-900 absolute bottom-0 w-full text-center leading-none mb-0">{{ strtoupper(date('F d, Y')) }}</p>
                                         </div>
                                         <div class="border-b-2 border-gray-500 pb-1"></div>
                                         <p class="text-xs text-gray-500 mt-1 text-center">DATE</p>
                                     </div>
-                                    <div class="text-center" style="max-width: 250px;">
-                                        <div class="relative" style="height: 20px;">
-                                            <p id="waiverPrintedName" class="font-bold text-gray-900 absolute bottom-0 w-full text-center leading-none mb-0 whitespace-nowrap overflow-hidden text-ellipsis text-[clamp(0.65rem,1.25vw,1rem)]">{{ ($client->firstname ?? '') . ' ' . ($client->lastname ?? '') }}</p>
+                                    <div class="text-center" style="width: 150px;">
+                                        <div class="relative" style="min-height: 20px;">
+                                            <p id="waiverPrintedName" class="font-bold text-gray-900 text-center leading-tight mb-0 break-words">{{ ($client->firstname ?? '') . ' ' . ($client->lastname ?? '') }}</p>
                                             <img id="waiverSignatureOverPrinted" class="hidden absolute bottom-0 z-10 pointer-events-none" style="left: 50%; transform: translate(-50%, -35px); max-height: 80px;" alt="">
                                         </div>
                                         <div class="border-b-2 border-gray-500 pb-1"></div>
-                                        <p class="text-xs text-gray-500 mt-1 text-left bg-white px-1 inline-block">Applicant's Full name & signature:</p>
+                                        <p class="text-xs text-gray-500 mt-1 text-center leading-tight">Applicant's Full name &<br>signature:</p>
                                     </div>
                                 </div>
                             </div>
@@ -569,7 +565,6 @@
             document.getElementById('totalRepayable').textContent = '₱ ' + totalRepayable.toFixed(2);
             
             // Update Monthly Payment Breakdown (loan-only)
-            document.getElementById('monthlyLoanPayment').textContent = '₱ ' + monthlyLoanPayment.toFixed(2);
             document.getElementById('monthlyInterest').textContent = '₱ ' + monthlyInterest.toFixed(2);
             document.getElementById('monthlyPrincipal').textContent = '₱ ' + monthlyPrincipal.toFixed(2);
             document.getElementById('totalInterest').textContent = '₱ ' + totalInterest.toFixed(2);

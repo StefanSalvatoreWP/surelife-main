@@ -6,12 +6,15 @@
             <div class="flex items-center space-x-3">
                 @if(session('user_roleid') != 7)
                     <a href="/home" class="flex items-center space-x-3 group">
+                        <img src="{{ asset('images/Surelife.png')}}" alt="SLC Logo" class="h-10 w-10 sm:h-12 sm:w-12 object-contain transform group-hover:scale-110 transition duration-300">
+                        <span class="text-primary-600 font-bold text-lg sm:text-xl tracking-tight">SLC Admin Panel</span>
+                    </a>
                 @else
                     <a href="/clienthome/{{ session('user_id') }}" class="flex items-center space-x-3 group">
+                        <img src="{{ asset('images/Surelife.png')}}" alt="SLC Logo" class="h-10 w-10 sm:h-12 sm:w-12 object-contain transform group-hover:scale-110 transition duration-300">
+                        <span class="text-green-600 font-bold text-lg sm:text-xl tracking-tight">SLC Client Portal</span>
+                    </a>
                 @endif
-                    <img src="{{ asset('images/Surelife.png')}}" alt="SLC Logo" class="h-10 w-10 sm:h-12 sm:w-12 object-contain transform group-hover:scale-110 transition duration-300">
-                    <span class="text-primary-600 font-bold text-lg sm:text-xl tracking-tight">SLC Admin Panel</span>
-                </a>
             </div>
 
             <!-- Right Side - Font Size, User Info & Logout -->
