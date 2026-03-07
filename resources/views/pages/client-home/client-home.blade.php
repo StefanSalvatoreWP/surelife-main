@@ -2,7 +2,7 @@
 @extends('layouts.main')
 
 @section('content')
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         @if(session('error'))
             <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-lg shadow-sm">
                 <div class="flex items-center">
@@ -13,444 +13,472 @@
                 </div>
             </div>
         @endif
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="main-grid">
-            <!-- Left Column - Client Information -->
-            <div id="client-info-column">
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-                    <!-- Header with Toggle Button -->
-                    <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100 flex justify-between items-center">
-                        <h3 class="text-lg font-semibold text-gray-800">Client Information</h3>
-                        <button id="toggle-client-info" class="p-2 rounded-lg hover:bg-gray-200 transition duration-200" title="Toggle client information">
-                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+
+        @php
+            $base_price = $clients->Price;
+            $total_payments = 0;
+
+            switch($clients->Term){
+                case "Spotcash": $total_price = $base_price; break;	
+                case "Annual": $total_price = $base_price * 5; break;
+                case "Semi-Annual": $total_price = ($base_price * 2) * 5; break;
+                case "Quarterly": $total_price = ($base_price * 4) * 5; break;
+                case "Monthly": $total_price = $base_price * 60; break;
+                default: $total_price = $base_price * 60;
+            }
+
+            foreach ($payments as $paymentKey => $paymentIndex) {
+                if($paymentIndex->VoidStatus != '1' && 
+                    ($paymentIndex->Remarks == null || 
+                    $paymentIndex->Remarks == 'Standard' || 
+                    $paymentIndex->Remarks == 'Partial' || 
+                    $paymentIndex->Remarks == 'Custom')){
+                    $total_payments += $paymentIndex->AmountPaid;
+                }
+            }
+            $balance = $total_price - $total_payments;
+        @endphp
+
+        <!-- Modern Payment Summary Cards -->
+        <div class="mb-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Package Price Card -->
+                <div class="rounded-xl p-5 shadow-lg hover:shadow-xl transition-shadow duration-300" style="background-color: #3b82f6; color: white;">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1 min-w-0 pr-3">
+                            <p class="text-sm font-medium mb-1" style="color: rgba(255,255,255,0.8);">Package Price</p>
+                            <p class="text-2xl font-bold whitespace-nowrap" style="color: white;">₱ {{ number_format($total_price, 2) }}</p>
+                        </div>
+                        <div class="rounded-full p-3 flex-shrink-0" style="background-color: rgba(255,255,255,0.3);">
+                            <svg class="w-6 h-6" style="color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
-                        </button>
+                        </div>
                     </div>
-                    <div class="p-6 space-y-6" id="client-info-content">
-                        <!-- Contract Section -->
-                        <div>
-                            <h4 class="text-sm font-bold text-gray-800 uppercase tracking-wide mb-3 pb-2 border-b-2 border-gray-200">Contract</h4>
-                            <div class="space-y-2">
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Contract No.</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->ContractNumber }}</span>
+                </div>
+
+                <!-- Total Payment Card -->
+                <div class="rounded-xl p-5 shadow-lg hover:shadow-xl transition-shadow duration-300" style="background-color: #9333ea; color: white;">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1 min-w-0 pr-3">
+                            <p class="text-sm font-medium mb-1" style="color: rgba(255,255,255,0.8);">Total Payment</p>
+                            <p class="text-2xl font-bold whitespace-nowrap" style="color: white;">₱ {{ number_format($total_payments, 2) }}</p>
+                        </div>
+                        <div class="rounded-full p-3 flex-shrink-0" style="background-color: rgba(255,255,255,0.3);">
+                            <svg class="w-6 h-6" style="color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Balance Card -->
+                @if($balance > 0)
+                    <div class="rounded-xl p-5 shadow-lg hover:shadow-xl transition-shadow duration-300" style="background-color: #ef4444; color: white;">
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1 min-w-0 pr-3">
+                                <p class="text-sm font-medium mb-1" style="color: rgba(255,255,255,0.8);">Outstanding Balance</p>
+                                <p class="text-2xl font-bold whitespace-nowrap" style="color: white;">₱ {{ number_format($balance, 2) }}</p>
+                            </div>
+                            <div class="rounded-full p-3 flex-shrink-0" style="background-color: rgba(255,255,255,0.3);">
+                                <svg class="w-6 h-6" style="color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                @else
+                    <div class="rounded-xl p-5 shadow-lg hover:shadow-xl transition-shadow duration-300" style="background-color: #22c55e; color: white;">
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1 min-w-0 pr-3">
+                                <p class="text-sm font-medium mb-1" style="color: rgba(255,255,255,0.8);">Balance</p>
+                                <p class="text-2xl font-bold whitespace-nowrap" style="color: white;">₱ 0.00</p>
+                                <p class="text-xs mt-1" style="color: rgba(255,255,255,0.8);">✓ Fully Paid</p>
+                            </div>
+                            <div class="rounded-full p-3 flex-shrink-0" style="background-color: rgba(255,255,255,0.3);">
+                                <svg class="w-6 h-6" style="color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                <!-- Payment Status Card -->
+                @php
+                    $paymentStatus = 'Active';
+                    $isLapsed = false;
+                    $lastPayment = $payments->where('VoidStatus', '!=', '1')->sortByDesc('Date')->first();
+                    if($lastPayment) {
+                        $lastPaymentDate = \Carbon\Carbon::parse($lastPayment->Date);
+                        $monthsDiff = $lastPaymentDate->diffInMonths(\Carbon\Carbon::now());
+                        if($monthsDiff > 3) {
+                            $paymentStatus = 'Lapse';
+                            $isLapsed = true;
+                        }
+                    } else {
+                        $paymentStatus = 'No Payment';
+                    }
+                @endphp
+                @if($isLapsed)
+                    <div class="rounded-xl p-5 shadow-lg hover:shadow-xl transition-shadow duration-300" style="background-color: #f97316; color: white;">
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1 min-w-0 pr-3">
+                                <p class="text-sm font-medium mb-1" style="color: rgba(255,255,255,0.8);">Payment Status</p>
+                                <p class="text-2xl font-bold" style="color: white;">{{ $paymentStatus }}</p>
+                            </div>
+                            <div class="rounded-full p-3 flex-shrink-0" style="background-color: rgba(255,255,255,0.3);">
+                                <svg class="w-6 h-6" style="color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                @else
+                    <div class="rounded-xl p-5 shadow-lg hover:shadow-xl transition-shadow duration-300" style="background-color: #10b981; color: white;">
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1 min-w-0 pr-3">
+                                <p class="text-sm font-medium mb-1" style="color: rgba(255,255,255,0.8);">Payment Status</p>
+                                <p class="text-2xl font-bold" style="color: white;">{{ $paymentStatus }}</p>
+                            </div>
+                            <div class="rounded-full p-3 flex-shrink-0" style="background-color: rgba(255,255,255,0.3);">
+                                <svg class="w-6 h-6" style="color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left Column - Client Information -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <!-- Header -->
+                    <div class="px-6 py-4 bg-gradient-to-r from-indigo-600 to-purple-600">
+                        <div class="flex items-center">
+                            <div class="bg-white/20 rounded-full p-2 mr-3">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-white">Client Information</h3>
+                                <p class="text-indigo-100 text-sm">{{ $clients->ContractNumber }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-6">
+                        <!-- Client Name Banner -->
+                        <div class="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-4 mb-6 border border-gray-200">
+                            <div class="flex items-center">
+                                <div class="bg-indigo-100 rounded-full p-3 mr-4 flex-shrink-0">
+                                    <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
                                 </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Package</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->Package }}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Term</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->Term  . ' ( ₱ ' . number_format($clients->Price, 2) .' )' }}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Region</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->RegionName }}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Branch</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->BranchName }}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Best place to collect</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->BestPlaceToCollect }}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Best time to collect</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->BestTimeToCollect }}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Status</span>
-                                    <span class="text-gray-900 text-sm">
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="text-xl font-bold text-gray-900 truncate">{{ $clients->LastName . ', ' . $clients->FirstName . ' ' . $clients->MiddleName }}</h4>
+                                    <div class="flex flex-wrap gap-2 mt-2">
                                         @if($clients->Status == '1')
-                                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-gray-200 text-gray-700">Pending</span>
+                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-gray-200 text-gray-700">
+                                                <span class="w-2 h-2 bg-gray-500 rounded-full mr-1.5"></span>Pending
+                                            </span>
                                         @elseif($clients->Status == '2')
-                                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-200 text-blue-700">Verified</span>
+                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
+                                                <span class="w-2 h-2 bg-blue-500 rounded-full mr-1.5"></span>Verified
+                                            </span>
                                         @elseif($clients->Status == '3')
-                                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-200 text-green-700">Approved</span>
+                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+                                                <span class="w-2 h-2 bg-green-500 rounded-full mr-1.5"></span>Approved
+                                            </span>
                                         @endif
-                                    </span>
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-700">{{ $clients->Package }}</span>
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-700">{{ $clients->Term }}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <!-- Personal Section -->
-                        <div>
-                            <h4 class="text-sm font-bold text-gray-800 uppercase tracking-wide mb-3 pb-2 border-b-2 border-gray-200">Personal</h4>
-                            <div class="space-y-2">
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Name</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->LastName . ', ' . $clients->FirstName . " " . $clients->MiddleName }}</span>
+
+                        <!-- Information Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Contract Details -->
+                            <div class="space-y-4">
+                                <h5 class="text-sm font-bold text-gray-700 uppercase tracking-wide flex items-center">
+                                    <svg class="w-4 h-4 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    </svg>
+                                    Contract Details
+                                </h5>
+                                <div class="bg-gray-50 rounded-lg p-4 space-y-3">
+                                    <div class="flex justify-between items-center py-1">
+                                        <span class="text-gray-500 text-sm">Contract No.</span>
+                                        <span class="text-gray-900 text-sm font-medium">{{ $clients->ContractNumber }}</span>
+                                    </div>
+                                    <div class="border-t border-gray-200"></div>
+                                    <div class="flex justify-between items-center py-1">
+                                        <span class="text-gray-500 text-sm">Package</span>
+                                        <span class="text-gray-900 text-sm font-medium">{{ $clients->Package }}</span>
+                                    </div>
+                                    <div class="border-t border-gray-200"></div>
+                                    <div class="flex justify-between items-center py-1">
+                                        <span class="text-gray-500 text-sm">Term</span>
+                                        <span class="text-gray-900 text-sm font-medium whitespace-nowrap">{{ $clients->Term }} (₱{{ number_format($clients->Price, 2) }})</span>
+                                    </div>
+                                    <div class="border-t border-gray-200"></div>
+                                    <div class="flex justify-between items-center py-1">
+                                        <span class="text-gray-500 text-sm">Region</span>
+                                        <span class="text-gray-900 text-sm font-medium text-right ml-4">{{ $clients->RegionName }}</span>
+                                    </div>
+                                    <div class="border-t border-gray-200"></div>
+                                    <div class="flex justify-between items-center py-1">
+                                        <span class="text-gray-500 text-sm">Branch</span>
+                                        <span class="text-gray-900 text-sm font-medium text-right ml-4">{{ $clients->BranchName }}</span>
+                                    </div>
                                 </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Birth Date</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->BirthDate }}</span>
+                            </div>
+
+                            <!-- Personal Details -->
+                            <div class="space-y-4">
+                                <h5 class="text-sm font-bold text-gray-700 uppercase tracking-wide flex items-center">
+                                    <svg class="w-4 h-4 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                    </svg>
+                                    Personal Details
+                                </h5>
+                                <div class="bg-gray-50 rounded-lg p-4 space-y-3">
+                                    <div class="flex justify-between items-center py-1">
+                                        <span class="text-gray-500 text-sm">Birth Date</span>
+                                        <span class="text-gray-900 text-sm font-medium">{{ $clients->BirthDate }}</span>
+                                    </div>
+                                    <div class="border-t border-gray-200"></div>
+                                    <div class="flex justify-between items-center py-1">
+                                        <span class="text-gray-500 text-sm">Age</span>
+                                        <span class="text-gray-900 text-sm font-medium">{{ $clients->Age }}</span>
+                                    </div>
+                                    <div class="border-t border-gray-200"></div>
+                                    <div class="flex justify-between items-center py-1">
+                                        <span class="text-gray-500 text-sm">Gender</span>
+                                        <span class="text-gray-900 text-sm font-medium">{{ $clients->Gender }}</span>
+                                    </div>
+                                    <div class="border-t border-gray-200"></div>
+                                    <div class="flex justify-between items-center py-1">
+                                        <span class="text-gray-500 text-sm">Civil Status</span>
+                                        <span class="text-gray-900 text-sm font-medium">{{ $clients->CivilStatus }}</span>
+                                    </div>
+                                    <div class="border-t border-gray-200"></div>
+                                    <div class="flex justify-between items-center py-1">
+                                        <span class="text-gray-500 text-sm">Occupation</span>
+                                        <span class="text-gray-900 text-sm font-medium text-right ml-4">{{ $clients->Occupation }}</span>
+                                    </div>
                                 </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Age</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->Age }}</span>
+                            </div>
+
+                            <!-- Contact Information -->
+                            <div class="space-y-4">
+                                <h5 class="text-sm font-bold text-gray-700 uppercase tracking-wide flex items-center">
+                                    <svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                                    </svg>
+                                    Contact Information
+                                </h5>
+                                <div class="bg-gray-50 rounded-lg p-4 space-y-3">
+                                    <div class="flex justify-between items-center py-1">
+                                        <span class="text-gray-500 text-sm">Mobile</span>
+                                        <span class="text-gray-900 text-sm font-medium">{{ $clients->MobileNumber }}</span>
+                                    </div>
+                                    <div class="border-t border-gray-200"></div>
+                                    <div class="flex justify-between items-center py-1">
+                                        <span class="text-gray-500 text-sm">Home</span>
+                                        <span class="text-gray-900 text-sm font-medium">{{ $clients->HomeNumber ?? 'N/A' }}</span>
+                                    </div>
+                                    <div class="border-t border-gray-200"></div>
+                                    <div class="flex justify-between items-center py-1">
+                                        <span class="text-gray-500 text-sm">Email</span>
+                                        <span class="text-gray-900 text-sm font-medium break-all ml-4">{{ $clients->EmailAddress }}</span>
+                                    </div>
                                 </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Gender</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->Gender }}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Civil Status</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->CivilStatus }}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Occupation</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->Occupation }}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Birth Place</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->BirthPlace }}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Province</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->ProvinceName }}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">City</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->CityName }}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Barangay</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->BarangayName }}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Street</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->Street }}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Zipcode</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->ZipCode }}</span>
+                            </div>
+
+                            <!-- Address -->
+                            <div class="space-y-4">
+                                <h5 class="text-sm font-bold text-gray-700 uppercase tracking-wide flex items-center">
+                                    <svg class="w-4 h-4 mr-2 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    </svg>
+                                    Address
+                                </h5>
+                                <div class="bg-gray-50 rounded-lg p-4 space-y-3">
+                                    <div class="flex justify-between items-center py-1">
+                                        <span class="text-gray-500 text-sm">Province</span>
+                                        <span class="text-gray-900 text-sm font-medium text-right ml-4">{{ $clients->ProvinceName }}</span>
+                                    </div>
+                                    <div class="border-t border-gray-200"></div>
+                                    <div class="flex justify-between items-center py-1">
+                                        <span class="text-gray-500 text-sm">City</span>
+                                        <span class="text-gray-900 text-sm font-medium text-right ml-4">{{ $clients->CityName }}</span>
+                                    </div>
+                                    <div class="border-t border-gray-200"></div>
+                                    <div class="flex justify-between items-center py-1">
+                                        <span class="text-gray-500 text-sm">Barangay</span>
+                                        <span class="text-gray-900 text-sm font-medium text-right ml-4">{{ $clients->BarangayName }}</span>
+                                    </div>
+                                    <div class="border-t border-gray-200"></div>
+                                    <div class="flex justify-between items-center py-1">
+                                        <span class="text-gray-500 text-sm">Street</span>
+                                        <span class="text-gray-900 text-sm font-medium text-right ml-4">{{ $clients->Street }}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <!-- Contact Section -->
-                        <div>
-                            <h4 class="text-sm font-bold text-gray-800 uppercase tracking-wide mb-3 pb-2 border-b-2 border-gray-200">Contact</h4>
-                            <div class="space-y-2">
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Home No.</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->HomeNumber }}</span>
+
+                        <!-- Collection Info -->
+                        <div class="mt-6">
+                            <h5 class="text-sm font-bold text-gray-700 uppercase tracking-wide flex items-center mb-4">
+                                <svg class="w-4 h-4 mr-2 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                Collection Details
+                            </h5>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
+                                    <p class="text-yellow-600 text-xs font-medium mb-1">Best Place to Collect</p>
+                                    <p class="text-gray-900 text-sm font-medium">{{ $clients->BestPlaceToCollect ?? 'Not specified' }}</p>
                                 </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Mobile No.</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->MobileNumber }}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Email Address</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->EmailAddress }}</span>
+                                <div class="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
+                                    <p class="text-yellow-600 text-xs font-medium mb-1">Best Time to Collect</p>
+                                    <p class="text-gray-900 text-sm font-medium">{{ $clients->BestTimeToCollect ?? 'Not specified' }}</p>
                                 </div>
                             </div>
                         </div>
-                        <!-- Beneficiaries Section -->
-                        <div>
-                            <h4 class="text-sm font-bold text-gray-800 uppercase tracking-wide mb-3 pb-2 border-b-2 border-gray-200">Beneficiaries</h4>
-                            <div class="space-y-2">
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Principal (Age)</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->PrincipalBeneficiaryName . ' (' . $clients->PrincipalBeneficiaryAge . ')'}}</span>
+
+                        <!-- Beneficiaries -->
+                        <div class="mt-6">
+                            <h5 class="text-sm font-bold text-gray-700 uppercase tracking-wide flex items-center mb-4">
+                                <svg class="w-4 h-4 mr-2 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                </svg>
+                                Beneficiaries
+                            </h5>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                <div class="bg-pink-50 rounded-lg p-3 border border-pink-200">
+                                    <p class="text-pink-600 text-xs font-medium mb-1">Principal</p>
+                                    <p class="text-gray-900 text-sm font-medium">{{ $clients->PrincipalBeneficiaryName }} ({{ $clients->PrincipalBeneficiaryAge }})</p>
                                 </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Beneficiary 1 (Age)</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->Secondary1Name . ' (' . $clients->Secondary1Age . ')'}}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Beneficiary 2 (Age)</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->Secondary2Name . ' (' . $clients->Secondary2Age . ')'}}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Beneficiary 3 (Age)</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->Secondary3Name . ' (' . $clients->Secondary3Age . ')'}}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Beneficiary 4 (Age)</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->Secondary4Name . ' (' . $clients->Secondary4Age . ')'}}</span>
-                                </div>
+                                @if($clients->Secondary1Name)
+                                    <div class="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                                        <p class="text-gray-500 text-xs font-medium mb-1">Beneficiary 1</p>
+                                        <p class="text-gray-900 text-sm font-medium">{{ $clients->Secondary1Name }} ({{ $clients->Secondary1Age }})</p>
+                                    </div>
+                                @endif
+                                @if($clients->Secondary2Name)
+                                    <div class="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                                        <p class="text-gray-500 text-xs font-medium mb-1">Beneficiary 2</p>
+                                        <p class="text-gray-900 text-sm font-medium">{{ $clients->Secondary2Name }} ({{ $clients->Secondary2Age }})</p>
+                                    </div>
+                                @endif
+                                @if($clients->Secondary3Name)
+                                    <div class="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                                        <p class="text-gray-500 text-xs font-medium mb-1">Beneficiary 3</p>
+                                        <p class="text-gray-900 text-sm font-medium">{{ $clients->Secondary3Name }} ({{ $clients->Secondary3Age }})</p>
+                                    </div>
+                                @endif
+                                @if($clients->Secondary4Name)
+                                    <div class="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                                        <p class="text-gray-500 text-xs font-medium mb-1">Beneficiary 4</p>
+                                        <p class="text-gray-900 text-sm font-medium">{{ $clients->Secondary4Name }} ({{ $clients->Secondary4Age }})</p>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            
+
             <!-- Right Column - Payment History -->
-            <div>
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-                    <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-green-50 to-green-100">
-                        <h3 class="text-lg font-semibold text-gray-800">Payment History</h3>
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden sticky top-6">
+                    <div class="px-6 py-4 bg-gradient-to-r from-green-500 to-emerald-600">
+                        <div class="flex items-center">
+                            <div class="bg-white/20 rounded-full p-2 mr-3">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-semibold text-white">Payment History</h3>
+                        </div>
                     </div>
-                    <div class="p-6">
-                        @php
-                                $base_price = $clients->Price;
-                                $total_payments = 0;
-
-                                switch($clients->Term){
-                                    case "Spotcash":
-                                        $total_price = $base_price;
-                                        break;	
-                                    case "Annual":
-                                        $total_price = $base_price * 5;
-                                        break;
-                                    case "Semi-Annual":
-                                        $total_price = ($base_price * 2) * 5;
-                                        break;
-                                    case "Quarterly":
-                                        $total_price = ($base_price * 4) * 5;
-                                        break;
-                                    case "Monthly":
-                                        $total_price = $base_price * 60;
-                                        break;
-                                    default:
-                                        $total_price = $base_price * 60;
-                                }
-
-                                // Calculate payments BEFORE displaying cards
-                                foreach ($payments as $paymentKey => $paymentIndex) {
-                                    if($paymentIndex->VoidStatus != '1' && 
-                                        ($paymentIndex->Remarks == null || 
-                                        $paymentIndex->Remarks == 'Standard' || 
-                                        $paymentIndex->Remarks == 'Partial' || 
-                                        $paymentIndex->Remarks == 'Custom')){
-                                        $total_payments += $paymentIndex->AmountPaid;
-                                    }
-                                }
-                                $balance = $total_price - $total_payments;
-                        @endphp
-                        
-                        <!-- Custom CSS for Dynamic Icon Visibility -->
-                        <style>
-                            /* 
-                                Logic: Hide icons ONLY when:
-                                1. Screen is XL or larger (where 4-column grid activates)
-                                2. AND Sidebar is OPEN (causing cramping)
-                            */
-                            @media (min-width: 1280px) {
-                                #main-grid.sidebar-open .dashboard-card-icon {
-                                    display: none !important;
-                                }
-                            }
-                        </style>
-
-                        <!-- Payment Summary Cards -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
-                            <!-- Package Price Card -->
-                            <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <p class="text-sm text-blue-600 font-medium mb-1">Package Price</p>
-                                        <p class="text-2xl font-bold text-blue-900">₱ {{ number_format($total_price, 2) }}</p>
+                    <div class="p-4 max-h-96 overflow-y-auto">
+                        @php $displayIndex = 1; @endphp
+                        @foreach ($payments as $paymentKey => $paymentIndex)
+                            @if($paymentIndex->VoidStatus != '1')
+                                <div class="mb-3 p-3 bg-gray-50 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <div class="flex-1 min-w-0 pr-2">
+                                            <p class="text-xs text-gray-500">{{ $paymentIndex->Date }}</p>
+                                            <p class="text-sm font-semibold text-gray-900 whitespace-nowrap">₱ {{ number_format($paymentIndex->AmountPaid, 2) }}</p>
+                                        </div>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700 flex-shrink-0">
+                                            Success
+                                        </span>
                                     </div>
-                                    <div class="bg-blue-200 rounded-full p-3 dashboard-card-icon">
-                                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                        </svg>
+                                    <div class="flex justify-between items-center text-xs text-gray-500">
+                                        <span>OR: {{ $paymentIndex->ORNo }}</span>
+                                        <span class="text-gray-400">{{ $paymentIndex->Remarks ?? 'Standard' }}</span>
                                     </div>
                                 </div>
+                                @php $displayIndex++; @endphp
+                            @endif
+                        @endforeach
+
+                        @if($displayIndex == 1)
+                            <div class="text-center py-8 text-gray-500">
+                                <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                <p class="text-sm">No payment records yet</p>
                             </div>
-
-                            <!-- Total Package Payment Card -->
-                            <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <p class="text-sm text-purple-600 font-medium mb-1">Total Package Payment</p>
-                                        <p class="text-2xl font-bold text-purple-900">₱ {{ number_format($total_payments, 2) }}</p>
-                                    </div>
-                                    <div class="bg-purple-200 rounded-full p-3 dashboard-card-icon">
-                                        <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
-                                        </svg>
-                                    </div>
-                                </div>
-                            </div>
-
-                            @if($balance > 0)
-                                <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-lg p-4 border border-red-200">
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <p class="text-sm text-red-600 font-medium mb-1">Outstanding Balance</p>
-                                            <p class="text-2xl font-bold text-red-900">₱ {{ number_format($balance, 2) }}</p>
-                                        </div>
-                                        <div class="bg-red-200 rounded-full p-3 dashboard-card-icon">
-                                            <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                            </svg>
-                                        </div>
-                                    </div>
-                                </div>
-                            @else
-                                <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <p class="text-sm text-green-600 font-medium mb-1">Balance</p>
-                                            <p class="text-2xl font-bold text-green-900">₱ {{ number_format(0, 2) }}</p>
-                                            <p class="text-xs text-green-600 mt-1">Fully Paid</p>
-                                        </div>
-                                        <div class="bg-green-200 rounded-full p-3 dashboard-card-icon">
-                                            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                            </svg>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endif
-
-                            <!-- Payment Status Card - Hidden for fully paid clients -->
-                            @if($balance > 0)
-                                @php
-                                    $paymentStatus = 'Active';
-                                    $isLapsed = false;
-                                    
-                                    // Get last payment date (excluding voided)
-                                    $lastPayment = $payments->where('VoidStatus', '!=', '1')
-                                        ->sortByDesc('Date')
-                                        ->first();
-                                    
-                                    if($lastPayment) {
-                                        $lastPaymentDate = \Carbon\Carbon::parse($lastPayment->Date);
-                                        $monthsDiff = $lastPaymentDate->diffInMonths(\Carbon\Carbon::now());
-                                        
-                                        if($monthsDiff > 3) {
-                                            $paymentStatus = 'Lapse';
-                                            $isLapsed = true;
-                                        }
-                                    }
-                                @endphp
-                                @if($isLapsed)
-                                    <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-lg p-4 border border-red-200">
-                                        <div class="flex items-center justify-between">
-                                            <div>
-                                                <p class="text-sm text-red-600 font-medium mb-1">Payment Status</p>
-                                                <p class="text-2xl font-bold text-red-900">{{ $paymentStatus }}</p>
-                                            </div>
-                                            <div class="bg-red-200 rounded-full p-3 dashboard-card-icon">
-                                                <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                                </svg>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @else
-                                    <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
-                                        <div class="flex items-center justify-between">
-                                            <div>
-                                                <p class="text-sm text-green-600 font-medium mb-1">Payment Status</p>
-                                                <p class="text-2xl font-bold text-green-900">{{ $paymentStatus }}</p>
-                                            </div>
-                                            <div class="bg-green-200 rounded-full p-3 dashboard-card-icon">
-                                                <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                                </svg>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endif
-                            @endif
-                        </div>
-                        <!-- Payment Table -->
-                        <div class="bg-white rounded-lg border border-gray-200 overflow-x-auto">
-                            <table id="common_dataTable" class="table table-hover font-sm w-100">
-                                <thead class="bg-gradient-to-r from-green-500 to-green-600">
-                                    <tr>
-                                        <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider">No</th>
-                                        <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider">Series Code</th>
-                                        <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider">OR No.</th>
-                                        <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider">Amount Paid</th>
-                                        <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider">Payment Type</th>
-                                        <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider">Date</th>
-                                        <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider">Status</th>
-                                        @if(session('user_roleid') != 7)
-                                            <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider">Action</th>
-                                        @endif
-                                    </tr>
-                                </thead>
-                            <tbody>
-                                @php $displayIndex = 1; @endphp
-                                @foreach ($payments as $paymentKey => $paymentIndex)
-                                    @if($paymentIndex->VoidStatus != '1')
-                                        <tr>
-                                            <td>{{ $displayIndex }}</td>
-                                            <td>
-                                                @if ($paymentIndex->officialReceipt && $paymentIndex->officialReceipt->orBatch)
-                                                    {{ $paymentIndex->officialReceipt->orBatch->SeriesCode }}
-                                                @else
-                                                    <span class="text-secondary">Not available</span>
-                                                @endif
-                                            </td>
-                                            <td>{{ $paymentIndex->ORNo }}</td>
-                                            <td>P {{ number_format($paymentIndex->AmountPaid, 2) }}</td>
-                                            <td>
-                                                @php
-                                                    $paymentType = $paymentIndex->Remarks ?? 'Standard';
-                                                    $displayType = $paymentType;
-                                                    $typeClass = 'px-3 py-1 rounded-full text-xs font-semibold bg-blue-200 text-blue-800';
-                                                    
-                                                    if($paymentType == 'Partial') {
-                                                        $typeClass = 'px-3 py-1 rounded-full text-xs font-semibold bg-yellow-200 text-yellow-800';
-                                                    } elseif($paymentType == 'Custom' || $paymentType == 'Custom Add Payment') {
-                                                        $typeClass = 'px-3 py-1 rounded-full text-xs font-semibold bg-purple-200 text-purple-800';
-                                                        $displayType = 'Custom';
-                                                    } elseif($paymentType == 'Transfer') {
-                                                        $typeClass = 'px-3 py-1 rounded-full text-xs font-semibold bg-indigo-200 text-indigo-800';
-                                                    } elseif($paymentType == 'Reinstatement') {
-                                                        $typeClass = 'px-3 py-1 rounded-full text-xs font-semibold bg-green-200 text-green-800';
-                                                    } elseif($paymentType == 'Change Mode') {
-                                                        $typeClass = 'px-3 py-1 rounded-full text-xs font-semibold bg-orange-200 text-orange-800';
-                                                    } elseif($paymentType == 'Penalty') {
-                                                        $typeClass = 'px-3 py-1 rounded-full text-xs font-semibold bg-gray-200 text-gray-800';
-                                                    }
-                                                @endphp
-                                                <span class="{{ $typeClass }}">
-                                                    {{ $displayType }}
-                                                </span>
-                                            </td>
-                                            <td>{{ $paymentIndex->Date }}</td>
-                                            <td>
-                                                <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold bg-green-600 text-white shadow-sm">
-                                                    <svg class="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                                    </svg>
-                                                    Success
-                                                </span>
-                                            </td>
-                                            @if(session('user_roleid') != 7)
-                                                <td>
-                                                    <a onclick="showPaymentVoidModal('{{ $paymentIndex->Id }}', '{{ $paymentIndex->ORNo }}')" role="button">
-                                                        <span class="badge bg-danger">Void</span>
-                                                    </a>
-                                                </td>
-                                            @endif
-                                        </tr>
-                                        @php $displayIndex++; @endphp
-                                    @endif
-                                @endforeach
-                            </tbody>
-                            </table>
-                        </div>
-                        @if(session('user_roleid') != 7)
-                            @if($clients->Status == '3')
-                                <div class="mt-4 flex flex-wrap gap-3">
-                                    <a href="/client-addpayment/{{ $clients->cid }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white text-sm font-medium rounded-md shadow-sm hover:shadow transition duration-150" role="button">Add Payment</a>
-                                    <a href="/client-printsoa/{{ $clients->cid }}?export=true" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white text-sm font-medium rounded-md shadow-sm hover:shadow transition duration-150" role="button" target="_blank">SOA (CSV)</a>
-                                    <a href="/client-printsoa-pdf/{{ $clients->cid }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white text-sm font-medium rounded-md shadow-sm hover:shadow transition duration-150" role="button" target="_blank">SOA (PDF)</a>
-                                    @if($balance <= 0)
-                                        @if($clients->CFPNO == null)
-                                            <a class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white text-sm font-medium rounded-md shadow-sm hover:shadow transition duration-150" onclick="showCfpInputModal({{ $clients->cid }})" role="button">Certificate of Full Payment</a>
-                                        @else
-                                            <a href="/client-printcofp/{{ $clients->cid }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white text-sm font-medium rounded-md shadow-sm hover:shadow transition duration-150" role="button">Certificate of Full Payment</a>
-                                        @endif
-                                    @endif
-                                </div>
-                            @else
-                                <p class="mt-4 text-gray-500 text-sm">** Client needs to be approved to add a new payment.</p>
-                                <!-- Debug: Always show PDF button for testing -->
-                                <div class="mt-4 flex flex-wrap gap-3">
-                                    <a href="/client-printsoa-pdf/{{ $clients->cid }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white text-sm font-medium rounded-md shadow-sm hover:shadow transition duration-150" role="button" target="_blank">SOA (PDF) - Test</a>
-                                </div>
-                            @endif
                         @endif
                     </div>
+
+                    <!-- Action Buttons -->
+                    @if(session('user_roleid') != 7)
+                        @if($clients->Status == '3')
+                            <div class="p-4 border-t border-gray-200 bg-gray-50">
+                                <div class="grid grid-cols-2 gap-2">
+                                    <a href="/client-addpayment/{{ $clients->cid }}" class="inline-flex items-center justify-center px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-xs font-medium rounded-lg transition-colors">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                        </svg>
+                                        Add Payment
+                                    </a>
+                                    <a href="/client-printsoa-pdf/{{ $clients->cid }}" class="inline-flex items-center justify-center px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg transition-colors" target="_blank">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                        </svg>
+                                        SOA PDF
+                                    </a>
+                                </div>
+                                @if($balance <= 0 && $clients->CFPNO == null)
+                                    <a class="mt-2 w-full inline-flex items-center justify-center px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-medium rounded-lg transition-colors" onclick="showCfpInputModal({{ $clients->cid }})" role="button">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                        Certificate of Full Payment
+                                    </a>
+                                @endif
+                            </div>
+                        @else
+                            <div class="p-4 border-t border-gray-200 bg-yellow-50">
+                                <p class="text-xs text-yellow-700 text-center">Client needs approval to add payments</p>
+                            </div>
+                        @endif
+                    @endif
                 </div>
             </div>
         </div>
@@ -459,96 +487,6 @@
 
 @section('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const toggleBtn = document.getElementById('toggle-client-info');
-    const clientInfoContent = document.getElementById('client-info-content');
-    const clientInfoColumn = document.getElementById('client-info-column');
-    const mainGrid = document.getElementById('main-grid');
-    let isCollapsed = false;
-
-    // Initialize sidebar-open class since we start expanded
-    mainGrid.classList.add('sidebar-open');
-
-    toggleBtn.addEventListener('click', function() {
-        isCollapsed = !isCollapsed;
-        
-        if (isCollapsed) {
-            // Collapse client info
-            clientInfoContent.style.display = 'none';
-            clientInfoColumn.style.maxWidth = '60px';
-            clientInfoColumn.style.minWidth = '60px';
-            mainGrid.classList.remove('lg:grid-cols-2');
-            mainGrid.classList.add('lg:grid-cols-[60px_1fr]');
-            
-            // Remove sidebar-open class to show icons
-            mainGrid.classList.remove('sidebar-open');
-            
-            // Change icon to chevron right (expand)
-            toggleBtn.innerHTML = `
-                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                </svg>
-            `;
-            toggleBtn.setAttribute('title', 'Expand client information');
-            toggleBtn.parentElement.style.justifyContent = 'center';
-            toggleBtn.parentElement.querySelector('h3').style.display = 'none';
-        } else {
-            // Expand client info
-            clientInfoContent.style.display = 'block';
-            clientInfoColumn.style.maxWidth = 'none';
-            clientInfoColumn.style.minWidth = 'auto';
-            mainGrid.classList.remove('lg:grid-cols-[60px_1fr]');
-            mainGrid.classList.add('lg:grid-cols-2');
-
-            // Add sidebar-open class to hide icons if needed
-            mainGrid.classList.add('sidebar-open');
-            
-            // Change icon to chevron left (collapse)
-            toggleBtn.innerHTML = `
-                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                </svg>
-            `;
-            toggleBtn.setAttribute('title', 'Collapse client information');
-            toggleBtn.parentElement.style.justifyContent = 'space-between';
-            toggleBtn.parentElement.querySelector('h3').style.display = 'block';
-        }
-    });
-});
-
-// Swift-Style Modal Functions
-let currentPaymentId = null;
-function showPaymentVoidModal(paymentId, orNo) {
-    currentPaymentId = paymentId;
-    showSwiftModal('Void Payment', `You are going to void the selected payment with OR No. ${orNo}\n\nYou cannot undo this action. Continue?`, 'warning', [
-        {text: 'Confirm', class: 'bg-red-500 hover:bg-red-600 text-white', action: 'submitPaymentVoid()'},
-        {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
-    ]);
-}
-
-function submitPaymentVoid() {
-    if (!currentPaymentId) return;
-    
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = '/submit-void-payment/' + currentPaymentId;
-    
-    const csrfToken = document.createElement('input');
-    csrfToken.type = 'hidden';
-    csrfToken.name = '_token';
-    csrfToken.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-    
-    const method = document.createElement('input');
-    method.type = 'hidden';
-    method.name = '_method';
-    method.value = 'PUT';
-    
-    form.appendChild(csrfToken);
-    form.appendChild(method);
-    document.body.appendChild(form);
-    form.submit();
-}
-
 // Certificate of Full Payment Modal
 function showCfpInputModal(clientId) {
     const modal = document.getElementById('swiftModal');

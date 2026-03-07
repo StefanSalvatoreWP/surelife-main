@@ -726,12 +726,11 @@
                             <!-- Package Price Card -->
                             <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
                                 <div class="flex items-center justify-between">
-                                    <div>
+                                    <div class="min-w-0">
                                         <p class="text-sm text-blue-600 font-medium mb-1">Package Price</p>
-                                        <p class="text-2xl font-bold text-blue-900">₱ {{ number_format($total_price, 2) }}
-                                        </p>
+                                        <p class="text-2xl font-bold text-blue-900 whitespace-nowrap">₱ {{ number_format($total_price, 2) }}</p>
                                     </div>
-                                    <div class="bg-blue-200 rounded-full p-3">
+                                    <div class="bg-blue-200 rounded-full p-3 flex-shrink-0">
                                         <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -742,16 +741,13 @@
                             </div>
 
                             <!-- Total Package Payment Card -->
-                            <div
-                                class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
+                            <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
                                 <div class="flex items-center justify-between">
-                                    <div>
+                                    <div class="min-w-0">
                                         <p class="text-sm text-purple-600 font-medium mb-1">Total Package Payment</p>
-                                        <p class="text-2xl font-bold text-purple-900">₱
-                                            {{ number_format($total_payments, 2) }}
-                                        </p>
+                                        <p class="text-2xl font-bold text-purple-900 whitespace-nowrap">₱ {{ number_format($total_payments, 2) }}</p>
                                     </div>
-                                    <div class="bg-purple-200 rounded-full p-3">
+                                    <div class="bg-purple-200 rounded-full p-3 flex-shrink-0">
                                         <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

@@ -65,8 +65,6 @@ $(document).ready(function() {
                                 'Voided' +
                                 '</button>';
                     } else {
-                        $('#contractseriesToVoid').val(row.ContractNumber);
-
                         return '<a data-bs-toggle="modal" data-bs-target="#contractseriesVoidModal" data-contractseries-id="' + row.Id + '" data-contractseries-contractno="' + row.ContractNumber + '" role="button" class="action-btn action-btn-void">' +
                                 '<svg class="action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
                                 '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>' +
@@ -94,7 +92,6 @@ $(document).ready(function() {
     });
 
     $('#contractseriesVoidModal').on('show.bs.modal', function(event) {
-
         let button = $(event.relatedTarget);
         let contractSeriesId = button.data('contractseries-id');
         let contractNumber = button.data('contractseries-contractno');
@@ -102,7 +99,6 @@ $(document).ready(function() {
         let modal = $(this);
         modal.find('#contractseriesToVoid').text(contractNumber);
         modal.find('#confirmVoid').click(function() {
-            
             let voidForm = $('#voidForm');
             voidForm.attr('action', '/submit-contractseries-void/' + contractSeriesId);
             voidForm.submit();

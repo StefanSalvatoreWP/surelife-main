@@ -29,19 +29,7 @@
             </div>
 
             <!-- Eligibility Alert -->
-            @if($loanRequest)
-                {{-- Loan request exists - show status info --}}
-                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg">
-                    <div class="flex items-center">
-                        <svg class="w-5 h-5 text-blue-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-3a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                                clip-rule="evenodd" />
-                        </svg>
-                        <p class="text-blue-700 font-medium">Loan request submitted. Status: {{ $loanStatus }}</p>
-                    </div>
-                </div>
-            @elseif(!$isEligible)
+            @if(!$isEligible)
                 {{-- No loan request, not eligible - show reason --}}
                 <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-lg">
                     <div class="flex items-center">
@@ -208,20 +196,8 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-green-600 font-medium mb-2">Status</p>
-                        @if($loanStatus == 'Pending')
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-gray-200 text-gray-700">
-                                {{ $loanStatus }}
-                            </span>
-                        @elseif($loanStatus == 'Verified')
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-200 text-blue-700">
-                                {{ $loanStatus }}
-                            </span>
-                        @elseif($loanStatus == 'Approved')
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-200 text-green-700">
-                                {{ $loanStatus }}
-                            </span>
-                        @else
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-gray-200 text-gray-700">{{ $loanStatus }}</span>
+                        @if(!$loanRequest)
+                            <p class="text-gray-500 text-sm">No loan request yet</p>
                         @endif
                     </div>
                     <div class="bg-green-200 rounded-full p-4">
@@ -280,6 +256,31 @@
                         </svg>
                     </div>
                 </div>
+                @if($loanRequest)
+                <!-- Payment Progress -->
+                <div class="mt-4 pt-4 border-t border-orange-200">
+                    @php
+                        $totalRepayable = $loanableAmount + ($loanableAmount * 0.0125 * ($termMonths ?? 12));
+                        $paidAmount = $totalRepayable - $loanBalance;
+                        $progressPercent = $totalRepayable > 0 ? round(($paidAmount / $totalRepayable) * 100) : 0;
+                    @endphp
+                    <div class="flex justify-between text-xs text-orange-600 mb-1">
+                        <span>Payment Progress</span>
+                        <span>{{ $progressPercent }}%</span>
+                    </div>
+                    <div class="w-full bg-orange-200 rounded-full h-2">
+                        <div class="bg-orange-500 h-2 rounded-full transition-all duration-300" style="width: {{ $progressPercent }}%"></div>
+                    </div>
+                    <div class="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>₱ {{ number_format($paidAmount, 2) }} paid</span>
+                        <span>₱ {{ number_format($totalRepayable, 2) }} total</span>
+                    </div>
+                </div>
+                @else
+                <div class="mt-4 pt-4 border-t border-orange-200">
+                    <p class="text-gray-500 text-sm">No outstanding balance</p>
+                </div>
+                @endif
             </div>
         </div>
     </div>
