@@ -146,6 +146,15 @@
                         <span class="font-semibold text-gray-900">{{ $premiumPaidPercent }}%</span>
                     </div>
                     <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                        <span class="text-gray-600">Tier Qualified</span>
+                        <span class="font-semibold text-gray-900">
+                            @php
+                                $tierNames = [60 => 'Bronze', 80 => 'Silver', 100 => 'Gold'];
+                                echo $tierNames[$premiumPaidPercent] ?? 'Not Qualified';
+                            @endphp
+                        </span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
                         <span class="text-gray-600">Loanable Percentage (Tier)</span>
                         <span class="font-semibold text-gray-900">
                             @php
@@ -200,14 +209,6 @@
                     <div class="flex justify-between items-center py-2 border-b border-gray-100">
                         <span class="text-gray-600">Monthly Loan Payment</span>
                         <span class="font-semibold text-gray-900">₱ {{ number_format($monthlyLoanPayment, 2) }}</span>
-                    </div>
-                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                        <span class="text-amber-600 font-medium">Interest Rate per Month</span>
-                        <span class="font-semibold text-amber-600">{{ $interestRate }}%</span>
-                    </div>
-                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                        <span class="text-amber-600 font-medium">Total Interest ({{ $termMonths }} months)</span>
-                        <span class="font-semibold text-amber-600">₱ {{ number_format($totalInterest, 2) }}</span>
                     </div>
                     <div class="flex justify-between items-center py-2 border-b border-gray-100">
                         <span class="text-gray-600">Monthly Interest</span>
