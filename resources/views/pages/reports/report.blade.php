@@ -270,9 +270,10 @@
                     <div id="statusDateRange" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label for="statusDateFrom" class="block text-sm font-medium text-gray-700 mb-2">
-                                Date From <span class="text-gray-400 font-normal">(optional)</span>
+                                Date From <span class="text-red-500">*</span>
                             </label>
                             <input type="date" id="statusDateFrom" name="statusdatefrom" value="{{ old('statusdatefrom') }}"
+                                required
                                 class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition duration-200">
                             @error('statusdatefrom')
                                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
@@ -280,9 +281,10 @@
                         </div>
                         <div>
                             <label for="statusDateTo" class="block text-sm font-medium text-gray-700 mb-2">
-                                Date To <span class="text-gray-400 font-normal">(optional)</span>
+                                Date To <span class="text-red-500">*</span>
                             </label>
                             <input type="date" id="statusDateTo" name="statusdateto" value="{{ old('statusdateto') }}"
+                                required
                                 class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition duration-200">
                             @error('statusdateto')
                                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
@@ -293,7 +295,7 @@
                     {{-- Info note about Active/Lapse --}}
                     <p class="text-xs text-gray-500 italic">
                         * Active &amp; Lapse reports use term-aware thresholds: Monthly (2 mos), Quarterly (6 mos),
-                        Semi-Annual (12 mos), Annual (24 mos). No date filter required.
+                        Semi-Annual (12 mos), Annual (24 mos). Date filters apply to the 'Date Accomplished' field.
                     </p>
 
                     {{-- Export Buttons --}}
