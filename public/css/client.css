@@ -126,6 +126,27 @@
     color: #dc2626;
 }
 
+/* Approve/Reject dropdown items */
+.dropdown-item-approve {
+    color: #059669;
+}
+
+.dropdown-item-approve:hover {
+    background: #ecfdf5 !important;
+    background-color: #ecfdf5 !important;
+    color: #047857;
+}
+
+.dropdown-item-reject {
+    color: #dc2626;
+}
+
+.dropdown-item-reject:hover {
+    background: #fef2f2 !important;
+    background-color: #fef2f2 !important;
+    color: #b91c1c;
+}
+
 /* Prevent hover/clicks on ALL action-dropdown elements when dropdown is open */
 body.dropdown-open .action-dropdown {
     pointer-events: none !important;
@@ -161,7 +182,9 @@ body.dropdown-open #spotcash-approval-table tbody tr:has(.action-dropdown.open):
 
 /* Action column width - prevent cutoff and horizontal scroll */
 #common_dataTable thead th:last-child,
-#common_dataTable tbody td:last-child {
+#common_dataTable tbody td:last-child,
+#spotcash-approval-table thead th:last-child,
+#spotcash-approval-table tbody td:last-child {
     width: 60px !important;
     min-width: 60px !important;
     max-width: 60px !important;

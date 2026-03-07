@@ -134,28 +134,29 @@
                     return '<span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-medium">' + data + '</span>';
                 }},
                 { data: null, orderable: false, render: function(data) {
-                    var approveBtn = '<button type="button" onclick="openModal(' + data.id + ')" class="action-btn action-btn-assign text-xs sm:text-sm">' +
-                        '<svg class="action-icon w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
-                        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />' +
-                        '</svg>' +
-                        '<span class="hidden sm:inline">Approve</span>' +
-                        '</button>';
-
-                    var rejectBtn = '<button type="button" onclick="openRejectionModal(' + data.id + ')" class="action-btn action-btn-delete text-xs sm:text-sm">' +
-                        '<svg class="action-icon w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
-                        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />' +
-                        '</svg>' +
-                        '<span class="hidden sm:inline">Reject</span>' +
-                        '</button>';
-
-                    return '<div style="display: flex; gap: 0.5rem;" class="flex-col sm:flex-row">' + approveBtn + rejectBtn + '</div>';
+                    return '<div class="action-dropdown">' +
+                        '<button onclick="toggleDropdown(this)" class="action-dropdown-btn">' +
+                        '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">' +
+                        '<path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>' +
+                        '</svg></button>' +
+                        '<div class="action-dropdown-menu">' +
+                        '<button type="button" onclick="openModal(' + data.id + ')" class="dropdown-item dropdown-item-approve">' +
+                        '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
+                        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>' +
+                        '</svg><span>Approve</span></button>' +
+                        '<button type="button" onclick="openRejectionModal(' + data.id + ')" class="dropdown-item dropdown-item-reject">' +
+                        '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
+                        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>' +
+                        '</svg><span>Reject</span></button>' +
+                        '</div></div>';
                 }}
             ],
             columnDefs: [
                 {
                     targets: [6],
                     orderable: false,
-                    width: '200px'
+                    width: '60px',
+                    className: 'action-column'
                 }
             ],
             order: [[0, 'desc']]
@@ -163,6 +164,28 @@
     });
 
     let currentPaymentId = null;
+
+    function toggleDropdown(btn) {
+        const dropdown = btn.closest('.action-dropdown');
+        const menu = dropdown.querySelector('.action-dropdown-menu');
+        const isOpen = menu.classList.contains('show');
+        
+        // Close all other dropdowns
+        document.querySelectorAll('.action-dropdown-menu.show').forEach(m => {
+            m.classList.remove('show');
+        });
+        document.querySelectorAll('.action-dropdown.open').forEach(d => {
+            d.classList.remove('open');
+        });
+        document.body.classList.remove('dropdown-open');
+        
+        // Toggle current dropdown
+        if (!isOpen) {
+            menu.classList.add('show');
+            dropdown.classList.add('open');
+            document.body.classList.add('dropdown-open');
+        }
+    }
 
     function openModal(paymentId) {
         currentPaymentId = paymentId;
