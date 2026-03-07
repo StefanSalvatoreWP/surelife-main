@@ -1,6 +1,10 @@
 <!-- 2024 SilverDust) S. Maceren --> 
 @extends('layouts.main')
 
+@section('styles')
+    <link rel="stylesheet" href="{{ asset('css/action.css') }}?v={{ time() }}">
+@endsection
+
 @section('content')
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Header Section -->
