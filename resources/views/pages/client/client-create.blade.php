@@ -1985,11 +1985,12 @@
                 homeCitySelect.addEventListener('change', function() {
                     const cityCode = this.value;
                     const cityName = this.options[this.selectedIndex]?.text || '';
+                    const provinceCode = homeProvinceSelect ? homeProvinceSelect.value : '';
                     homeBarangaySelect.innerHTML = '<option value="">Select Barangay</option>';
                     
                     if (cityCode) {
                         fetchHomeBarangays(cityCode);
-                        fetchHomeZipcode(cityName);
+                        fetchHomeZipcode(cityName, provinceCode);
                     }
                 });
             }
@@ -2088,7 +2089,7 @@
                         const selectedValue = homeCitySelect.value;
                         const selectedText = homeCitySelect.options[homeCitySelect.selectedIndex].text;
                         fetchHomeBarangays(selectedValue, preselectedBarangay);
-                        fetchHomeZipcode(selectedText);
+                        fetchHomeZipcode(selectedText, provinceCode);
                     }
                 },
                 error: function(xhr, status, error) {
@@ -2142,16 +2143,19 @@
             });
         }
         
-        function fetchHomeZipcode(cityName) {
+        function fetchHomeZipcode(cityName, provinceCode = '') {
             const homeZipcodeInput = document.getElementById('homeZipcode');
             
             $.ajax({
                 url: '/get-cities-zipcode',
                 method: 'GET',
-                data: { cityName: cityName },
+                data: { 
+                    cityName: cityName,
+                    provinceCode: provinceCode
+                },
                 success: function(zipcode) {
-                    if (zipcode) {
-                        homeZipcodeInput.value = zipcode;
+                    if (zipcode && zipcode.length > 0) {
+                        homeZipcodeInput.value = zipcode[0];
                     }
                 },
                 error: function(xhr, status, error) {

@@ -631,7 +631,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
                             <div>
                                 @php
-                                    $prevHomeZipcode = old('home_zipcode', $clients->HomeZipCode ?? '');
+                                    $prevHomeZipcode = old('home_zipcode', $clients->homezipcode ?? '');
                                 @endphp
                                 <label for="homeZipcode" class="block text-sm font-medium text-gray-700 mb-2">ZIP code</label>
                                 <input type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="homeZipcode" name="home_zipcode" maxlength="10" value="{{ $prevHomeZipcode }}" placeholder="Select city first" />
@@ -1090,11 +1090,12 @@
                 homeCitySelect.addEventListener('change', function() {
                     const cityCode = this.value;
                     const cityName = this.options[this.selectedIndex]?.text || '';
+                    const provinceCode = homeProvinceSelect ? homeProvinceSelect.value : '';
                     homeBarangaySelect.innerHTML = '<option value="">Select Barangay</option>';
 
                     if (cityCode) {
                         fetchHomeBarangays(cityCode);
-                        fetchHomeZipcode(cityName);
+                        fetchHomeZipcode(cityName, provinceCode);
                     }
                 });
             }
@@ -1201,7 +1202,7 @@
                         const selectedValue = homeCitySelect.value;
                         const selectedText = homeCitySelect.options[homeCitySelect.selectedIndex].text;
                         fetchHomeBarangays(selectedValue, preselectedBarangay);
-                        fetchHomeZipcode(selectedText);
+                        fetchHomeZipcode(selectedText, provinceCode);
                     }
                 },
                 error: function(xhr, status, error) {
@@ -1256,16 +1257,19 @@
             });
         }
 
-        function fetchHomeZipcode(cityName) {
+        function fetchHomeZipcode(cityName, provinceCode = '') {
             const homeZipcodeInput = document.getElementById('homeZipcode');
 
             $.ajax({
                 url: '/get-cities-zipcode',
                 method: 'GET',
-                data: { cityName: cityName },
+                data: { 
+                    cityName: cityName,
+                    provinceCode: provinceCode
+                },
                 success: function(zipcode) {
-                    if (zipcode) {
-                        homeZipcodeInput.value = zipcode;
+                    if (zipcode && zipcode.length > 0) {
+                        homeZipcodeInput.value = zipcode[0];
                     }
                 },
                 error: function(xhr, status, error) {
