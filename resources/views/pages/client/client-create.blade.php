@@ -1625,11 +1625,19 @@
                             if (found) {
                                 contractDropdown.setValue(valueToValidate);
                             } else {
-                                // Contract not found in available list — keep text visible so user
-                                // can see what they had, but clear the hidden value so it's not submitted
+                                // Contract not found in available list — clear values so it's not submitted
                                 if (contractDropdown.hiddenInput) contractDropdown.hiddenInput.value = '';
-                                // Keep searchInput text as-is (already set from old() value)
+                                if (contractDropdown.searchInput) contractDropdown.searchInput.value = '';
                                 console.warn('⚠️ [fetchContracts] Previously selected contract not found in available list:', valueToValidate);
+                                
+                                // Auto-select first contract instead of leaving it empty
+                                if (items.length > 0) {
+                                    const firstContract = items[0].value;
+                                    contractDropdown.setValue(firstContract);
+                                    console.log(`✅ [fetchContracts] Auto-selected first contract after invalidating old: ${firstContract}`);
+                                } else {
+                                    contractDropdown.clear();
+                                }
                             }
                         } else if (items.length > 0) {
                             // Auto-select first contract if none selected
@@ -1816,6 +1824,12 @@
                 branchSelect.addEventListener('change', function() {
                     const regionId = regionSelect ? regionSelect.value : '';
                     const branchId = this.value;
+                    
+                    // Clear the contract dropdown so we get a fresh contract for the new branch
+                    if (contractDropdown) {
+                        contractDropdown.clear();
+                    }
+                    
                     if (regionId) {
                         fetchContracts(regionId, branchId);
                     }
