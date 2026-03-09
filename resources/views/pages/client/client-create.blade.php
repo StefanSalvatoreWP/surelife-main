@@ -246,9 +246,10 @@
                             <div>
                                 @php
                                     $prevPaymentDate = old('paymentdate');
+                                    $maxPaymentDate = \Carbon\Carbon::now()->format('Y-m-d');
                                 @endphp
-                                <label for="paymentDate" class="block text-sm font-medium text-gray-700 mb-2">Payment Date</label>
-                                <input type="date" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="paymentDate" name="paymentdate" value="{{ $prevPaymentDate }}" />
+                                <label for="paymentDate" class="block text-sm font-medium text-gray-700 mb-2">Payment Date <span class="text-xs text-gray-400 font-normal">(Up to today)</span></label>
+                                <input type="date" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200" id="paymentDate" name="paymentdate" value="{{ $prevPaymentDate }}" max="{{ $maxPaymentDate }}" />
                                     @error('paymentdate')
                                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                                     @enderror
