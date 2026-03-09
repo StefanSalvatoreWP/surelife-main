@@ -40,22 +40,7 @@
                 @endif
             </div>
 
-            <!-- Eligibility Alert -->
-            @if(!$isEligible && !$loanRequest)
-                {{-- No loan request, not eligible - show reason --}}
-                <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-lg">
-                    <div class="flex items-center">
-                        <svg class="w-5 h-5 text-yellow-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0v-6a1 1 0 112 0v6zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                                clip-rule="evenodd" />
-                        </svg>
-                        <p class="text-yellow-700 font-medium">{{ $eligibilityMessage ?: 'You are not yet eligible for loan request.' }}</p>
-                    </div>
-                </div>
-            @endif
-
-        </div>
+</div>
         <!-- Loan Details Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
             <!-- Tier Qualified Card -->
@@ -130,19 +115,20 @@
             </div>
         </div>
 
-        <!-- Processing Fee & Status Row -->
+        <!-- Interest Info & Status Row -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <!-- Processing Fee Card -->
+            <!-- Interest Info Card -->
             <div class="bg-gradient-to-br from-amber-50 to-amber-100 rounded-lg p-6 border border-amber-200">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm text-amber-600 font-medium mb-2">Processing Fee (10%)</p>
-                        <p class="text-3xl font-bold text-amber-900">₱ {{ number_format($processingFee, 2) }}</p>
-                        <p class="text-xs text-amber-500 mt-1">Deducted from loanable amount</p>
+                        <p class="text-sm text-amber-600 font-medium mb-2">Interest Information</p>
+                        <p class="text-xl font-bold text-amber-900">1.25% per month</p>
+                        <p class="text-sm text-amber-600 mt-1">Total: ₱ {{ number_format(($loanableAmount ?? 0) * 0.0125 * ($termMonths ?? 12), 2) }}</p>
                     </div>
                     <div class="bg-amber-200 rounded-full p-4">
                         <svg class="w-10 h-10 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2zM10 8.5a.5.5 0 11-1 0 .5.5 0 011 0zm5 5a.5.5 0 11-1 0 .5.5 0 011 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                         </svg>
                     </div>
                 </div>
@@ -166,20 +152,19 @@
             </div>
         </div>
 
-        <!-- Interest Info & Remaining Balance Row -->
+        <!-- Processing Fee & Remaining Balance Row -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <!-- Interest Info Card -->
+            <!-- Processing Fee Card -->
             <div class="bg-gradient-to-br from-amber-50 to-amber-100 rounded-lg p-6 border border-amber-200">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm text-amber-600 font-medium mb-2">Interest Information</p>
-                        <p class="text-xl font-bold text-amber-900">1.25% per month</p>
-                        <p class="text-sm text-amber-600 mt-1">Total: ₱ {{ number_format(($loanableAmount ?? 0) * 0.0125 * ($termMonths ?? 12), 2) }}</p>
+                        <p class="text-sm text-amber-600 font-medium mb-2">Processing Fee (10%)</p>
+                        <p class="text-3xl font-bold text-amber-900">₱ {{ number_format($processingFee, 2) }}</p>
+                        <p class="text-xs text-amber-500 mt-1">Deducted from loanable amount</p>
                     </div>
                     <div class="bg-amber-200 rounded-full p-4">
                         <svg class="w-10 h-10 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2zM10 8.5a.5.5 0 11-1 0 .5.5 0 011 0zm5 5a.5.5 0 11-1 0 .5.5 0 011 0z" />
                         </svg>
                     </div>
                 </div>
@@ -461,7 +446,7 @@
                                     <div class="text-center" style="width: 150px;">
                                         <div class="relative" style="min-height: 20px;">
                                             <p id="waiverPrintedName" class="font-bold text-gray-900 text-center leading-tight mb-0 break-words">{{ ($client->firstname ?? '') . ' ' . ($client->lastname ?? '') }}</p>
-                                            <img id="waiverSignatureOverPrinted" class="hidden absolute bottom-0 z-10 pointer-events-none" style="left: 50%; transform: translate(-50%, -35px); max-height: 80px;" alt="">
+                                            <img id="waiverSignatureOverPrinted" class="hidden absolute bottom-0 z-10 pointer-events-none" style="left: 50%; transform: translate(-50%, 20px); max-height: 80px;" alt="">
                                         </div>
                                         <div class="border-b-2 border-gray-500 pb-1"></div>
                                         <p class="text-xs text-gray-500 mt-1 text-center leading-tight">Applicant's Full name &<br>signature:</p>
@@ -497,7 +482,7 @@
                                     </div>
                                     <div class="p-6">
                                         <div id="signatureModalSurface" class="border border-gray-200 rounded-md bg-white overflow-hidden touch-none">
-                                            <canvas id="signatureModalCanvas" class="w-full h-[150px] cursor-crosshair block"></canvas>
+                                            <canvas id="signatureModalCanvas" class="w-full h-[300px] cursor-crosshair block"></canvas>
                                         </div>
 
                                         <div class="flex items-center justify-between mt-4">
