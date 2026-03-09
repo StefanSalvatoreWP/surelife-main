@@ -272,11 +272,6 @@
                 <!-- Payment Progress -->
                 <div class="mt-4 pt-4 border-t border-orange-200">
                     @php
-<<<<<<< HEAD
-                        $totalRepayable = $loanableAmount + ($loanableAmount * 0.0125 * ($termMonths ?? 12));
-                        $paidAmount = $totalRepayable - $loanBalance;
-                        $progressPercent = $totalRepayable > 0 ? round(($paidAmount / $totalRepayable) * 100) : 0;
-=======
                         // Use actual total_repayable from loan request (not recalculated)
                         $actualTotalRepayable = $loanRequest->total_repayable ?? $loanRequest->TotalRepayable ?? ($loanableAmount + ($loanableAmount * 0.0125 * ($termMonths ?? 12)));
                         $paidAmount = $actualTotalRepayable - $loanBalance;
@@ -284,7 +279,6 @@
                         // Cap progress at 100% to avoid display issues
                         if ($progressPercent > 100) $progressPercent = 100;
                         if ($progressPercent < 0) $progressPercent = 0;
->>>>>>> marcus
                     @endphp
                     <div class="flex justify-between text-xs text-orange-600 mb-1">
                         <span>Payment Progress</span>
@@ -294,13 +288,8 @@
                         <div class="bg-orange-500 h-2 rounded-full transition-all duration-300" style="width: {{ $progressPercent }}%"></div>
                     </div>
                     <div class="flex justify-between text-xs text-gray-500 mt-1">
-<<<<<<< HEAD
-                        <span>₱ {{ number_format($paidAmount, 2) }} paid</span>
-                        <span>₱ {{ number_format($totalRepayable, 2) }} total</span>
-=======
                         <span>₱ {{ number_format(max(0, $paidAmount), 2) }} paid</span>
                         <span>₱ {{ number_format($actualTotalRepayable, 2) }} total</span>
->>>>>>> marcus
                     </div>
                 </div>
                 @else
