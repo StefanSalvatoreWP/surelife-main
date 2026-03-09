@@ -8,31 +8,93 @@ $(document).ready(function () {
     const config = window.loanPaymentConfig || {
         monthlyPayment: 0,
         remainingBalance: 0,
-        totalRepayable: 0
+        totalRepayable: 0,
+        totalPaid: 0
     };
     
     const monthlyPayment = config.monthlyPayment;
     const totalRepayable = config.totalRepayable;
+    const totalPaid = config.totalPaid || 0;
     
-    const paymentAmountSelect = $('#paymentAmount');
+    const paymentAmountInput = $('#paymentAmount');
     const advancePreview = $('#advancePaymentPreview');
     const monthsCoveredEl = $('#monthsCovered');
     const balanceAfterPaymentEl = $('#balanceAfterPayment');
+    const nextMonthMinEl = $('#nextMonthMin');
+    const excessPaymentEl = $('#excessPayment');
+    const paymentAmountError = $('#paymentAmountError');
+    const submitBtn = $('button[type="submit"]');
+    const maxPayment = config.remainingBalance; // Maximum allowed payment
+    const effectiveMinPayment = (maxPayment > 0 && maxPayment < monthlyPayment) ? maxPayment : monthlyPayment;
     
-    // Calculate advance payment preview when payment amount changes
-    paymentAmountSelect.on('change', function() {
+    // Function to validate payment amount
+    function validatePaymentAmount() {
+        const paymentAmount = parseFloat(paymentAmountInput.val()) || 0;
+        
+        // Check if payment exceeds remaining balance
+        if (paymentAmount > maxPayment && maxPayment > 0) {
+            paymentAmountError.text('Payment amount (₱' + paymentAmount.toLocaleString('en-PH', {minimumFractionDigits: 2}) + ') exceeds remaining balance (₱' + maxPayment.toLocaleString('en-PH', {minimumFractionDigits: 2}) + '). Maximum allowed: ₱' + maxPayment.toLocaleString('en-PH', {minimumFractionDigits: 2}));
+            paymentAmountError.removeClass('hidden');
+            submitBtn.prop('disabled', true).addClass('opacity-50 cursor-not-allowed');
+            return false;
+        }
+        
+        // Check minimum payment
+        // Allow payoff when the remaining balance (maxPayment) is below the monthly minimum.
+        if (paymentAmount > 0 && paymentAmount < effectiveMinPayment && paymentAmount !== maxPayment) {
+            paymentAmountError.text('Amount must be at least ₱' + effectiveMinPayment.toLocaleString('en-PH', {minimumFractionDigits: 2}));
+            paymentAmountError.removeClass('hidden');
+            submitBtn.prop('disabled', true).addClass('opacity-50 cursor-not-allowed');
+            return false;
+        }
+        
+        paymentAmountError.addClass('hidden');
+        submitBtn.prop('disabled', false).removeClass('opacity-50 cursor-not-allowed');
+        return true;
+    }
+    
+    // Calculate advance payment preview when payment amount changes (input event for real-time)
+    paymentAmountInput.on('input change', function() {
         const paymentAmount = parseFloat($(this).val()) || 0;
         
+        // Validate payment amount first
+        if (!validatePaymentAmount()) {
+            advancePreview.addClass('hidden');
+            return;
+        }
+        
         if (paymentAmount > 0) {
-            // Calculate months covered (rounded up)
-            const monthsCovered = Math.ceil(paymentAmount / monthlyPayment);
+            // Calculate total after this payment
+            const newTotalPaid = totalPaid + paymentAmount;
             
-            // Calculate balance after payment
-            const balanceAfter = Math.max(0, totalRepayable - paymentAmount);
+            // Calculate remaining balance AFTER this payment
+            const balanceAfter = Math.max(0, totalRepayable - newTotalPaid);
+            
+            // Calculate months covered by this payment only
+            const monthsCovered = Math.floor(paymentAmount / monthlyPayment);
+            const excessAmount = paymentAmount % monthlyPayment;
+            
+            // Calculate next month minimum payment
+            // If there's excess, next month payment is reduced.
+            // If the loan becomes fully paid, there is no next-month minimum.
+            const nextMonthMin = balanceAfter <= 0
+                ? 0
+                : (excessAmount > 0 ? (monthlyPayment - excessAmount) : monthlyPayment);
             
             // Show preview
             monthsCoveredEl.text(monthsCovered + ' month' + (monthsCovered > 1 ? 's' : ''));
             balanceAfterPaymentEl.text('₱ ' + balanceAfter.toLocaleString('en-PH', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+            
+            // Show excess and next month minimum
+            if (balanceAfter <= 0) {
+                $('#excessInfo').addClass('hidden');
+            } else if (excessAmount > 0) {
+                excessPaymentEl.text('₱ ' + excessAmount.toLocaleString('en-PH', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+                nextMonthMinEl.text('₱ ' + nextMonthMin.toLocaleString('en-PH', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+                $('#excessInfo').removeClass('hidden');
+            } else {
+                $('#excessInfo').addClass('hidden');
+            }
             
             // Show/hide advance payment preview
             if (paymentAmount > monthlyPayment) {
@@ -45,8 +107,8 @@ $(document).ready(function () {
         }
     });
     
-    // Trigger on page load if value is pre-selected
-    paymentAmountSelect.trigger('change');
+    // Trigger on page load
+    paymentAmountInput.trigger('input');
 
     // *** O.R SERIES CODE DROPDOWN FUNCTIONALITY ***
 
@@ -61,9 +123,9 @@ $(document).ready(function () {
     // Store available series codes
     let availableSeriesCodes = [];
 
-    // Function to load O.R series codes by branch (loan type = '2')
+    // Function to load O.R series codes by branch (loan type = '1' - same as regular payments)
     function loadOrSeriesCodes() {
-        const orType = '2'; // Loan payment type
+        const orType = '1'; // Use same OR pool as regular payments
 
         console.log('Loading O.R series codes for loan payment:', {
             branchId: clientBranch,
@@ -144,16 +206,23 @@ $(document).ready(function () {
         });
     }
 
-    // Load series codes on page load
-    loadOrSeriesCodes();
+    // Load series codes on page load - OPTIONAL: Only load if user wants to use OR
+    // Commented out to make OR optional - user can trigger by clicking the input
+    // loadOrSeriesCodes();
 
     // Show dropdown when input is focused
     orSeriesCodeInput.on('focus', function () {
+        if (orSeriesCodeInput.prop('readonly')) {
+            return;
+        }
         orSeriesCodeDropdown.removeClass('hidden');
     });
 
     // Filter dropdown options as user types
     orSeriesCodeInput.on('input', function () {
+        if (orSeriesCodeInput.prop('readonly')) {
+            return;
+        }
         const searchTerm = $(this).val().toLowerCase();
         orSeriesCodeDropdown.find('.series-code-option').each(function () {
             const optionText = $(this).text().toLowerCase();
@@ -194,6 +263,9 @@ $(document).ready(function () {
 
     // Show dropdown on input click
     orSeriesCodeInput.on('click', function (e) {
+        if (orSeriesCodeInput.prop('readonly')) {
+            return;
+        }
         e.stopPropagation();
         orSeriesCodeDropdown.removeClass('hidden');
     });
@@ -205,12 +277,19 @@ $(document).ready(function () {
     const orNoLoading = $('#orNoLoading');
     const orNoError = $('#orNoError');
 
+    // If series code is already set (e.g., last-used per client), automatically load OR numbers.
+    // This prevents forcing the user to re-select a series code just to submit.
+    // OPTIONAL: Only auto-load if user wants to use OR (has a value)
+    // if (orSeriesCodeInput.val()) {
+    //     loadOrNumbers(orSeriesCodeInput.val());
+    // }
+
     // Store available OR numbers
     let availableOrNumbers = [];
 
     // Function to load O.R numbers by series code
     function loadOrNumbers(seriesCode) {
-        const orType = '2'; // Loan payment type
+        const orType = '1'; // Loan payment - use Standard OR pool (same as regular payments)
 
         if (!seriesCode) {
             console.log('No series code provided');
@@ -272,8 +351,13 @@ $(document).ready(function () {
                     });
                 }
 
-                // Show the dropdown
-                orNoDropdown.removeClass('hidden');
+                // Do not auto-show the dropdown on load; keep it hidden unless user clicks.
+                orNoDropdown.addClass('hidden');
+
+                // OPTIONAL: Do not auto-select OR number - let user choose or leave empty
+                // if ((!orNoInput.val() || !String(orNoInput.val()).trim()) && orNumbers.length > 0) {
+                //     orNoInput.val(orNumbers[0].ORNumber);
+                // }
 
                 console.log('Loaded O.R numbers:', orNumbers.length);
             },
@@ -286,7 +370,12 @@ $(document).ready(function () {
     }
 
     // Show dropdown when OR No. input is focused
+    // If the input is readonly (to prevent typing), don't auto-show the dropdown.
+    // User can still open it via click.
     orNoInput.on('focus', function () {
+        if (orNoInput.prop('readonly')) {
+            return;
+        }
         if (availableOrNumbers.length > 0) {
             orNoDropdown.removeClass('hidden');
         }

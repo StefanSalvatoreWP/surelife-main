@@ -4,6 +4,7 @@
 
 @section('styles')
     <link rel="stylesheet" href="{{ asset('css/client.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ asset('css/deposit.css') }}?v={{ time() }}">
     <style>
         /* Loan Request Table Header - Page Specific */
         #loanrequest-table thead th {
@@ -180,6 +181,39 @@
                     }
                 }},
                 { data: null, orderable: false, render: function(data) {
+                    // If status is Completed, use 3-dots dropdown
+                    if (data.Status === 'Completed') {
+                        var dropdownHtml = '<div class="action-dropdown">' +
+                            '<button onclick="toggleDropdown(this)" class="action-dropdown-btn">' +
+                            '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">' +
+                            '<path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>' +
+                            '</svg></button>' +
+                            '<div class="action-dropdown-menu">';
+                        
+                        // View option
+                        dropdownHtml += '<a href="/req-loans/view/' + data.Id + '" class="dropdown-item">' +
+                            '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
+                            '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />' +
+                            '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />' +
+                            '</svg><span>View</span></a>';
+                        
+                        // Remarks option (always show for Completed)
+                        dropdownHtml += '<button type="button" onclick="openRemarksModal(\'' + escapeHtml(data.Remarks || 'No remarks') + '\')" class="dropdown-item">' +
+                            '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
+                            '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />' +
+                            '</svg><span>Remarks</span></button>';
+                        
+                        // Delete option
+                        dropdownHtml += '<button type="button" onclick="openDeleteModal(' + data.Id + ')" class="dropdown-item dropdown-item-delete">' +
+                            '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
+                            '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />' +
+                            '</svg><span>Delete</span></button>';
+                        
+                        dropdownHtml += '</div></div>';
+                        return dropdownHtml;
+                    }
+                    
+                    // Normal status: View and Delete buttons
                     var viewBtn = '<a href="/req-loans/view/' + data.Id + '" class="action-btn action-btn-view text-xs sm:text-sm">' +
                         '<svg class="action-icon w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
                         '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />' +
@@ -188,16 +222,6 @@
                         '<span class="hidden sm:inline">View</span>' +
                         '</a>';
 
-                    var remarksBtn = '';
-                    if (data.Remarks != null && data.Remarks != "" && data.Remarks != "Not available") {
-                        remarksBtn = '<button type="button" onclick="openRemarksModal(\'' + escapeHtml(data.Remarks) + '\')" class="action-btn action-btn-note text-xs sm:text-sm">' +
-                            '<svg class="action-icon w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
-                            '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />' +
-                            '</svg>' +
-                            '<span class="hidden sm:inline">Remarks</span>' +
-                            '</button>';
-                    }
-
                     var deleteBtn = '<button type="button" onclick="openDeleteModal(' + data.Id + ')" class="action-btn action-btn-delete text-xs sm:text-sm">' +
                         '<svg class="action-icon w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
                         '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />' +
@@ -205,7 +229,7 @@
                         '<span class="hidden sm:inline">Delete</span>' +
                         '</button>';
 
-                    return '<div style="display: flex; gap: 0.5rem;" class="flex-col sm:flex-row">' + viewBtn + remarksBtn + deleteBtn + '</div>';
+                    return '<div style="display: flex; gap: 0.5rem;" class="flex-col sm:flex-row">' + viewBtn + deleteBtn + '</div>';
                 }}
             ],
             columnDefs: [
@@ -252,6 +276,29 @@
 
     function confirmDelete() {
         document.getElementById('deleteForm').submit();
+    }
+
+    // Toggle dropdown for 3-dots menu
+    function toggleDropdown(btn) {
+        const dropdown = btn.closest('.action-dropdown');
+        const menu = dropdown.querySelector('.action-dropdown-menu');
+        const isOpen = menu.classList.contains('show');
+        
+        // Close all other dropdowns
+        document.querySelectorAll('.action-dropdown-menu.show').forEach(m => {
+            m.classList.remove('show');
+        });
+        document.querySelectorAll('.action-dropdown.open').forEach(d => {
+            d.classList.remove('open');
+        });
+        document.body.classList.remove('dropdown-open');
+        
+        // Toggle current dropdown
+        if (!isOpen) {
+            menu.classList.add('show');
+            dropdown.classList.add('open');
+            document.body.classList.add('dropdown-open');
+        }
     }
 
     // Close modals when clicking outside

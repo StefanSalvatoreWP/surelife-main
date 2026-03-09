@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 class Client extends Model
 {
     protected $table = 'tblclient';
+    protected $primaryKey = 'Id';
     public $timestamps = false;
 
     use HasFactory;

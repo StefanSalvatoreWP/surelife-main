@@ -94,36 +94,49 @@
                 <div class="flex items-center">
                     <svg class="w-5 h-5 text-red-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
                             clip-rule="evenodd" />
                     </svg>
                     <p class="text-red-700 font-medium">{{ session('error') }}</p>
                 </div>
             </div>
         @elseif(session('success'))
-            <div class="bg-green-50 border-l-4 border-green-500 p-4 mb-6 rounded-lg shadow-sm">
-                <div class="flex items-center">
-                    <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                            clip-rule="evenodd" />
-                    </svg>
-                    <p class="text-green-700 font-medium">{{ session('success') }}</p>
-                </div>
-            </div>
             @php
+                $useSwiftModal = false;
+                $swiftMessage = '';
                 if (session('success') == 'Successfully updated the selected client!') {
                     $message = 'client';
                 } elseif (session('success') == 'Added new payment!') {
                     $message = 'payment';
                 } elseif (session('success') == 'Void payment successful!') {
                     $message = 'payment';
-                } elseif (session('success') == 'Added new loan payment!') {
-                    $message = 'loan';
+                } elseif (str_contains(strtolower(session('success')), 'loan payment')) {
+                    $useSwiftModal = true;
+                    $swiftMessage = session('success');
                 } elseif (session('success') == 'Successfully assigned.') {
                     $message = 'assign';
                 }
             @endphp
+            @if($useSwiftModal)
+                @push('scripts')
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            showSwiftModal('Success', '{{ $swiftMessage }}');
+                        });
+                    </script>
+                @endpush
+            @else
+                <div class="bg-green-50 border-l-4 border-green-500 p-4 mb-6 rounded-lg shadow-sm">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                clip-rule="evenodd" />
+                        </svg>
+                        <p class="text-green-700 font-medium">{{ session('success') }}</p>
+                    </div>
+                </div>
+            @endif
         @elseif(session('warning'))
             <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-6 rounded-lg shadow-sm">
                 <div class="flex items-center">
@@ -500,7 +513,7 @@
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Zipcode</label>
                                     <input type="text"
                                         class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
-                                        value="{{ $clients->HomeZipCode ?? '-' }}" readonly />
+                                        value="{{ $clients->homezipcode ?? '-' }}" readonly />
                                 </div>
                                 <div class="lg:col-span-4">
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Street</label>
@@ -1081,7 +1094,7 @@
                         </div>
                     </div>
                     <div class="p-6">
-                        @if($hasLoanRequest && $hasLoanRequest->Status == 'Approved' && $loanBalance > 0)
+                        @if($hasLoanRequest && in_array($hasLoanRequest->Status, ['Approved', 'Completed']))
                             <!-- Loan Summary Cards -->
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                                 <!-- Total Loan Amount Card -->
@@ -1103,7 +1116,7 @@
                                     <div class="flex items-center justify-between">
                                         <div>
                                             <p class="text-sm text-green-600 font-medium mb-1">Total Paid</p>
-                                            <p class="text-2xl font-bold text-green-900">₱ {{ number_format($hasLoanRequest->Amount - $loanBalance, 2) }}</p>
+                                            <p class="text-2xl font-bold text-green-900">₱ {{ number_format($totalLoanPayments, 2) }}</p>
                                         </div>
                                         <div class="bg-green-200 rounded-full p-3">
                                             <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1155,7 +1168,7 @@
                                         </svg>
                                         <div>
                                             <p class="text-xs text-gray-500">Term</p>
-                                            <p class="text-lg font-bold text-blue-600">{{ $hasLoanRequest->TermMonths ?? 12 }} months</p>
+                                            <p class="text-lg font-bold text-blue-600">{{ $hasLoanRequest->term_months ?? $hasLoanRequest->TermMonths ?? 12 }} months</p>
                                         </div>
                                     </div>
                                     <div class="flex items-center">
@@ -1164,7 +1177,7 @@
                                         </svg>
                                         <div>
                                             <p class="text-xs text-gray-500">Total Repayable</p>
-                                            <p class="text-lg font-bold text-green-600">₱ {{ number_format($hasLoanRequest->TotalRepayable ?? $hasLoanRequest->Amount, 2) }}</p>
+                                            <p class="text-lg font-bold text-green-600">₱ {{ number_format($hasLoanRequest->total_repayable ?? $hasLoanRequest->TotalRepayable ?? $hasLoanRequest->Amount, 2) }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -1209,7 +1222,7 @@
                                                         @else
                                                             <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800" style="margin-left: -13px;">
                                                                 <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A1 1 0 014 6v2a1 1 0 011 1h2a1 1 0 011 1v2a1 1 0 01-1 1H6a1 1 0 01-1-1v-2a1 1 0 011-1H7v-2a1 1 0 011-1h2z" clip-rule="evenodd" />
                                                                 </svg>
                                                                 Active
                                                             </span>
@@ -1242,13 +1255,22 @@
 
                             <!-- Add Payment Button - Centered -->
                             <div class="flex justify-center">
-                                <a href="/client-addloanpayment/{{ $clients->cid }}"
-                                    class="inline-flex items-center px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-200 ease-in-out">
-                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                    </svg>
-                                    Add Payment
-                                </a>
+                                @if($hasLoanRequest->Status == 'Approved' && $loanBalance > 0)
+                                    <a href="/client-addloanpayment/{{ $clients->Id }}"
+                                        class="inline-flex items-center px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-200 ease-in-out">
+                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                        </svg>
+                                        Add Payment
+                                    </a>
+                                @else
+                                    <div class="inline-flex items-center px-8 py-3 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-600 font-semibold rounded-lg">
+                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Loan Fully Paid
+                                    </div>
+                                @endif
                             </div>
                         @else
                             <div class="flex flex-col items-center justify-center py-16">

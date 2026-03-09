@@ -58,24 +58,42 @@ preg_match_all("/\(\d+, '([^']+)', (\d+), '([^']*)'\)/", $content, $matches, PRE
 $sqlByExactName = [];
 $sqlByUpperName = [];
 $sqlByCleanName = [];
+$sqlByProvinceAndName = []; // NEW: Index by province_id + name
+
+// Build province name to ID map
+$provinceNameToId = [];
+preg_match_all("/\(\d+, '([^']+)'/", $content, $provMatches, PREG_SET_ORDER);
+foreach ($provMatches as $pm) {
+    $provinceNameToId[strtoupper(trim($pm[1]))] = $pm[0];
+}
 
 foreach ($matches as $m) {
     $name = trim($m[1]);
+    $provinceId = trim($m[2]);
     $zip = trim($m[3]);
     
     if (empty($zip)) continue;
     
-    // Index 1: Exact name
-    $sqlByExactName[$name] = $zip;
+    // Index 1: Exact name (for backward compatibility)
+    if (!isset($sqlByExactName[$name])) {
+        $sqlByExactName[$name] = $zip;
+    }
     
     // Index 2: Uppercase
-    $sqlByUpperName[strtoupper($name)] = $zip;
+    if (!isset($sqlByUpperName[strtoupper($name)])) {
+        $sqlByUpperName[strtoupper($name)] = $zip;
+    }
     
     // Index 3: Clean name (remove City suffix)
     $cleanName = strtoupper($name);
     $cleanName = preg_replace('/\s+CITY$/i', '', $cleanName);
     $cleanName = trim($cleanName);
-    $sqlByCleanName[$cleanName] = $zip;
+    if (!isset($sqlByCleanName[$cleanName])) {
+        $sqlByCleanName[$cleanName] = $zip;
+    }
+    
+    // Index 4: Province ID + Name (for disambiguation)
+    $sqlByProvinceAndName[$provinceId . ':' . strtoupper($name)] = $zip;
 }
 
 echo "Cities in SQL file: " . count($sqlByExactName) . "\n\n";
@@ -83,26 +101,165 @@ echo "Cities in SQL file: " . count($sqlByExactName) . "\n\n";
 $updateCount = 0;
 $variationCount = 0;
 $skipCount = 0;
+$correctCount = 0;
 
-// Get all cities from database without zip
+// Get ALL cities from database, including province_code for disambiguation
+// We need to fix ALL cities, not just those without zip codes
 $dbCities = $pdo->query("
-    SELECT code, description 
+    SELECT code, description, province_code, zipcode 
     FROM tbladdress 
-    WHERE address_type = 'citymun' 
-    AND (zipcode IS NULL OR zipcode = '')
+    WHERE address_type = 'citymun'
 ")->fetchAll(PDO::FETCH_OBJ);
 
-echo "Cities in DB without zip: " . count($dbCities) . "\n\n";
+echo "Total cities in DB: " . count($dbCities) . "\n\n";
 
 $stmtUpdate = $pdo->prepare("UPDATE tbladdress SET zipcode = ? WHERE code = ? AND address_type = 'citymun'");
 
 foreach ($dbCities as $dbCity) {
     $dbName = trim($dbCity->description);
+    $dbProvinceCode = $dbCity->province_code;
+    $currentZip = $dbCity->zipcode;
     $zip = null;
     $matchMethod = '';
     
-    // CHECK 1: Exact match
-    if (isset($sqlByExactName[$dbName])) {
+    // CHECK 0: Province-aware match (highest priority for disambiguation)
+    // Map province codes from DB (refCitymun codes) to SQL province IDs
+    // IMPORTANT: tbladdress uses refCitymun codes (e.g., '0722' for Cebu), NOT PSGC codes
+    $provinceIdMap = [
+        '0128' => '34',  // ILOCOS NORTE
+        '0129' => '35',  // ILOCOS SUR
+        '0133' => '39',  // LA UNION
+        '0155' => '60',  // PANGASINAN
+        '0209' => '11',  // BATANES
+        '0215' => '18',  // CAGAYAN
+        '0231' => '37',  // ISABELA
+        '0250' => '55',  // NUEVA VIZCAYA
+        '0257' => '62',  // QUIRINO
+        '0308' => '10',  // BATAAN
+        '0314' => '17',  // BULACAN
+        '0349' => '54',  // NUEVA ECIJA
+        '0354' => '59',  // PAMPANGA
+        '0369' => '75',  // TARLAC
+        '0371' => '77',  // ZAMBALES
+        '0377' => '8',   // AURORA
+        '0410' => '12',  // BATANGAS
+        '0421' => '24',  // CAVITE
+        '0434' => '40',  // LAGUNA
+        '0456' => '61',  // QUEZON
+        '0458' => '63',  // RIZAL
+        '1740' => '45',  // MARINDUQUE
+        '1751' => '56',  // OCCIDENTAL MINDORO
+        '1752' => '57',  // ORIENTAL MINDORO
+        '1753' => '58',  // PALAWAN
+        '1759' => '64',  // ROMBLON
+        '0505' => '5',   // ALBAY
+        '0516' => '19',  // CAMARINES NORTE
+        '0517' => '20',  // CAMARINES SUR
+        '0520' => '23',  // CATANDUANES
+        '0541' => '46',  // MASBATE
+        '0562' => '68',  // SORSOGON
+        '0604' => '4',   // AKLAN
+        '0606' => '6',   // ANTIQUE
+        '0619' => '22',  // CAPIZ
+        '0630' => '36',  // ILOILO
+        '0645' => '51',  // NEGROS OCCIDENTAL
+        '0679' => '32',  // GUIMARAS
+        '0712' => '15',  // BOHOL
+        '0722' => '25',  // CEBU
+        '0746' => '52',  // NEGROS ORIENTAL
+        '0761' => '67',  // SIQUIJOR
+        '0826' => '31',  // EASTERN SAMAR
+        '0837' => '43',  // LEYTE
+        '0848' => '53',  // NORTHERN SAMAR
+        '0860' => '65',  // SAMAR (WESTERN SAMAR)
+        '0864' => '70',  // SOUTHERN LEYTE
+        '0878' => '14',  // BILIRAN
+        '0972' => '78',  // ZAMBOANGA DEL NORTE
+        '0973' => '79',  // ZAMBOANGA DEL SUR
+        '0983' => '80',  // ZAMBOANGA SIBUGAY
+        '1013' => '16',  // BUKIDNON
+        '1018' => '21',  // CAMIGUIN
+        '1035' => '41',  // LANAO DEL NORTE
+        '1042' => '48',  // MISAMIS OCCIDENTAL
+        '1043' => '49',  // MISAMIS ORIENTAL
+        '1123' => '28',  // DAVAO DEL NORTE
+        '1124' => '29',  // DAVAO DEL SUR
+        '1125' => '30',  // DAVAO ORIENTAL
+        '1182' => '26',  // COMPOSTELA VALLEY
+        '1186' => '29',  // DAVAO OCCIDENTAL
+        '1247' => '27',  // COTABATO (NORTH COTABATO)
+        '1263' => '69',  // SOUTH COTABATO
+        '1265' => '71',  // SULTAN KUDARAT
+        '1280' => '66',  // SARANGANI
+        '1401' => '1',   // ABRA
+        '1411' => '13',  // BENGUET
+        '1427' => '33',  // IFUGAO
+        '1432' => '38',  // KALINGA
+        '1444' => '50',  // MOUNTAIN PROVINCE
+        '1481' => '7',   // APAYAO
+        '1507' => '9',   // BASILAN
+        '1536' => '42',  // LANAO DEL SUR
+        '1538' => '44',  // MAGUINDANAO
+        '1566' => '72',  // SULU
+        '1570' => '76',  // TAWI-TAWI
+        '1602' => '2',   // AGUSAN DEL NORTE
+        '1603' => '3',   // AGUSAN DEL SUR
+        '1667' => '73',  // SURIGAO DEL NORTE
+        '1668' => '74',  // SURIGAO DEL SUR
+        '1685' => '73',  // DINAGAT ISLANDS
+    ];
+    
+    $sqlProvinceId = $provinceIdMap[$dbProvinceCode] ?? null;
+    
+    // Try province-aware match first for cities with duplicate names
+    if ($sqlProvinceId) {
+        $provinceKey = $sqlProvinceId . ':' . strtoupper($dbName);
+        if (isset($sqlByProvinceAndName[$provinceKey])) {
+            $zip = $sqlByProvinceAndName[$provinceKey];
+            $matchMethod = 'PROVINCE-AWARE';
+        }
+        // Also try with "CITY" suffix
+        if (!$zip) {
+            $provinceKeyWithCity = $sqlProvinceId . ':' . strtoupper($dbName) . ' CITY';
+            if (isset($sqlByProvinceAndName[$provinceKeyWithCity])) {
+                $zip = $sqlByProvinceAndName[$provinceKeyWithCity];
+                $matchMethod = 'PROVINCE-AWARE';
+            }
+        }
+        // Also try without "CITY" suffix
+        if (!$zip) {
+            $cleanDbName = preg_replace('/\s+CITY$/i', '', strtoupper($dbName));
+            $provinceKeyClean = $sqlProvinceId . ':' . $cleanDbName;
+            if (isset($sqlByProvinceAndName[$provinceKeyClean])) {
+                $zip = $sqlByProvinceAndName[$provinceKeyClean];
+                $matchMethod = 'PROVINCE-AWARE';
+            }
+        }
+        // Also try removing "CITY OF" prefix and adding "CITY" suffix
+        // DB: "CITY OF TALISAY" -> SQL: "TALISAY CITY"
+        if (!$zip) {
+            $cleanDbName = strtoupper($dbName);
+            $cleanDbName = preg_replace('/^CITY OF\s+/i', '', $cleanDbName);
+            $provinceKeyWithCity = $sqlProvinceId . ':' . $cleanDbName . ' CITY';
+            if (isset($sqlByProvinceAndName[$provinceKeyWithCity])) {
+                $zip = $sqlByProvinceAndName[$provinceKeyWithCity];
+                $matchMethod = 'PROVINCE-AWARE';
+            }
+        }
+        // Also try just the name without "CITY OF" prefix
+        if (!$zip) {
+            $cleanDbName = strtoupper($dbName);
+            $cleanDbName = preg_replace('/^CITY OF\s+/i', '', $cleanDbName);
+            $provinceKeyClean = $sqlProvinceId . ':' . $cleanDbName;
+            if (isset($sqlByProvinceAndName[$provinceKeyClean])) {
+                $zip = $sqlByProvinceAndName[$provinceKeyClean];
+                $matchMethod = 'PROVINCE-AWARE';
+            }
+        }
+    }
+    
+    // CHECK 1: Exact match (fallback)
+    if (!$zip && isset($sqlByExactName[$dbName])) {
         $zip = $sqlByExactName[$dbName];
         $matchMethod = 'EXACT';
     }
@@ -141,14 +298,19 @@ foreach ($dbCities as $dbCity) {
     }
     
     if ($zip) {
-        $stmtUpdate->execute([$zip, $dbCity->code]);
-        if ($stmtUpdate->rowCount() > 0) {
-            if ($matchMethod === 'EXACT') {
-                $updateCount++;
-            } else {
-                $variationCount++;
+        // Only update if zip is different from current (or current is empty)
+        if ($zip !== $currentZip) {
+            $stmtUpdate->execute([$zip, $dbCity->code]);
+            if ($stmtUpdate->rowCount() > 0) {
+                if ($matchMethod === 'EXACT' || $matchMethod === 'PROVINCE-AWARE') {
+                    $updateCount++;
+                } else {
+                    $variationCount++;
+                }
+                echo "[$matchMethod] [$dbCity->code] $dbName => $zip (was: $currentZip)\n";
             }
-            echo "[$matchMethod] [$dbCity->code] $dbName => $zip\n";
+        } else {
+            $correctCount++;
         }
     } else {
         $skipCount++;
@@ -156,8 +318,9 @@ foreach ($dbCities as $dbCity) {
 }
 
 echo "\n=== MERGE COMPLETE ===\n";
-echo "Exact Matches: $updateCount\n";
-echo "Variation Matches: $variationCount\n";
+echo "Province-Aware/Exact Matches Updated: $updateCount\n";
+echo "Variation Matches Updated: $variationCount\n";
+echo "Already Correct: $correctCount\n";
 echo "Not Found in SQL: $skipCount\n";
 echo "Total Updated: " . ($updateCount + $variationCount) . "\n";
 

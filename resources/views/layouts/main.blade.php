@@ -53,6 +53,7 @@
         @include('components.swift-modal')
         <script src="{{ asset('js/swift-modal.js') }}"></script>
 
+        @stack('scripts')
         @yield('scripts')
     </div>
     

@@ -446,17 +446,23 @@ $(document).ready(function () {
         }
     });
 
-    // zipcode
+    // zipcode - province-aware lookup
     let zipcodeSelect = $('#zipcode');
+    let provinceCode = $('#addressProvince').val();
 
     $.ajax({
         url: '/get-cities-zipcode',
         method: 'GET',
-        data: { cityName: selectedCity },
+        data: { 
+            cityName: selectedCity,
+            provinceCode: provinceCode
+        },
         dataType: 'json',
         cache: false,
         success: function (zipcode) {
-            zipcodeSelect.val(zipcode);
+            if (zipcode && zipcode.length > 0) {
+                zipcodeSelect.val(zipcode[0]);
+            }
         },
         error: function (xhr, status, error) {
             zipcodeSelect.val('NA');

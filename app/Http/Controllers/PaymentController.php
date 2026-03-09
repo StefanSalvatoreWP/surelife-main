@@ -405,7 +405,7 @@ class PaymentController extends Controller
                 $paymenDateFormat = $paymentDate->format('Y-m-d');
 
                 $paymentMultiplier = $paymentAmount / $client->PaymentTermAmount;
-                $paymentAmount = number_format($paymentAmount, 2);
+                $paymentAmountFormatted = number_format($paymentAmount, 2);
 
                 switch ($clientTerm->Term) {
                     case 'Monthly':
@@ -425,21 +425,19 @@ class PaymentController extends Controller
                 $dueDateFormat = $dueDate->format('Y-m-d');
 
                 if ($paymentType == 'Standard') {
-                    // $sender = "Surelife Care & Services Admin";
-                    // Mail::to($client->EmailAddress)->send(new SucceedingPaymentMail($paymentAmount, $paymenDateFormat, $sender));
-
-                    // send sms to clients
-//                     $sms_message = 'This is to acknowledge your payment with the amount of P' . $paymentAmount . ' on ' . $paymenDateFormat . ' has been received by Surelife Care & Services. Your next due is on ' . $dueDateFormat . '. You can pay on the nearest Surelife branch. Thank you for your constant support! 
-
-                    // Smile to a worry-free financial future. (This is a system generated message. Do not reply)';
-
-                    //                     $insertSmsData = [
-//                         'contactno' => $client->MobileNumber,
-//                         'message' => $sms_message,
-//                         'sendto' => 'Client',
-//                         'status' => 1
-//                     ];
-//                     Sms::insert($insertSmsData);
+                    // Send payment confirmation SMS
+                    if ($client->MobileNumber) {
+                        \App\Services\SmsService::sendPaymentConfirmation(
+                            $client,
+                            (object)['amount' => $paymentAmount, 'date' => $paymenDateFormat, 'id' => null],
+                            $dueDateFormat
+                        );
+                    }
+                }
+            } else {
+                // Full payment - send congratulations SMS
+                if ($paymentType == 'Standard' && $client->MobileNumber) {
+                    \App\Services\SmsService::sendFullPaymentCongratulations($client);
                 }
             }
 
@@ -938,6 +936,12 @@ class PaymentController extends Controller
             ];
 
             Payment::where('Id', $payment->Id)->update($updateData);
+
+            // Send SMS notification for approved spot cash payment
+            $client = Client::where('id', $payment->ClientId)->first();
+            if ($client && $client->MobileNumber) {
+                \App\Services\SmsService::sendSpotCashApproval($client, $payment);
+            }
 
             Log::channel('activity')->info('[StaffID] ' . session('user_id') . ' [Menu] Payment Approval [Action] Approve Spot Cash [Target] ' . $payment->Id);
 

@@ -215,6 +215,17 @@ class TestClientSeeder extends Seeder
     {
         if ($totalAmount <= 0) return;
 
+        // Get an existing OR batch from the system (preferably for payments)
+        $orBatch = DB::table('tblorbatch')
+            ->where('Type', 'Payment')
+            ->where('Status', 'Active')
+            ->first();
+        
+        if (!$orBatch) {
+            // Fallback to any OR batch
+            $orBatch = DB::table('tblorbatch')->first();
+        }
+
         // Create payments in chunks to simulate realistic payment history
         $paymentCount = (int)($totalAmount / 416.67); // Monthly payment amount
         $remaining = $totalAmount;
@@ -222,9 +233,25 @@ class TestClientSeeder extends Seeder
         for ($i = 1; $i <= $paymentCount && $remaining > 0; $i++) {
             $amount = min(416.67, $remaining);
             
+            // Create OR record if batch exists
+            $orId = null;
+            $orNumber = 'T' . str_pad((string)$clientId, 4, '0', STR_PAD_LEFT) . $i;
+            
+            if ($orBatch) {
+                $orId = DB::table('tblofficialreceipt')->insertGetId([
+                    'orbatchid' => $orBatch->id,
+                    'ORNo' => $orNumber,
+                    'ornumber' => $orNumber,
+                    'Status' => 'Used',
+                    'DateCreated' => Carbon::now()->subMonths($paymentCount - $i),
+                    'CreatedBy' => 1,
+                ]);
+            }
+            
             DB::table('tblpayment')->insert([
                 'ClientId' => $clientId,
-                'ORNo' => 'T' . str_pad((string)$clientId, 4, '0', STR_PAD_LEFT) . $i,
+                'ORId' => $orId,
+                'ORNo' => $orNumber,
                 'AmountPaid' => $amount,
                 'NetPayment' => $amount,
                 'Date' => Carbon::now()->subMonths($paymentCount - $i)->format('Y-m-d'),
