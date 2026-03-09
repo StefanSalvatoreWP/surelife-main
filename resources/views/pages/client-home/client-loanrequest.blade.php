@@ -8,6 +8,7 @@
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-2xl font-bold text-gray-800">Loan Request</h3>
                 @if(!$loanRequest)
+                    {{-- No existing loan - show request button --}}
                     <button onclick="showLoanRequestModal()"
                         class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white text-sm font-semibold rounded-md shadow-sm hover:shadow transition duration-150">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -16,7 +17,18 @@
                         </svg>
                         Request a Loan
                     </button>
+                @elseif($loanRequest && $loanRequest->Status == 'Completed' && $loanBalance <= 0)
+                    {{-- Loan fully paid - can request new loan --}}
+                    <button onclick="showLoanRequestModal()"
+                        class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white text-sm font-semibold rounded-md shadow-sm hover:shadow transition duration-150">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        Request a New Loan
+                    </button>
                 @else
+                    {{-- Active loan in progress --}}
                     <div
                         class="inline-flex items-center px-4 py-2 bg-gray-50 text-gray-500 text-sm font-semibold rounded-md border border-gray-200 cursor-not-allowed">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -29,7 +41,7 @@
             </div>
 
             <!-- Eligibility Alert -->
-            @if(!$isEligible)
+            @if(!$isEligible && !$loanRequest)
                 {{-- No loan request, not eligible - show reason --}}
                 <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-lg">
                     <div class="flex items-center">
@@ -260,9 +272,13 @@
                 <!-- Payment Progress -->
                 <div class="mt-4 pt-4 border-t border-orange-200">
                     @php
-                        $totalRepayable = $loanableAmount + ($loanableAmount * 0.0125 * ($termMonths ?? 12));
-                        $paidAmount = $totalRepayable - $loanBalance;
-                        $progressPercent = $totalRepayable > 0 ? round(($paidAmount / $totalRepayable) * 100) : 0;
+                        // Use actual total_repayable from loan request (not recalculated)
+                        $actualTotalRepayable = $loanRequest->total_repayable ?? $loanRequest->TotalRepayable ?? ($loanableAmount + ($loanableAmount * 0.0125 * ($termMonths ?? 12)));
+                        $paidAmount = $actualTotalRepayable - $loanBalance;
+                        $progressPercent = $actualTotalRepayable > 0 ? round(($paidAmount / $actualTotalRepayable) * 100) : 0;
+                        // Cap progress at 100% to avoid display issues
+                        if ($progressPercent > 100) $progressPercent = 100;
+                        if ($progressPercent < 0) $progressPercent = 0;
                     @endphp
                     <div class="flex justify-between text-xs text-orange-600 mb-1">
                         <span>Payment Progress</span>
@@ -272,8 +288,8 @@
                         <div class="bg-orange-500 h-2 rounded-full transition-all duration-300" style="width: {{ $progressPercent }}%"></div>
                     </div>
                     <div class="flex justify-between text-xs text-gray-500 mt-1">
-                        <span>₱ {{ number_format($paidAmount, 2) }} paid</span>
-                        <span>₱ {{ number_format($totalRepayable, 2) }} total</span>
+                        <span>₱ {{ number_format(max(0, $paidAmount), 2) }} paid</span>
+                        <span>₱ {{ number_format($actualTotalRepayable, 2) }} total</span>
                     </div>
                 </div>
                 @else

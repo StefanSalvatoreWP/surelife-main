@@ -114,7 +114,7 @@ class LoanRequest extends Model
      */
     public function getTotalPaymentsAttribute(): float
     {
-        return $this->loanPayments()->sum('amount') ?? 0;
+        return $this->loanPayments()->sum('Amount') ?? 0;
     }
 
     /**

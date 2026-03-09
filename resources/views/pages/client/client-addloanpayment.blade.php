@@ -34,6 +34,14 @@
             @endpush
         @endif
 
+        @if(session('success'))
+            @push('scripts')
+                <script>
+                    showSwiftModal('Success', '{{ session('success') }}');
+                </script>
+            @endpush
+        @endif
+
         <!-- Loan Summary Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
@@ -76,7 +84,7 @@
             </div>
             <div class="bg-gradient-to-br from-amber-50 to-amber-100 rounded-lg p-4 border border-amber-200">
                 <p class="text-sm text-amber-600 font-medium mb-1">Term Remaining</p>
-                <p class="text-xl font-bold text-amber-900">{{ $loanRequestData->TermMonths ?? 12 }} months</p>
+                <p class="text-xl font-bold text-amber-900">{{ $loanRequestData->term_months ?? $loanRequestData->TermMonths ?? 12 }} months</p>
             </div>
         </div>
 
@@ -98,6 +106,20 @@
                     <p class="font-bold text-indigo-900" id="balanceAfterPayment">-</p>
                 </div>
             </div>
+            <!-- Excess Payment Info -->
+            <div id="excessInfo" class="hidden mt-3 pt-3 border-t border-indigo-200">
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <p class="text-purple-600">Excess Amount:</p>
+                        <p class="font-bold text-purple-900" id="excessPayment">-</p>
+                    </div>
+                    <div>
+                        <p class="text-green-600">Next Month Minimum:</p>
+                        <p class="font-bold text-green-900" id="nextMonthMin">-</p>
+                    </div>
+                </div>
+                <p class="text-xs text-gray-500 mt-2 italic">Excess payment reduces your next month's minimum due.</p>
+            </div>
         </div>
 
         <!-- Payment Form -->
@@ -112,20 +134,34 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <!-- Payment Amount -->
-                    <div>
+                    <div class="relative">
                         <label for="paymentAmount" class="block text-sm font-medium text-gray-700 mb-2">Payment Amount</label>
-                        <select class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition" id="paymentAmount" name="paymentamount">
-                            @php $selectedPaymentAmount = old('paymentamount'); @endphp
+                        @php $minPayableAmount = min($loanMonthlyAmount, $loanBalance); @endphp
+                        <p class="text-xs text-gray-500 mb-1 h-4">Minimum: ₱ {{ number_format($minPayableAmount, 2) }} | Max: ₱ {{ number_format($loanBalance, 2) }}</p>
+                        <input type="number" 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition no-spinner" 
+                               id="paymentAmount" 
+                               name="paymentamount" 
+                               min="{{ $minPayableAmount }}" 
+                               max="{{ $loanBalance }}" 
+                               step="0.01"
+                               value="{{ old('paymentamount') ?: $minPayableAmount }}" 
+                               placeholder="Enter payment amount"
+                               autocomplete="off"
+                               required />
+                        <div id="paymentSuggestions" class="hidden absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
                             @foreach($amounts as $amount)
-                                <option value="{{ $amount }}" {{ $selectedPaymentAmount == $amount ? 'selected' : '' }}>₱ {{ number_format($amount, 2) }}</option>
+                                <div class="px-4 py-2 hover:bg-purple-50 cursor-pointer text-sm" data-value="{{ $amount }}">₱ {{ number_format($amount, 2) }}</div>
                             @endforeach
-                        </select>
+                        </div>
+                        <p id="paymentAmountError" class="text-red-500 text-sm mt-1 hidden">Amount must be at least ₱ {{ number_format($loanMonthlyAmount, 2) }}</p>
                         @error('paymentamount')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
                     </div>
 
                     <!-- Payment Method -->
                     <div>
                         <label for="paymentMethod" class="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
+                        <p class="text-xs text-gray-500 mb-1 h-4">Select payment type</p>
                         <select class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition" id="paymentMethod" name="paymentmethod">
                             @php $selectedPaymentMethod = old('paymentmethod'); @endphp
                             <option value="Cash" {{ $selectedPaymentMethod === 'Cash' ? 'selected' : '' }}>Cash</option>
@@ -133,12 +169,16 @@
                         @error('paymentmethod')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
                     </div>
 
-                    <!-- O.R Series Code -->
+                    <!-- O.R Series Code (Optional) -->
                     <div>
-                        <label for="orSeriesCode" class="block text-sm font-medium text-gray-700 mb-2">O.R Series Code</label>
-                        <p class="text-xs text-gray-500 mb-1">Select O.R Series for loan payment</p>
+                        <label for="orSeriesCode" class="block text-sm font-medium text-gray-700 mb-2">O.R Series Code <span class="text-gray-400 text-xs">(Optional)</span></label>
+                        @if($lastOrSeriesCode)
+                            <p class="text-xs text-blue-600 mb-1">Last used: <strong>{{ $lastOrSeriesCode }}</strong></p>
+                        @else
+                            <p class="text-xs text-gray-500 mb-1">Leave empty if no O.R needed</p>
+                        @endif
                         <div class="relative">
-                            <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition" id="orSeriesCode" name="orseriescode" maxlength="30" value="{{ old('orseriescode') }}" placeholder="Type or select O.R Series Code" autocomplete="off" />
+                            <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition" id="orSeriesCode" name="orseriescode" maxlength="30" value="{{ old('orseriescode') }}" placeholder="Optional - Leave empty if no O.R" autocomplete="off" />
                             <div id="orSeriesCodeDropdown" class="hidden absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
                                 <!-- Dropdown options will be populated here -->
                             </div>
@@ -148,12 +188,12 @@
                         @error('orseriescode')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
                     </div>
 
-                    <!-- O.R No. -->
+                    <!-- O.R No. (Optional) -->
                     <div>
-                        <label for="orNo" class="block text-sm font-medium text-gray-700 mb-2">O.R No.</label>
-                        <p class="text-xs text-gray-500 mb-1">Select available O.R Number</p>
+                        <label for="orNo" class="block text-sm font-medium text-gray-700 mb-2">O.R No. <span class="text-gray-400 text-xs">(Optional)</span></label>
+                        <p class="text-xs text-gray-500 mb-1">Leave empty if no O.R needed</p>
                         <div class="relative">
-                            <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition" id="orNo" name="orno" maxlength="30" value="{{ old('orno') }}" placeholder="Type or select O.R Number" autocomplete="off" />
+                            <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition" id="orNo" name="orno" maxlength="30" value="{{ old('orno') }}" placeholder="Optional - Leave empty if no O.R" autocomplete="off" />
                             <div id="orNoDropdown" class="hidden absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
                                 <!-- Dropdown options will be populated here -->
                             </div>
@@ -166,7 +206,7 @@
                     <!-- Payment Date -->
                     <div class="md:col-span-2">
                         <label for="paymentDate" class="block text-sm font-medium text-gray-700 mb-2">Payment Date</label>
-                        <input type="date" class="w-full md:w-1/2 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition" id="paymentDate" name="paymentdate" value="{{ old('paymentdate') }}" />
+                        <input type="date" class="w-full md:w-1/2 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition" id="paymentDate" name="paymentdate" value="{{ old('paymentdate') ?: date('Y-m-d') }}" />
                         @error('paymentdate')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
                     </div>
                 </div>
@@ -188,8 +228,49 @@
         window.loanPaymentConfig = {
             monthlyPayment: {{ $loanRequestData->MonthlyAmount ?? 0 }},
             remainingBalance: {{ $loanBalance ?? 0 }},
-            totalRepayable: {{ $loanRequestData->TotalRepayable ?? $loanRequestData->Amount ?? 0 }}
+            totalRepayable: {{ $loanRequestData->total_repayable ?? $loanRequestData->TotalRepayable ?? $loanRequestData->Amount ?? 0 }},
+            totalPaid: {{ $totalLoanPayments ?? 0 }}
         };
     </script>
     <script src="{{ asset('js/client-addloanpayment.js') }}"></script>
 @endsection
+@push('styles')
+<style>
+    /* Hide number input spinners */
+    .no-spinner::-webkit-inner-spin-button,
+    .no-spinner::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    .no-spinner {
+        -moz-appearance: textfield;
+    }
+</style>
+@endpush
+@push('scripts')
+<script>
+$(document).ready(function() {
+    const $input = $('#paymentAmount');
+    const $dropdown = $('#paymentSuggestions');
+    
+    // Show suggestions on focus
+    $input.on('focus', function() {
+        $dropdown.removeClass('hidden');
+    });
+    
+    // Hide on click outside
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('#paymentAmount, #paymentSuggestions').length) {
+            $dropdown.addClass('hidden');
+        }
+    });
+    
+    // Select suggestion
+    $dropdown.on('click', 'div', function() {
+        $input.val($(this).data('value'));
+        $dropdown.addClass('hidden');
+        $input.trigger('input');
+    });
+});
+</script>
+@endpush

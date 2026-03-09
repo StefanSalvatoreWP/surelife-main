@@ -17,12 +17,9 @@ $(document).ready(function() {
         cache: false,
         success: function(branches) {
             branches.forEach(function(branch) {
-                branchSelect.append('<option value="' + branch.Id + '">' + branch.BranchName + '</option>');
+                let isSelected = (selectedBranch == branch.Id) ? 'selected' : '';
+                branchSelect.append('<option value="' + branch.Id + '" ' + isSelected + '>' + branch.BranchName + '</option>');
             });
-
-            if(selectedBranch == branch.Id){
-                branchSelect.append('<option hidden selected value="' + branch.Id + '">' + branch.BranchName + '</option>');
-            }
         },
         error: function(xhr, status, error) {
             branchSelect.append('<option value="0">Select region</option>');

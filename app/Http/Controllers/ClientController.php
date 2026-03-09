@@ -344,14 +344,14 @@ class ClientController extends Controller
             }
         }
 
-        // loan payments - include Verified and Approved statuses
+        // loan payments - include Verified, Approved, and Completed statuses
         $hasLoanRequest = LoanRequest::query()
             ->where('ClientId', $client->Id)
-            ->whereIn('Status', ['Verified', 'Approved'])
-            ->where('remarks', '<>', 'Completed')
+            ->whereIn('Status', ['Verified', 'Approved', 'Completed'])
             ->first();
 
         $loanBalance = 0;
+        $totalLoanPayments = 0;
         $loanPayments = collect();
         if ($hasLoanRequest) {
             $loanPayments = LoanPayment::query()
@@ -363,10 +363,23 @@ class ClientController extends Controller
                 ->leftJoin('tblorbatch', 'tblofficialreceipt.orbatchid', '=', 'tblorbatch.id')
                 ->where('tblloanpayment.clientid', $hasLoanRequest->ClientId)
                 ->where('tblloanpayment.loanrequestid', $hasLoanRequest->Id)
+                ->where('tblloanpayment.status', '<>', 'Void')
                 ->get();
 
             $totalLoanPayments = $loanPayments->sum('Amount');
-            $loanBalance = $hasLoanRequest->Amount - $totalLoanPayments;
+            
+            // Use total_repayable (lowercase) first as that's what's in database
+            $totalRepayable = $hasLoanRequest->total_repayable ?? $hasLoanRequest->TotalRepayable ?? $hasLoanRequest->Amount;
+            $loanBalance = max(0, $totalRepayable - $totalLoanPayments);
+            
+            // Auto-correct loan status if balance > 0 but marked as Completed
+            if ($loanBalance > 0 && $hasLoanRequest->Status === 'Completed') {
+                LoanRequest::where('Id', $hasLoanRequest->Id)->update([
+                    'Status' => 'Approved',
+                    'remarks' => 'Reactivated - balance remaining'
+                ]);
+                $hasLoanRequest->Status = 'Approved';
+            }
         }
 
         // get details of the assigned member from the client
@@ -390,12 +403,25 @@ class ClientController extends Controller
         // check if it is available for transfer - for transfer client purpose
         $canTransfer = ClientTransfer::query()->where('clientid', $client->Id)->first();
 
+        // Get payments for this client
+        $payments = Payment::query()
+            ->select(
+                'tblpayment.*',
+                'tblorbatch.SeriesCode'
+            )
+            ->leftJoin('tblofficialreceipt', 'tblpayment.ORId', '=', 'tblofficialreceipt.id')
+            ->leftJoin('tblorbatch', 'tblofficialreceipt.orbatchid', '=', 'tblorbatch.id')
+            ->where('tblpayment.clientid', $client->Id)
+            ->orderBy('tblpayment.date', 'desc')
+            ->get();
+
         return view('pages.client.client-view', [
-            'clients' => $clients,
+            'clients' => $client,
             'payments' => $payments,
             'hasLoanRequest' => $hasLoanRequest,
             'loanPayments' => $loanPayments,
             'loanBalance' => $loanBalance,
+            'totalLoanPayments' => $totalLoanPayments ?? 0,
             'assignedMemberData' => $assignedMemberData,
             'staff' => $assignedBy,
             'cfpApprover' => $cfpApprover,
@@ -452,21 +478,37 @@ class ClientController extends Controller
         $actions = Actions::query()->where('action', '=', 'Add Payment')->first();
         if ($roleLevel->Level <= $actions->RoleLevel) {
 
-            // get loan payments data - include Verified and Approved statuses
+            // get loan payments data - include Verified, Approved, and Completed statuses
             $hasLoanRequest = LoanRequest::query()
                 ->where('ClientId', $client->Id)
-                ->whereIn('Status', ['Verified', 'Approved'])
-                ->where('remarks', '<>', 'Completed')
+                ->whereIn('Status', ['Verified', 'Approved', 'Completed'])
                 ->first();
 
             $loanPayments = LoanPayment::query()
                 ->where('clientid', $hasLoanRequest->ClientId)
                 ->where('loanrequestid', $hasLoanRequest->Id)
+                ->where('status', '<>', 'Void')
                 ->get();
 
             $totalMonthlyDue = $hasLoanRequest->MonthlyAmount;
             $totalLoanPayments = $loanPayments->sum('Amount');
-            $loanBalance = $hasLoanRequest->Amount - $totalLoanPayments;
+            // Use total_repayable (lowercase) first as that's what's in database
+            $totalRepayable = $hasLoanRequest->total_repayable ?? $hasLoanRequest->TotalRepayable ?? $hasLoanRequest->Amount;
+            $loanBalance = max(0, $totalRepayable - $totalLoanPayments);
+            
+            // Auto-correct loan status if balance > 0 but marked as Completed
+            if ($loanBalance > 0 && $hasLoanRequest->Status === 'Completed') {
+                LoanRequest::where('Id', $hasLoanRequest->Id)->update([
+                    'Status' => 'Approved',
+                    'remarks' => 'Reactivated - balance remaining'
+                ]);
+                $hasLoanRequest->Status = 'Approved';
+            }
+            
+            // If loan is fully paid (Completed status with 0 balance), redirect back
+            if ($hasLoanRequest->Status === 'Completed' && $loanBalance <= 0) {
+                return redirect('/client-view/' . $client->Id)->with('error', 'Loan is already fully paid. No more payments needed.');
+            }
 
             // temp - get monthly loan amount
             $term = 12;
@@ -476,12 +518,33 @@ class ClientController extends Controller
             }
             $amounts[] = $loanBalance;
 
+            // Get last used OR Series Code and OR No from client's payments
+            $lastPayment = Payment::where('clientid', $client->Id)
+                ->whereNotNull('ORId')
+                ->orderBy('date', 'desc')
+                ->first();
+            
+            $lastOrSeriesCode = null;
+            $lastOrNo = null;
+            if ($lastPayment && $lastPayment->ORId) {
+                $orInfo = DB::table('tblofficialreceipt')
+                    ->join('tblorbatch', 'tblofficialreceipt.orbatchid', '=', 'tblorbatch.id')
+                    ->where('tblofficialreceipt.id', $lastPayment->ORId)
+                    ->select('tblorbatch.SeriesCode', 'tblofficialreceipt.ornumber as ORNo')
+                    ->first();
+                $lastOrSeriesCode = $orInfo->SeriesCode ?? null;
+                $lastOrNo = $orInfo->ORNo ?? null;
+            }
+
             return view('pages.client.client-addloanpayment', [
                 'clients' => $client,
                 'loanRequestData' => $hasLoanRequest,
                 'loanBalance' => $loanBalance,
                 'loanMonthlyAmount' => $totalMonthlyDue,
-                'amounts' => $amounts
+                'amounts' => $amounts,
+                'lastOrSeriesCode' => $lastOrSeriesCode,
+                'lastOrNo' => $lastOrNo,
+                'totalLoanPayments' => $totalLoanPayments
             ]);
         } else {
             return redirect()->back()->with('error', 'You do not have access to this function.');
@@ -3527,10 +3590,21 @@ class ClientController extends Controller
             $loanPayments = LoanPayment::query()
                 ->where('clientid', $clientDetails->Id)
                 ->where('loanrequestid', $hasLoanRequest->Id)
+                ->where('status', '<>', 'Void')
                 ->get();
 
             $totalLoanPayments = $loanPayments->sum('Amount');
-            $loanBalance = $hasLoanRequest->Amount - $totalLoanPayments;
+            $totalRepayable = $hasLoanRequest->total_repayable ?? $hasLoanRequest->TotalRepayable ?? $hasLoanRequest->Amount;
+            $loanBalance = max(0, $totalRepayable - $totalLoanPayments); // Never show negative balance
+            
+            // Auto-complete loan if overpaid or fully paid
+            if ($totalLoanPayments >= $totalRepayable && $hasLoanRequest->Status !== 'Completed') {
+                LoanRequest::where('Id', $hasLoanRequest->Id)->update([
+                    'Status' => 'Completed',
+                    'remarks' => 'Completed'
+                ]);
+                $loanStatus = 'Completed';
+            }
         }
 
         // Use LoanCalculator for eligibility (same as actual loan request)
@@ -3553,17 +3627,33 @@ class ClientController extends Controller
 
         $totalPremiumsPaid = Payment::where('clientid', $clientDetails->Id)->sum('amountpaid');
 
-        $calculator = new \App\Services\LoanCalculator();
-        $loanDetails = $calculator->calculateLoanDetails($contract, $totalPremiumsPaid, 12);
+        // If client has existing loan, use saved loan details instead of calculator
+        if ($hasLoanRequest && $hasLoanRequest->remarks !== 'Completed') {
+            // Active loan - not eligible for new loan
+            $isEligible = false;
+            $eligibilityMessage = 'You have an active loan. Complete current loan before applying for a new one.';
+            $netLoanableAmount = $hasLoanRequest->net_loan_amount ?? 0;
+            $monthlyDue = $hasLoanRequest->MonthlyAmount ?? 0;
+            $tier = $hasLoanRequest->premium_paid_percent ?? 0;
+            $loanableAmount = $hasLoanRequest->Amount ?? 0;
+            $processingFee = $hasLoanRequest->processing_fee ?? 0;
+            $monthlyContractPremium = $contract->paymenttermamount ?? 0;
+            $termMonths = $hasLoanRequest->term_months ?? $hasLoanRequest->TermMonths ?? 12;
+        } else {
+            // No active loan - use calculator for new loan eligibility
+            $calculator = new \App\Services\LoanCalculator();
+            $loanDetails = $calculator->calculateLoanDetails($contract, $totalPremiumsPaid, 12);
 
-        $isEligible = $loanDetails['eligible'] ?? false;
-        $eligibilityMessage = $loanDetails['message'] ?? '';
-        $netLoanableAmount = $loanDetails['net_loan_amount'] ?? 0;
-        $monthlyDue = $loanDetails['monthly_total_due'] ?? 0;
-        $tier = $loanDetails['tier'] ?? 0;
-        $loanableAmount = $loanDetails['loanable_amount'] ?? 0;
-        $processingFee = $loanDetails['processing_fee'] ?? 0;
-        $monthlyContractPremium = $loanDetails['monthly_contract_premium'] ?? 0;
+            $isEligible = $loanDetails['eligible'] ?? false;
+            $eligibilityMessage = $loanDetails['message'] ?? '';
+            $netLoanableAmount = $loanDetails['net_loan_amount'] ?? 0;
+            $monthlyDue = $loanDetails['monthly_total_due'] ?? 0;
+            $tier = $loanDetails['tier'] ?? 0;
+            $loanableAmount = $loanDetails['loanable_amount'] ?? 0;
+            $processingFee = $loanDetails['processing_fee'] ?? 0;
+            $monthlyContractPremium = $loanDetails['monthly_contract_premium'] ?? 0;
+            $termMonths = 12;
+        }
 
         return view('pages.client-home.client-loanrequest', [
             'loanStatus' => $loanStatus,
@@ -3577,7 +3667,8 @@ class ClientController extends Controller
             'loanableAmount' => $loanableAmount,
             'processingFee' => $processingFee,
             'client' => $clientDetails,
-            'monthlyContractPremium' => $monthlyContractPremium
+            'monthlyContractPremium' => $monthlyContractPremium,
+            'termMonths' => $termMonths
         ]);
     }
 
