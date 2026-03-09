@@ -3581,28 +3581,47 @@ class ClientController extends Controller
     public function clientHomeLoanRequest(Request $request)
     {
         $clientDetails = Client::where('id', session('user_id'))->first();
-        $hasLoanRequest = LoanRequest::where('clientid', $clientDetails->Id)->first();
+        // Always start by looking at the latest loan request record for this client
+        $latestLoanRequest = LoanRequest::where('clientid', $clientDetails->Id)
+            ->orderBy('Id', 'desc')
+            ->first();
+
+        // Define an "active" loan request as one that is NOT completed
+        // (Some rows may have Status completed but remarks not updated, so we check both)
+        $hasLoanRequest = LoanRequest::where('clientid', $clientDetails->Id)
+            ->where(function ($q) {
+                $q->whereNull('Status')
+                    ->orWhere('Status', '!=', 'Completed');
+            })
+            ->where(function ($q) {
+                $q->whereNull('remarks')
+                    ->orWhere('remarks', '!=', 'Completed');
+            })
+            ->orderBy('Id', 'desc')
+            ->first();
 
         $loanBalance = 0;
         $loanStatus = $hasLoanRequest->Status ?? 'Ready';
 
-        if ($hasLoanRequest) {
+        if ($latestLoanRequest) {
             $loanPayments = LoanPayment::query()
                 ->where('clientid', $clientDetails->Id)
-                ->where('loanrequestid', $hasLoanRequest->Id)
+                ->where('loanrequestid', $latestLoanRequest->Id)
                 ->where('status', '<>', 'Void')
                 ->get();
 
             $totalLoanPayments = $loanPayments->sum('Amount');
-            $totalRepayable = $hasLoanRequest->total_repayable ?? $hasLoanRequest->TotalRepayable ?? $hasLoanRequest->Amount;
+            $totalRepayable = $latestLoanRequest->total_repayable ?? $latestLoanRequest->TotalRepayable ?? $latestLoanRequest->Amount;
             $loanBalance = max(0, $totalRepayable - $totalLoanPayments); // Never show negative balance
             
             // Auto-complete loan if overpaid or fully paid
-            if ($totalLoanPayments >= $totalRepayable && $hasLoanRequest->Status !== 'Completed') {
-                LoanRequest::where('Id', $hasLoanRequest->Id)->update([
+            if ($loanBalance <= 0 && ($latestLoanRequest->Status ?? null) !== 'Completed') {
+                LoanRequest::where('Id', $latestLoanRequest->Id)->update([
                     'Status' => 'Completed',
                     'remarks' => 'Completed'
                 ]);
+                // If the latest loan just completed, do not treat it as an active loan for eligibility
+                $hasLoanRequest = null;
                 $loanStatus = 'Completed';
             }
         }
