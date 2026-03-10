@@ -215,8 +215,8 @@
                         <span class="font-semibold text-gray-900">₱ {{ number_format($monthlyInterest, 2) }}</span>
                     </div>
                     <div class="flex justify-between items-center py-3 bg-green-50 rounded-lg px-3 mt-2">
-                        <span class="font-bold text-green-800">Total Monthly Due ({{ $termMonths }} months)</span>
-                        <span class="font-bold text-green-800 text-lg">₱ {{ number_format($monthlyTotalDue, 2) }}</span>
+                        <span class="font-bold text-green-800">Monthly Loan Payment</span>
+                        <span class="font-bold text-green-800 text-lg">₱ {{ number_format($monthlyLoanPayment, 2) }}</span>
                     </div>
                 </div>
             </div>
