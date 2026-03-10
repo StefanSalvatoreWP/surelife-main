@@ -8,20 +8,22 @@ namespace Database\Seeders;
  * ============================================================================
  * 
  * ┌─────────────────────────────────────────────────────────────────────┐
- * │  USERNAME       │  PASSWORD      │  ACCESS KEY    │  LOAN STATUS     │
+ * │  USERNAME       │  PASSWORD      │  ACCESS KEY    │  TIER          │
  * ├─────────────────────────────────────────────────────────────────────┤
- * │  TESTCLIENT001  │  password123   │  a8821dd1f     │  ✅ ELIGIBLE      │
- * │  TESTCLIENT002  │  password123   │  a8821dd1f     │  ✅ ELIGIBLE      │
- * │  TESTCLIENT003  │  password123   │  a8821dd1f     │  ❌ NOT ELIGIBLE  │
+ * │  TESTCLIENT001  │  password123   │  a8821dd1f     │  🥇 Gold (45%)  │
+ * │  TESTCLIENT002  │  password123   │  a8821dd1f     │  🥈 Silver(40%)│
+ * │  TESTCLIENT003  │  password123   │  a8821dd1f     │  🥉 Bronze(30%)│
+ * │  TESTCLIENT004  │  password123   │  a8821dd1f     │  ❌ NOT ELIGIBLE│
  * └─────────────────────────────────────────────────────────────────────┘
  * 
  * LOGIN URL: /login
  * NOTE: Use Contract Number as Username
  * 
  * ELIGIBILITY DETAILS:
- * - TESTCLIENT001: Status=3 (Approved), 100% paid → 45% loan tier
- * - TESTCLIENT002: Status=3 (Approved), 80% paid  → 40% loan tier  
- * - TESTCLIENT003: Status=1 (Pending) → Cannot apply for loan
+ * - TESTCLIENT001: Status=3 (Approved), 100% paid → Gold tier (45% loanable)
+ * - TESTCLIENT002: Status=3 (Approved), 80% paid  → Silver tier (40% loanable)
+ * - TESTCLIENT003: Status=3 (Approved), 60% paid  → Bronze tier (30% loanable)
+ * - TESTCLIENT004: Status=1 (Pending) → Cannot apply for loan
  * 
  * ============================================================================
  */
@@ -33,7 +35,7 @@ use Carbon\Carbon;
 class TestClientSeeder extends Seeder
 {
     /**
-     * Create test clients: 2 eligible for loan, 1 not eligible
+     * Create test clients: 3 eligible (Gold/Silver/Bronze), 1 not eligible
      */
     public function run(): void
     {
@@ -50,33 +52,44 @@ class TestClientSeeder extends Seeder
         $city = DB::table('refcitymun')->where('provCode', $province->provCode ?? '0128')->first();
         $barangay = DB::table('refbrgy')->where('citymunCode', $city->citymunCode ?? '012801')->first();
 
-        // ============ CLIENT 1: ELIGIBLE (100% paid, Status=3) ============
+        // ============ CLIENT 1: GOLD TIER (100% paid, Status=3) ============
         $this->createClient([
             'contract_number' => 'TESTCLIENT001',
-            'lastname' => 'ELIGIBLE',
+            'lastname' => 'GOLD',
             'firstname' => 'CLIENT_ONE',
             'status' => 3, // Approved/Active
             'package_price' => 5000.00,
-            'total_paid' => 5000.00, // 100% paid - eligible for 45% tier
-            'tier' => '100% (45% loan tier)',
+            'total_paid' => 5000.00, // 100% paid - Gold tier (45% loanable)
+            'tier' => 'Gold (45% loan tier)',
         ], $region, $branch, $package, $paymentTerm, $province, $city, $barangay);
 
-        // ============ CLIENT 2: ELIGIBLE (80% paid, Status=3) ============
+        // ============ CLIENT 2: SILVER TIER (80% paid, Status=3) ============
         $this->createClient([
             'contract_number' => 'TESTCLIENT002',
-            'lastname' => 'ELIGIBLE',
+            'lastname' => 'SILVER',
             'firstname' => 'CLIENT_TWO',
             'status' => 3, // Approved/Active
             'package_price' => 5000.00,
-            'total_paid' => 4000.00, // 80% paid - eligible for 40% tier
-            'tier' => '80% (40% loan tier)',
+            'total_paid' => 4000.00, // 80% paid - Silver tier (40% loanable)
+            'tier' => 'Silver (40% loan tier)',
         ], $region, $branch, $package, $paymentTerm, $province, $city, $barangay);
 
-        // ============ CLIENT 3: NOT ELIGIBLE (Status=1 Pending) ============
+        // ============ CLIENT 3: BRONZE TIER (60% paid, Status=3) ============
         $this->createClient([
             'contract_number' => 'TESTCLIENT003',
+            'lastname' => 'BRONZE',
+            'firstname' => 'CLIENT_THREE',
+            'status' => 3, // Approved/Active
+            'package_price' => 5000.00,
+            'total_paid' => 3000.00, // 60% paid - Bronze tier (30% loanable)
+            'tier' => 'Bronze (30% loan tier)',
+        ], $region, $branch, $package, $paymentTerm, $province, $city, $barangay);
+
+        // ============ CLIENT 4: NOT ELIGIBLE (Status=1 Pending) ============
+        $this->createClient([
+            'contract_number' => 'TESTCLIENT004',
             'lastname' => 'NOTELIGIBLE',
-            'firstname' => 'CLIENT_ONE',
+            'firstname' => 'CLIENT_FOUR',
             'status' => 1, // Pending - NOT eligible regardless of payments
             'package_price' => 5000.00,
             'total_paid' => 5000.00, // Even 100% paid, still not eligible due to status
@@ -90,15 +103,20 @@ class TestClientSeeder extends Seeder
         $this->command->info('');
         $this->command->info('📊 LOAN ELIGIBILITY SUMMARY:');
         $this->command->info('');
-        $this->command->info('✅ ELIGIBLE FOR LOAN:');
-        $this->command->info('   1. TESTCLIENT001 - 100% paid, Status=3 (Approved)');
-        $this->command->info('      → Tier: 45% loanable (₱2,250 from ₱5,000 contract)');
+        $this->command->info('🥇 GOLD TIER (45% loanable):');
+        $this->command->info('   TESTCLIENT001 - 100% paid, Status=3 (Approved)');
+        $this->command->info('      → Loanable: ₱2,250 from ₱5,000 contract');
         $this->command->info('');
-        $this->command->info('   2. TESTCLIENT002 - 80% paid, Status=3 (Approved)');
-        $this->command->info('      → Tier: 40% loanable (₱2,000 from ₱5,000 contract)');
+        $this->command->info('🥈 SILVER TIER (40% loanable):');
+        $this->command->info('   TESTCLIENT002 - 80% paid, Status=3 (Approved)');
+        $this->command->info('      → Loanable: ₱2,000 from ₱5,000 contract');
+        $this->command->info('');
+        $this->command->info('🥉 BRONZE TIER (30% loanable):');
+        $this->command->info('   TESTCLIENT003 - 60% paid, Status=3 (Approved)');
+        $this->command->info('      → Loanable: ₱1,500 from ₱5,000 contract');
         $this->command->info('');
         $this->command->info('❌ NOT ELIGIBLE FOR LOAN:');
-        $this->command->info('   3. TESTCLIENT003 - Status=1 (Pending)');
+        $this->command->info('   TESTCLIENT004 - Status=1 (Pending)');
         $this->command->info('      → Reason: Pending clients cannot apply for loan');
         $this->command->info('');
         $this->command->info('═══════════════════════════════════════════════════════════════');
@@ -109,9 +127,10 @@ class TestClientSeeder extends Seeder
         $this->command->info('   Access Key: a8821dd1f');
         $this->command->info('');
         $this->command->info('   Usernames (Contract Numbers):');
-        $this->command->info('   - TESTCLIENT001');
-        $this->command->info('   - TESTCLIENT002');
-        $this->command->info('   - TESTCLIENT003');
+        $this->command->info('   - TESTCLIENT001 (Gold)');
+        $this->command->info('   - TESTCLIENT002 (Silver)');
+        $this->command->info('   - TESTCLIENT003 (Bronze)');
+        $this->command->info('   - TESTCLIENT004 (Not Eligible)');
         $this->command->info('');
         $this->command->info('═══════════════════════════════════════════════════════════════');
     }
@@ -215,16 +234,8 @@ class TestClientSeeder extends Seeder
     {
         if ($totalAmount <= 0) return;
 
-        // Get an existing OR batch from the system (preferably for payments)
-        $orBatch = DB::table('tblorbatch')
-            ->where('Type', 'Payment')
-            ->where('Status', 'Active')
-            ->first();
-        
-        if (!$orBatch) {
-            // Fallback to any OR batch
-            $orBatch = DB::table('tblorbatch')->first();
-        }
+        // Get an existing OR batch from the system
+        $orBatch = DB::table('tblorbatch')->first();
 
         // Create payments in chunks to simulate realistic payment history
         $paymentCount = (int)($totalAmount / 416.67); // Monthly payment amount

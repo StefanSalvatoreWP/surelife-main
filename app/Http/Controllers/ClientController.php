@@ -3613,7 +3613,7 @@ class ClientController extends Controller
             $totalLoanPayments = $loanPayments->sum('Amount');
             $totalRepayable = $latestLoanRequest->total_repayable ?? $latestLoanRequest->TotalRepayable ?? $latestLoanRequest->Amount;
             $loanBalance = max(0, $totalRepayable - $totalLoanPayments); // Never show negative balance
-            
+
             // Auto-complete loan if overpaid or fully paid
             if ($loanBalance <= 0 && ($latestLoanRequest->Status ?? null) !== 'Completed') {
                 LoanRequest::where('Id', $latestLoanRequest->Id)->update([
