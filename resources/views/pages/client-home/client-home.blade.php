@@ -13,10 +13,178 @@
                 </div>
             </div>
         @endif
-
-        @php
-            $base_price = $clients->Price;
-            $total_payments = 0;
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="main-grid">
+            <!-- Left Column - Client Information -->
+            <div id="client-info-column">
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                    <!-- Header with Toggle Button -->
+                    <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100 flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-gray-800">Client Information</h3>
+                        <button id="toggle-client-info" class="p-2 rounded-lg hover:bg-gray-200 transition duration-200" title="Toggle client information">
+                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="p-6 space-y-6" id="client-info-content">
+                        <!-- Contract Section -->
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-800 uppercase tracking-wide mb-3 pb-2 border-b-2 border-gray-200">Contract</h4>
+                            <div class="space-y-2">
+                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium text-sm">Contract No.</span>
+                                    <span class="text-gray-900 text-sm">{{ $clients->ContractNumber }}</span>
+                                </div>
+                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium text-sm">Package</span>
+                                    <span class="text-gray-900 text-sm">{{ $clients->Package }}</span>
+                                </div>
+                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium text-sm">Term</span>
+                                    <span class="text-gray-900 text-sm">{{ $clients->Term  . ' ( ₱ ' . number_format($clients->Price, 2) .' )' }}</span>
+                                </div>
+                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium text-sm">Region</span>
+                                    <span class="text-gray-900 text-sm">{{ $clients->RegionName }}</span>
+                                </div>
+                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium text-sm">Branch</span>
+                                    <span class="text-gray-900 text-sm">{{ $clients->BranchName }}</span>
+                                </div>
+                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium text-sm">Best place to collect</span>
+                                    <span class="text-gray-900 text-sm">{{ $clients->BestPlaceToCollect }}</span>
+                                </div>
+                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium text-sm">Best time to collect</span>
+                                    <span class="text-gray-900 text-sm">{{ $clients->BestTimeToCollect }}</span>
+                                </div>
+                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium text-sm">Status</span>
+                                    <span class="text-gray-900 text-sm">
+                                        @if($clients->Status == '1')
+                                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-gray-200 text-gray-700">Pending</span>
+                                        @elseif($clients->Status == '2')
+                                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-200 text-blue-700">Verified</span>
+                                        @elseif($clients->Status == '3')
+                                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-200 text-green-700">Approved</span>
+                                        @endif
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Personal Section -->
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-800 uppercase tracking-wide mb-3 pb-2 border-b-2 border-gray-200">Personal</h4>
+                            <div class="space-y-2">
+                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium text-sm">Name</span>
+                                    <span class="text-gray-900 text-sm">{{ $clients->LastName . ', ' . $clients->FirstName . " " . $clients->MiddleName }}</span>
+                                </div>
+                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium text-sm">Birth Date</span>
+                                    <span class="text-gray-900 text-sm">{{ $clients->BirthDate }}</span>
+                                </div>
+                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium text-sm">Age</span>
+                                    <span class="text-gray-900 text-sm">{{ $clients->Age }}</span>
+                                </div>
+                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium text-sm">Gender</span>
+                                    <span class="text-gray-900 text-sm">{{ $clients->Gender }}</span>
+                                </div>
+                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium text-sm">Civil Status</span>
+                                    <span class="text-gray-900 text-sm">{{ $clients->CivilStatus }}</span>
+                                </div>
+                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium text-sm">Occupation</span>
+                                    <span class="text-gray-900 text-sm">{{ $clients->Occupation }}</span>
+                                </div>
+                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium text-sm">Birth Place</span>
+                                    <span class="text-gray-900 text-sm">{{ $clients->BirthPlace }}</span>
+                                </div>
+                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium text-sm">Province</span>
+                                    <span class="text-gray-900 text-sm">{{ $clients->ProvinceName }}</span>
+                                </div>
+                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium text-sm">City</span>
+                                    <span class="text-gray-900 text-sm">{{ $clients->CityName }}</span>
+                                </div>
+                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium text-sm">Barangay</span>
+                                    <span class="text-gray-900 text-sm">{{ $clients->BarangayName }}</span>
+                                </div>
+                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium text-sm">Street</span>
+                                    <span class="text-gray-900 text-sm">{{ $clients->Street }}</span>
+                                </div>
+                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium text-sm">Zipcode</span>
+                                    <span class="text-gray-900 text-sm">{{ $clients->ZipCode }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Contact Section -->
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-800 uppercase tracking-wide mb-3 pb-2 border-b-2 border-gray-200">Contact</h4>
+                            <div class="space-y-2">
+                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium text-sm">Home No.</span>
+                                    <span class="text-gray-900 text-sm">{{ $clients->HomeNumber }}</span>
+                                </div>
+                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium text-sm">Mobile No.</span>
+                                    <span class="text-gray-900 text-sm">{{ $clients->MobileNumber }}</span>
+                                </div>
+                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium text-sm">Email Address</span>
+                                    <span class="text-gray-900 text-sm">{{ $clients->EmailAddress }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Beneficiaries Section -->
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-800 uppercase tracking-wide mb-3 pb-2 border-b-2 border-gray-200">Beneficiaries</h4>
+                            <div class="space-y-2">
+                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium text-sm">Principal (Age)</span>
+                                    <span class="text-gray-900 text-sm">{{ $clients->PrincipalBeneficiaryName . ' (' . $clients->PrincipalBeneficiaryAge . ')'}}</span>
+                                </div>
+                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium text-sm">Beneficiary 1 (Age)</span>
+                                    <span class="text-gray-900 text-sm">{{ $clients->Secondary1Name . ' (' . $clients->Secondary1Age . ')'}}</span>
+                                </div>
+                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium text-sm">Beneficiary 2 (Age)</span>
+                                    <span class="text-gray-900 text-sm">{{ $clients->Secondary2Name . ' (' . $clients->Secondary2Age . ')'}}</span>
+                                </div>
+                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium text-sm">Beneficiary 3 (Age)</span>
+                                    <span class="text-gray-900 text-sm">{{ $clients->Secondary3Name . ' (' . $clients->Secondary3Age . ')'}}</span>
+                                </div>
+                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium text-sm">Beneficiary 4 (Age)</span>
+                                    <span class="text-gray-900 text-sm">{{ $clients->Secondary4Name . ' (' . $clients->Secondary4Age . ')'}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column - Payment History -->
+            <div>
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-green-50 to-green-100">
+                        <h3 class="text-lg font-semibold text-gray-800">Payment History</h3>
+                    </div>
+                    <div class="p-6">
+                        @php
+                                $base_price = $clients->Price;
+                                $total_payments = 0;
 
             switch($clients->Term){
                 case "Spotcash": $total_price = $base_price; break;	

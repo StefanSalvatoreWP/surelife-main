@@ -28,7 +28,7 @@ $(document).ready(function() {
                 },
                 width: '200px'
             },
-            { data: 'ORNo', name: 'ORNo' },
+            { data: 'orno', name: 'orno' },
             {
                 data: 'Amount',
                 name: 'Amount',

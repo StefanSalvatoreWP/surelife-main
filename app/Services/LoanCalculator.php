@@ -188,7 +188,8 @@ class LoanCalculator
         $totalInterest = $this->calculateInterest($loanableAmount, $termMonths);
         $totalRepayable = $this->calculateTotalRepayable($loanableAmount, $termMonths);
         $monthlyLoanPayment = $this->calculateMonthlyLoanPayment($totalRepayable, $termMonths);
-        $monthlyDue = $this->calculateMonthlyDue($monthlyLoanPayment, $monthlyPremium);
+        // Monthly due is loan payment only (not including contract premium)
+        $monthlyDue = $monthlyLoanPayment;
 
         return [
             'eligible' => true,

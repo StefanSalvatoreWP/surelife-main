@@ -52,7 +52,8 @@
                                     </select>
 
                                     @php
-                                        $base_price = $client_terms->Price;
+                                        // Use PackagePrice (actual package price) not PaymentTerm Price (term amount)
+                                        $base_price = $client_terms->PackagePrice;
                                         $total_payments = 0;
 
                                         switch($client_terms->Term){

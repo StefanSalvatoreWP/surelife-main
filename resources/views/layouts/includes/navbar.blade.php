@@ -4,17 +4,47 @@
         <div class="flex justify-between items-center h-16">
             <!-- Logo and Brand -->
             <div class="flex items-center space-x-3">
-                @if(session('user_roleid') != 7)
-                    <a href="/home" class="flex items-center space-x-3 group">
-                        <img src="{{ asset('images/Surelife.png')}}" alt="SLC Logo" class="h-10 w-10 sm:h-12 sm:w-12 object-contain transform group-hover:scale-110 transition duration-300">
-                        <span class="text-primary-600 font-bold text-lg sm:text-xl tracking-tight">SLC Admin Panel</span>
-                    </a>
-                @else
-                    <a href="/clienthome/{{ session('user_id') }}" class="flex items-center space-x-3 group">
-                        <img src="{{ asset('images/Surelife.png')}}" alt="SLC Logo" class="h-10 w-10 sm:h-12 sm:w-12 object-contain transform group-hover:scale-110 transition duration-300">
-                        <span class="text-green-600 font-bold text-lg sm:text-xl tracking-tight">SLC Client Portal</span>
-                    </a>
-                @endif
+                @php
+                    $roleId = session('user_roleid');
+                    $roleName = session('user_rolename') ?? 'Staff';
+                    
+                    // Determine panel title and color based on role
+                    $panelTitle = 'SLC Staff Panel';
+                    $panelColor = 'text-blue-600';
+                    $homeLink = '/home';
+                    
+                    if ($roleId == 7) {
+                        // Client
+                        $panelTitle = 'SLC Client Portal';
+                        $panelColor = 'text-green-600';
+                        $homeLink = '/clienthome/' . session('user_id');
+                    } elseif ($roleId == 1) {
+                        // Administrator
+                        $panelTitle = 'SLC Admin Panel';
+                        $panelColor = 'text-primary-600';
+                    } elseif ($roleId == 20) {
+                        // Approver
+                        $panelTitle = 'SLC Approver Panel';
+                        $panelColor = 'text-purple-600';
+                    } elseif ($roleId == 14) {
+                        // Verifier
+                        $panelTitle = 'SLC Verifier Panel';
+                        $panelColor = 'text-orange-600';
+                    } elseif (in_array($roleId, [17, 18])) {
+                        // HR, Accounting
+                        $panelTitle = 'SLC ' . $roleName . ' Panel';
+                        $panelColor = 'text-teal-600';
+                    } elseif (in_array($roleId, [3, 4, 5, 6, 8, 9, 10, 15, 16])) {
+                        // Field staff roles
+                        $panelTitle = 'SLC Field Panel';
+                        $panelColor = 'text-indigo-600';
+                    }
+                @endphp
+                
+                <a href="{{ $homeLink }}" class="flex items-center space-x-3 group">
+                    <img src="{{ asset('images/Surelife.png')}}" alt="SLC Logo" class="h-10 w-10 sm:h-12 sm:w-12 object-contain transform group-hover:scale-110 transition duration-300">
+                    <span class="{{ $panelColor }} font-bold text-lg sm:text-xl tracking-tight">{{ $panelTitle }}</span>
+                </a>
             </div>
 
             <!-- Right Side - Font Size, User Info & Logout -->

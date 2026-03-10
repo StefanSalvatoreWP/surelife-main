@@ -263,6 +263,7 @@ class ClientController extends Controller
                 'tblregion.RegionName',
                 'tblbranch.BranchName',
                 'tblpackage.Package',
+                'tblpackage.Price as PackagePrice',
                 'tblpaymentterm.Id',
                 'tblpaymentterm.PackageId',
                 \DB::raw('tblpaymentterm.Term as ExpectedTerm'),
@@ -344,10 +345,11 @@ class ClientController extends Controller
             }
         }
 
-        // loan payments - include Verified, Approved, and Completed statuses
+        // loan payments - get the latest loan request (by Id DESC) to prioritize newer loans
         $hasLoanRequest = LoanRequest::query()
             ->where('ClientId', $client->Id)
             ->whereIn('Status', ['Verified', 'Approved', 'Completed'])
+            ->orderBy('Id', 'desc')
             ->first();
 
         $loanBalance = 0;
@@ -441,10 +443,12 @@ class ClientController extends Controller
             $assignedMemberData = AssignedPlans::where('clientid', $client->Id)
                 ->first();
 
-            // get client payment term
+            // get client payment term with package price
             $clientTerm = PaymentTerm::query()
-                ->where('packageid', $client->PackageID)
-                ->where('id', $client->PaymentTermId)
+                ->select('tblpaymentterm.*', 'tblpackage.Price as PackagePrice')
+                ->leftJoin('tblpackage', 'tblpaymentterm.PackageId', '=', 'tblpackage.id')
+                ->where('tblpaymentterm.packageid', $client->PackageID)
+                ->where('tblpaymentterm.id', $client->PaymentTermId)
                 ->first();
 
             // get payments data
@@ -478,10 +482,11 @@ class ClientController extends Controller
         $actions = Actions::query()->where('action', '=', 'Add Payment')->first();
         if ($roleLevel->Level <= $actions->RoleLevel) {
 
-            // get loan payments data - include Verified, Approved, and Completed statuses
+            // get loan payments data - get the latest loan request (by Id DESC) to prioritize newer loans
             $hasLoanRequest = LoanRequest::query()
                 ->where('ClientId', $client->Id)
                 ->whereIn('Status', ['Verified', 'Approved', 'Completed'])
+                ->orderBy('Id', 'desc')
                 ->first();
 
             $loanPayments = LoanPayment::query()
@@ -3550,6 +3555,7 @@ class ClientController extends Controller
                 'tblregion.RegionName',
                 'tblbranch.BranchName',
                 'tblpackage.Package',
+                'tblpackage.Price as PackagePrice',
                 'tblpaymentterm.Id',
                 'tblpaymentterm.PackageId',
                 'tblpaymentterm.Term',
@@ -3565,7 +3571,7 @@ class ClientController extends Controller
 
         // Calculate balance for the client
         $total_payment = 0;
-        $base_price = $clients->Price;
+        $base_price = $clients->PackagePrice;  // Use PackagePrice for total package price
         $total_price = 0;
 
         switch ($clients->Term) {

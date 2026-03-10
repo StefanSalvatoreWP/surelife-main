@@ -145,7 +145,7 @@
             @if($useSwiftModal)
                 @push('scripts')
                     <script>
-                        document.addEventListener('DOMContentLoa ded', function () {
+                        document.addEventListener('DOMContentLoaded', function () {
                             showSwiftModal('Success', '{{ $swiftMessage }}');
                         });
                     </script>
@@ -1049,9 +1049,9 @@
                                     @elseif($clients->CFPNO == "NA")
                                         <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
                                             onclick="showSwiftModal('Certificate of Full Payment', 'Enter certificate number to proceed.', 'warning', [
-                                                                                                                                                                                                                        {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpWithInput()'},
-                                                                                                                                                                                                                        {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
-                                                                                                                                                                                                                    ])"
+                                                                                                                                                                                                                                            {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpWithInput()'},
+                                                                                                                                                                                                                                            {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+                                                                                                                                                                                                                                        ])"
                                             data-client-id="{{ $clients->cid }}" role="button">Certificate of Full
                                             Payment</a>
                                     @else
@@ -1082,24 +1082,24 @@
                                         @if($clients->CFPNO == null && $cfpApprover == 0)
                                             <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
                                                 onclick="showSwiftModal('Warning', 'Certificate of full payment requires approval.', 'warning', [
-                                                                                                                                                                                                                                                            {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
-                                                                                                                                                                                                                                                        ])"
+                                                                                                                                                                                                                                                                                    {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+                                                                                                                                                                                                                                                                                ])"
                                                 data-client-id="{{ $clients->cid }}" role="button">Certificate of
                                                 Full Payment</a>
                                         @elseif($clients->CFPNO == null && $cfpApprover == 1)
                                             <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
                                                 onclick="showSwiftModal('Certificate Approval', 'You are going to approve the certificate of full payment for this client. You cannot undo this action. Continue?', 'warning', [
-                                                                                                                                                                                                                                                            {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpApproval()'},
-                                                                                                                                                                                                                                                            {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
-                                                                                                                                                                                                                                                        ])"
+                                                                                                                                                                                                                                                                                    {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpApproval()'},
+                                                                                                                                                                                                                                                                                    {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+                                                                                                                                                                                                                                                                                ])"
                                                 data-client-id="{{ $clients->cid }}" role="button">Certificate of
                                                 Full Payment</a>
                                         @elseif($clients->CFPNO == "NA")
                                             <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
                                                 onclick="showSwiftModal('Certificate of Full Payment', 'Enter certificate number to proceed.', 'warning', [
-                                                                                                                                                                                                                                                            {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpWithInput()'},
-                                                                                                                                                                                                                                                            {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
-                                                                                                                                                                                                                                                        ])"
+                                                                                                                                                                                                                                                                                    {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpWithInput()'},
+                                                                                                                                                                                                                                                                                    {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+                                                                                                                                                                                                                                                                                ])"
                                                 data-client-id="{{ $clients->cid }}" role="button">Certificate of
                                                 Full Payment</a>
                                         @else
@@ -1697,198 +1697,198 @@
         </style>
         <script src="{{ asset('js/client-view.js') }}"></script>
         <script>
-                // Function to submit complete memorial for          m
-                function submitCompleteMemorial() {
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = '/submit-complete-memorial/{{ $clients->cid }}';
+            // Function to submit complete memorial for          m
+            function submitCompleteMemorial() {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/submit-complete-memorial/{{ $clients->cid }}';
 
-                    const csrfToken = document.createElement('input');
-                    csrfToken.type = 'hidden';
-                    csrfToken.name = '_token';
-                    csrfToken.value = '{{ csrf_token() }}';
+                const csrfToken = document.createElement('input');
+                csrfToken.type = 'hidden';
+                csrfToken.name = '_token';
+                csrfToken.value = '{{ csrf_token() }}';
 
-                    const method = document.createElement('input');
-                    method.type = 'hidden';
-                    method.name = '_method';
-                    method.value = 'PUT';
+                const method = document.createElement('input');
+                method.type = 'hidden';
+                method.name = '_method';
+                method.value = 'PUT';
 
-                    form.appendChild(csrfToken);
-                    form.appendChild(method);
-                    document.body.appendChild(form);
-                    form.submit();
-                }
+                form.appendChild(csrfToken);
+                form.appendChild(method);
+                document.body.appendChild(form);
+                form.submit();
+            }
 
-                // Function to submit approve client form
-                function submitApproveClient() {
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = '/client-update-status/{{ $clients->cid }}';
+            // Function to submit approve client form
+            function submitApproveClient() {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/client-update-status/{{ $clients->cid }}';
 
-                    const csrfToken = document.createElement('input');
-                    csrfToken.type = 'hidden';
-                    csrfToken.name = '_token';
-                    csrfToken.value = '{{ csrf_token() }}';
+                const csrfToken = document.createElement('input');
+                csrfToken.type = 'hidden';
+                csrfToken.name = '_token';
+                csrfToken.value = '{{ csrf_token() }}';
 
-                    const method = document.createElement('input');
-                    method.type = 'hidden';
-                    method.name = '_method';
-                    method.value = 'PUT';
+                const method = document.createElement('input');
+                method.type = 'hidden';
+                method.name = '_method';
+                method.value = 'PUT';
 
-                    form.appendChild(csrfToken);
-                    form.appendChild(method);
-                    document.body.appendChild(form);
-                    form.submit();
-                }
+                form.appendChild(csrfToken);
+                form.appendChild(method);
+                document.body.appendChild(form);
+                form.submit();
+            }
 
-                // Function to submit verify client form
-                function submitVerifyClient() {
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = '/client-update-status/{{ $clients->cid }}';
+            // Function to submit verify client form
+            function submitVerifyClient() {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/client-update-status/{{ $clients->cid }}';
 
-                    const csrfToken = document.createElement('input');
-                    csrfToken.type = 'hidden';
-                    csrfToken.name = '_token';
-                    csrfToken.value = '{{ csrf_token() }}';
+                const csrfToken = document.createElement('input');
+                csrfToken.type = 'hidden';
+                csrfToken.name = '_token';
+                csrfToken.value = '{{ csrf_token() }}';
 
-                    const method = document.createElement('input');
-                    method.type = 'hidden';
-                    method.name = '_method';
-                    method.value = 'PUT';
+                const method = document.createElement('input');
+                method.type = 'hidden';
+                method.name = '_method';
+                method.value = 'PUT';
 
-                    form.appendChild(csrfToken);
-                    form.appendChild(method);
-                    document.body.appendChild(form);
-                    form.submit();
-                }
+                form.appendChild(csrfToken);
+                form.appendChild(method);
+                document.body.appendChild(form);
+                form.submit();
+            }
 
-                // Function to show payment void modal
-                let currentPaymentId = null;
-                function showPaymentVoidModal(paymentId, orNo) {
-                    currentPaymentId = paymentId;
-                    showSwiftModal('Void Payment', `You are going to void the selected payment with OR No. ${orNo}\n\nYou cannot undo this action. Continue?`, 'warning', [
-                        { text: 'Confirm', class: 'bg-red-500 hover:bg-red-600 text-white', action: 'submitPaymentVoid()' },
-                        { text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800' }
-                    ]);
-                }
+            // Function to show payment void modal
+            let currentPaymentId = null;
+            function showPaymentVoidModal(paymentId, orNo) {
+                currentPaymentId = paymentId;
+                showSwiftModal('Void Payment', `You are going to void the selected payment with OR No. ${orNo}\n\nYou cannot undo this action. Continue?`, 'warning', [
+                    { text: 'Confirm', class: 'bg-red-500 hover:bg-red-600 text-white', action: 'submitPaymentVoid()' },
+                    { text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800' }
+                ]);
+            }
 
-                // Function to submit payment void
-                function submitPaymentVoid() {
-                    if (!currentPaymentId) return;
+            // Function to submit payment void
+            function submitPaymentVoid() {
+                if (!currentPaymentId) return;
 
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = '/submit-void-payment/' + currentPaymentId;
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/submit-void-payment/' + currentPaymentId;
 
-                    const csrfToken = document.createElement('input');
-                    csrfToken.type = 'hidden';
-                    csrfToken.name = '_token';
-                    csrfToken.value = '{{ csrf_token() }}';
+                const csrfToken = document.createElement('input');
+                csrfToken.type = 'hidden';
+                csrfToken.name = '_token';
+                csrfToken.value = '{{ csrf_token() }}';
 
-                    const method = document.createElement('input');
-                    method.type = 'hidden';
-                    method.name = '_method';
-                    method.value = 'PUT';
+                const method = document.createElement('input');
+                method.type = 'hidden';
+                method.name = '_method';
+                method.value = 'PUT';
 
-                    form.appendChild(csrfToken);
-                    form.appendChild(method);
-                    document.body.appendChild(form);
-                    form.submit();
-                }
+                form.appendChild(csrfToken);
+                form.appendChild(method);
+                document.body.appendChild(form);
+                form.submit();
+            }
 
-                // Function to show loan payment void modal
-                let currentLoanPaymentId = null;
-                function showLoanPaymentVoidModal(loanPaymentId, orNo) {
-                    currentLoanPaymentId = loanPaymentId;
-                    showSwiftModal('Void Loan Payment', `You are going to void the selected payment with OR No. ${orNo}\n\nYou cannot undo this action. Continue?`, 'warning', [
-                        { text: 'Confirm', class: 'bg-red-500 hover:bg-red-600 text-white', action: 'submitLoanPaymentVoid()' },
-                        { text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800' }
-                    ]);
-                }
+            // Function to show loan payment void modal
+            let currentLoanPaymentId = null;
+            function showLoanPaymentVoidModal(loanPaymentId, orNo) {
+                currentLoanPaymentId = loanPaymentId;
+                showSwiftModal('Void Loan Payment', `You are going to void the selected payment with OR No. ${orNo}\n\nYou cannot undo this action. Continue?`, 'warning', [
+                    { text: 'Confirm', class: 'bg-red-500 hover:bg-red-600 text-white', action: 'submitLoanPaymentVoid()' },
+                    { text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800' }
+                ]);
+            }
 
-                // Function to submit loan payment void
-                function submitLoanPaymentVoid() {
-                    if (!currentLoanPaymentId) return;
+            // Function to submit loan payment void
+            function submitLoanPaymentVoid() {
+                if (!currentLoanPaymentId) return;
 
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = '/submit-void-loan-payment/' + currentLoanPaymentId;
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/submit-void-loan-payment/' + currentLoanPaymentId;
 
-                    const csrfToken = document.createElement('input');
-                    csrfToken.type = 'hidden';
-                    csrfToken.name = '_token';
-                    csrfToken.value = '{{ csrf_token() }}';
+                const csrfToken = document.createElement('input');
+                csrfToken.type = 'hidden';
+                csrfToken.name = '_token';
+                csrfToken.value = '{{ csrf_token() }}';
 
-                    const method = document.createElement('input');
-                    method.type = 'hidden';
-                    method.name = '_method';
-                    method.value = 'PUT';
+                const method = document.createElement('input');
+                method.type = 'hidden';
+                method.name = '_method';
+                method.value = 'PUT';
 
-                    form.appendChild(csrfToken);
-                    form.appendChild(method);
-                    document.body.appendChild(form);
-                    form.submit();
-                }
+                form.appendChild(csrfToken);
+                form.appendChild(method);
+                document.body.appendChild(form);
+                form.submit();
+            }
 
-                // Function to submit CFP approval
-                function submitCfpApproval() {
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = '/approve-cfp/{{ $clients->cid }}';
+            // Function to submit CFP approval
+            function submitCfpApproval() {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/approve-cfp/{{ $clients->cid }}';
 
-                    const csrfToken = document.createElement('input');
-                    csrfToken.type = 'hidden';
-                    csrfToken.name = '_token';
-                    csrfToken.value = '{{ csrf_token() }}';
+                const csrfToken = document.createElement('input');
+                csrfToken.type = 'hidden';
+                csrfToken.name = '_token';
+                csrfToken.value = '{{ csrf_token() }}';
 
-                    form.appendChild(csrfToken);
-                    document.body.appendChild(form);
-                    form.submit();
-                }
+                form.appendChild(csrfToken);
+                document.body.appendChild(form);
+                form.submit();
+            }
 
-                // Custom tab switching (more reliable than Bootstrap)
-                document.addEventListener('DOMContentLoaded', function () {
-                    @if(request('status'))
-                        localStorage.setItem('clientStatusFilter', '{{ request('status') }}');
-                    @endif
+            // Custom tab switching (more reliable than Bootstrap)
+            document.addEventListener('DOMContentLoaded', function () {
+                @if(request('status'))
+                    localStorage.setItem('clientStatusFilter', '{{ request('status') }}');
+                @endif
 
-                                                        const tabs = document.querySelectorAll('#clientTabs button[data-bs-toggle="tab"]');
-                    const tabPanes = document.querySelectorAll('.tab-pane');
+                                                            const tabs = document.querySelectorAll('#clientTabs button[data-bs-toggle="tab"]');
+                const tabPanes = document.querySelectorAll('.tab-pane');
 
-                    tabs.forEach(tab => {
-                        tab.addEventListener('click', function (e) {
-                            e.preventDefault();
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', function (e) {
+                        e.preventDefault();
 
-                            // Get target pane
-                            const targetId = this.getAttribute('data-bs-target');
-                            const targetPane = document.querySelector(targetId);
+                        // Get target pane
+                        const targetId = this.getAttribute('data-bs-target');
+                        const targetPane = document.querySelector(targetId);
 
-                            if (!targetPane) return;
+                        if (!targetPane) return;
 
-                            // Remove active classes from all tabs
-                            tabs.forEach(t => {
-                                t.classList.remove('text-purple-600', 'border-b-2', 'border-purple-600', 'font-semibold');
-                                t.classList.add('text-gray-500');
-                                t.setAttribute('aria-selected', 'false');
-                            });
-
-                            // Add active classes to clicked tab
-                            this.classList.remove('text-gray-500');
-                            this.classList.add('text-purple-600', 'border-b-2', 'border-purple-600', 'font-semibold');
-                            this.setAttribute('aria-selected', 'true');
-
-                            // Hide all tab panes
-                            tabPanes.forEach(pane => {
-                                pane.classList.remove('active');
-                            });
-
-                            // Show target pane
-                            targetPane.classList.add('active');
+                        // Remove active classes from all tabs
+                        tabs.forEach(t => {
+                            t.classList.remove('text-purple-600', 'border-b-2', 'border-purple-600', 'font-semibold');
+                            t.classList.add('text-gray-500');
+                            t.setAttribute('aria-selected', 'false');
                         });
-                    });
 
-                    console.log('✅ Custom tabs initialized:', tabs.length, 'tabs found');
+                        // Add active classes to clicked tab
+                        this.classList.remove('text-gray-500');
+                        this.classList.add('text-purple-600', 'border-b-2', 'border-purple-600', 'font-semibold');
+                        this.setAttribute('aria-selected', 'true');
+
+                        // Hide all tab panes
+                        tabPanes.forEach(pane => {
+                            pane.classList.remove('active');
+                        });
+
+                        // Show target pane
+                        targetPane.classList.add('active');
+                    });
                 });
-            </script>
+
+                console.log('✅ Custom tabs initialized:', tabs.length, 'tabs found');
+            });
+        </script>
 @endsection
