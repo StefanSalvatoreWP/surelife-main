@@ -29,7 +29,8 @@
             $message = 'client';
 
             // Calculate total price based on payment term
-            $base_price = $clients->Price;
+            // Use PackagePrice (actual package price) not PaymentTerm Price (term amount)
+            $base_price = $clients->PackagePrice;
             switch ($clients->Term) {
                 case "Spotcash":
                     $total_price = $base_price;
@@ -121,7 +122,7 @@
                 @push('scripts')
                     <script>
                         document.addEventListener('DOMContentLoaded', function() {
-                            showSwiftModal('Success', '{{ $swiftMessage }}');
+                            showSwiftModal('Success', '{{ $swiftMessage }}', 'success');
                         });
                     </script>
                 @endpush
