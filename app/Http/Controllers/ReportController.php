@@ -929,14 +929,14 @@ class ReportController extends Controller
 
     private function getActiveReportData($branchId, $dateFrom, $dateTo)
     {
-        // Term + Grace lapse thresholds (in months):
-        // Monthly=2, Quarterly=6, Semi-Annual=12, Annual=24
+        // Term lapse thresholds (in months):
+        // Monthly=1, Quarterly=3, Semi-Annual=6, Annual=12
         $lapseInterval = "CASE pt.Term
-            WHEN 'Monthly'     THEN 3
-            WHEN 'Quarterly'   THEN 6
-            WHEN 'Semi-Annual' THEN 12
-            WHEN 'Annual'      THEN 24
-            ELSE 2
+            WHEN 'Monthly'     THEN 1
+            WHEN 'Quarterly'   THEN 3
+            WHEN 'Semi-Annual' THEN 6
+            WHEN 'Annual'      THEN 12
+            ELSE 1
         END";
 
         $query = DB::table('tblclient as c')
@@ -955,7 +955,7 @@ class ReportController extends Controller
             ) as ps"), 'c.id', '=', 'ps.clientid')
             ->where('c.branchid', $branchId)
             ->where('c.status', '3')
-            ->whereRaw("ps.last_payment_date >= DATE_SUB(NOW(), INTERVAL ({$lapseInterval}) MONTH)")
+            ->whereRaw("COALESCE(ps.last_payment_date, c.datecreated) >= DATE_SUB(NOW(), INTERVAL ({$lapseInterval}) MONTH)")
             ->whereRaw("COALESCE(ps.total_paid, 0) < (
                 CASE
                     WHEN pt.Term = 'Spotcash'    THEN pt.Price
@@ -997,14 +997,14 @@ class ReportController extends Controller
 
     private function getLapseReportData($branchId, $dateFrom, $dateTo)
     {
-        // Term + Grace lapse thresholds (in months):
-        // Monthly=2, Quarterly=6, Semi-Annual=12, Annual=24
+        // Term lapse thresholds (in months):
+        // Monthly=1, Quarterly=3, Semi-Annual=6, Annual=12
         $lapseInterval = "CASE pt.Term
-            WHEN 'Monthly'     THEN 3
-            WHEN 'Quarterly'   THEN 6
-            WHEN 'Semi-Annual' THEN 12
-            WHEN 'Annual'      THEN 24
-            ELSE 2
+            WHEN 'Monthly'     THEN 1
+            WHEN 'Quarterly'   THEN 3
+            WHEN 'Semi-Annual' THEN 6
+            WHEN 'Annual'      THEN 12
+            ELSE 1
         END";
 
         $query = DB::table('tblclient as c')
@@ -1023,10 +1023,7 @@ class ReportController extends Controller
             ) as ps"), 'c.id', '=', 'ps.clientid')
             ->where('c.branchid', $branchId)
             ->where('c.status', '3')
-            ->where(function ($q) use ($lapseInterval) {
-                $q->whereRaw("ps.last_payment_date < DATE_SUB(NOW(), INTERVAL ({$lapseInterval}) MONTH)")
-                    ->orWhereNull('ps.last_payment_date');
-            })
+            ->whereRaw("COALESCE(ps.last_payment_date, c.datecreated) < DATE_SUB(NOW(), INTERVAL ({$lapseInterval}) MONTH)")
             ->whereRaw("COALESCE(ps.total_paid, 0) < (
                 CASE
                     WHEN pt.Term = 'Spotcash'    THEN pt.Price

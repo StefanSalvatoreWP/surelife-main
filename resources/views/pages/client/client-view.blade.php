@@ -29,7 +29,7 @@
             $message = 'client';
 
             // Calculate total price based on payment term
-            $base_price = $clients->Price;
+            $base_price = $clients->TermPrice;
             switch ($clients->Term) {
                 case "Spotcash":
                     $total_price = $base_price;
@@ -48,6 +48,31 @@
                     break;
                 default:
                     $total_price = $base_price;
+            }
+
+            // Fallback for missing/zero Term Price in DB
+            if ($total_price == 0 && $clients->PackagePrice > 0) {
+                $total_price = $clients->PackagePrice;
+                // Calculate correct base_price display
+                switch ($clients->Term) {
+                    case "Spotcash":
+                        $base_price = $total_price;
+                        break;
+                    case "Annual":
+                        $base_price = $total_price / 5;
+                        break;
+                    case "Semi-Annual":
+                        $base_price = $total_price / 10;
+                        break;
+                    case "Quarterly":
+                        $base_price = $total_price / 20;
+                        break;
+                    case "Monthly":
+                        $base_price = $total_price / 60;
+                        break;
+                    default:
+                        $base_price = $total_price;
+                }
             }
 
             // Calculate total payments and last valid payment date in a single loop
@@ -120,7 +145,7 @@
             @if($useSwiftModal)
                 @push('scripts')
                     <script>
-                        document.addEventListener('DOMContentLoaded', function() {
+                        document.addEventListener('DOMContentLoa ded', function () {
                             showSwiftModal('Success', '{{ $swiftMessage }}');
                         });
                     </script>
@@ -307,7 +332,7 @@
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Term</label>
                                     <input type="text"
                                         class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
-                                        value="{{ $clients->Term . ' ( ₱ ' . number_format($clients->Price, 2) . ' )' }}"
+                                        value="{{ $clients->Term . ' ( ₱ ' . number_format($base_price, 2) . ' )' }}"
                                         readonly />
                                 </div>
                                 <div>
@@ -356,22 +381,27 @@
                                     $paymentStatus = 'Active';
                                     $statusClass = 'bg-green-200 text-green-700';
 
-                                    // Term-aware lapse threshold (Term + Grace = 2x term)
+                                    // Term lapse threshold in months
                                     $lapseMonths = match ($clients->Term) {
-                                        'Monthly' => 3,
-                                        'Quarterly' => 6,
-                                        'Semi-Annual' => 12,
-                                        'Annual' => 24,
-                                        default => 2,
+                                        'Monthly' => 1,
+                                        'Quarterly' => 3,
+                                        'Semi-Annual' => 6,
+                                        'Annual' => 12,
+                                        default => 1,
                                     };
                                     $lapseCutoff = \Carbon\Carbon::now()->subMonths($lapseMonths);
 
                                     if ($isFullyPaid || $totalValidPayments >= $total_price) {
                                         $paymentStatus = 'Fully Paid';
                                         $statusClass = 'bg-green-300 text-green-800';
-                                    } elseif (is_null($lastValidPaymentDate) || $lastValidPaymentDate->lt($lapseCutoff)) {
-                                        $paymentStatus = 'Lapse';
-                                        $statusClass = 'bg-red-200 text-red-700';
+                                    } else {
+                                        // If there are no valid payments, use the client's DateCreated as the reference point
+                                        $referenceDate = $lastValidPaymentDate ?? \Carbon\Carbon::parse($clients->DateCreated);
+
+                                        if ($referenceDate->lt($lapseCutoff)) {
+                                            $paymentStatus = 'Lapse';
+                                            $statusClass = 'bg-red-200 text-red-700';
+                                        }
                                     }
                                 @endphp
                                 <div>
@@ -741,7 +771,9 @@
                                 <div class="flex items-center justify-between">
                                     <div class="min-w-0">
                                         <p class="text-sm text-blue-600 font-medium mb-1">Package Price</p>
-                                        <p class="text-2xl font-bold text-blue-900 whitespace-nowrap">₱ {{ number_format($total_price, 2) }}</p>
+                                        <p class="text-2xl font-bold text-blue-900 whitespace-nowrap">₱
+                                            {{ number_format($total_price, 2) }}
+                                        </p>
                                     </div>
                                     <div class="bg-blue-200 rounded-full p-3 flex-shrink-0">
                                         <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor"
@@ -754,11 +786,14 @@
                             </div>
 
                             <!-- Total Package Payment Card -->
-                            <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
+                            <div
+                                class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
                                 <div class="flex items-center justify-between">
                                     <div class="min-w-0">
                                         <p class="text-sm text-purple-600 font-medium mb-1">Total Package Payment</p>
-                                        <p class="text-2xl font-bold text-purple-900 whitespace-nowrap">₱ {{ number_format($total_payments, 2) }}</p>
+                                        <p class="text-2xl font-bold text-purple-900 whitespace-nowrap">₱
+                                            {{ number_format($total_payments, 2) }}
+                                        </p>
                                     </div>
                                     <div class="bg-purple-200 rounded-full p-3 flex-shrink-0">
                                         <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor"
@@ -814,19 +849,21 @@
                                     $paymentStatus = 'Active';
                                     $isLapsed = false;
 
-                                    // Term-aware lapse threshold (Term + Grace = 2x term)
+                                    // Term lapse threshold in months
                                     $lapseMonths = match ($clients->Term) {
-                                        'Monthly' => 3,
-                                        'Quarterly' => 6,
-                                        'Semi-Annual' => 12,
-                                        'Annual' => 24,
-                                        default => 2,
+                                        'Monthly' => 1,
+                                        'Quarterly' => 3,
+                                        'Semi-Annual' => 6,
+                                        'Annual' => 12,
+                                        default => 1,
                                     };
                                     $lapseCutoff = \Carbon\Carbon::now()->subMonths($lapseMonths);
 
                                     // Use $lastValidPaymentDate calculated at the top of the file
-                                    // consistently with the Client Information tab
-                                    if (is_null($lastValidPaymentDate) || $lastValidPaymentDate->lt($lapseCutoff)) {
+                                    // or fallback to DateCreated if client has no valid payments
+                                    $referenceDate = $lastValidPaymentDate ?? \Carbon\Carbon::parse($clients->DateCreated);
+
+                                    if ($referenceDate->lt($lapseCutoff)) {
                                         $paymentStatus = 'Lapse';
                                         $isLapsed = true;
                                     }
@@ -955,17 +992,25 @@
                                             </td>
                                             <td class="px-4 py-3 text-sm text-gray-900">
                                                 @if($payment->VoidStatus != 1)
-                                                    <button type="button" class="inline-flex items-center px-3 py-1.5 bg-red-100 hover:bg-red-200 border border-red-300 text-red-700 hover:text-red-800 text-xs font-semibold rounded-md shadow-sm transition duration-150 ease-in-out"
+                                                    <button type="button"
+                                                        class="inline-flex items-center px-3 py-1.5 bg-red-100 hover:bg-red-200 border border-red-300 text-red-700 hover:text-red-800 text-xs font-semibold rounded-md shadow-sm transition duration-150 ease-in-out"
                                                         onclick="showPaymentVoidModal('{{ $payment->Id }}', '{{ $payment->ORNo }}')">
-                                                        <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
+                                                        <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636">
+                                                            </path>
                                                         </svg>
                                                         Void
                                                     </button>
                                                 @else
-                                                    <span class="inline-flex items-center px-3 py-1.5 bg-gray-100 border border-gray-300 text-gray-500 text-xs font-semibold rounded-md">
-                                                        <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                                    <span
+                                                        class="inline-flex items-center px-3 py-1.5 bg-gray-100 border border-gray-300 text-gray-500 text-xs font-semibold rounded-md">
+                                                        <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                                                            </path>
                                                         </svg>
                                                         Locked
                                                     </span>
@@ -980,16 +1025,16 @@
                             @if($clients->Status == '3')
                                 @if($balance > 0)
                                     @if($assignedMemberData != null)
-                                        <a href="/client-addpayment/{{ $clients->cid }}"
+                                        <a href="/client-addpayment/{{ $clients->Id }}"
                                             class="inline-flex items-center px-6 py-3 bg-white border-2 border-green-200 hover:border-green-300 text-green-800 hover:text-green-900 font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
                                             role="button">Create Full Payment</a>
                                     @else
-                                        <a href="/client-addpayment/{{ $clients->cid }}"
+                                        <a href="/client-addpayment/{{ $clients->Id }}"
                                             class="inline-flex items-center px-6 py-3 bg-white border-2 border-green-200 hover:border-green-300 text-green-800 hover:text-green-900 font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
                                             role="button">Add Payment</a>
                                     @endif
                                 @endif
-                                <a href="/client-printsoa/{{ $clients->cid }}?export=true"
+                                <a href="/client-printsoa/{{ $clients->Id }}?export=true"
                                     class="inline-flex items-center px-6 py-3 bg-white border-2 border-purple-200 hover:border-purple-300 text-purple-800 hover:text-purple-900 font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
                                     role="button" target="_blank">Statement of Account</a>
                                 @if($balance <= 0)
@@ -1004,13 +1049,13 @@
                                     @elseif($clients->CFPNO == "NA")
                                         <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
                                             onclick="showSwiftModal('Certificate of Full Payment', 'Enter certificate number to proceed.', 'warning', [
-                                                                                                            {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpWithInput()'},
-                                                                                                            {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
-                                                                                                        ])"
+                                                                                                                                                                                                                        {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpWithInput()'},
+                                                                                                                                                                                                                        {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+                                                                                                                                                                                                                    ])"
                                             data-client-id="{{ $clients->cid }}" role="button">Certificate of Full
                                             Payment</a>
                                     @else
-                                        <a href="/client-printcofp/{{ $clients->cid }}"
+                                        <a href="/client-printcofp/{{ $clients->Id }}"
                                             class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
                                             role="button">Certificate of Full Payment</a>
                                     @endif
@@ -1026,35 +1071,35 @@
                             @else
                                 @if($clients->Status == '3')
                                     @if($balance > 0)
-                                        <a href="/client-addpayment/{{ $clients->cid }}"
+                                        <a href="/client-addpayment/{{ $clients->Id }}"
                                             class="inline-flex items-center px-6 py-3 bg-white border-2 border-green-200 hover:border-green-300 text-green-800 hover:text-green-900 font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
                                             role="button">Add Payment</a>
                                     @endif
-                                    <a href="/client-printsoa/{{ $clients->cid }}?export=true"
+                                    <a href="/client-printsoa/{{ $clients->Id }}?export=true"
                                         class="inline-flex items-center px-6 py-3 bg-white border-2 border-purple-200 hover:border-purple-300 text-purple-800 hover:text-purple-900 font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
                                         role="button" target="_blank">Statement of Account</a>
                                     @if($balance <= 0)
                                         @if($clients->CFPNO == null && $cfpApprover == 0)
                                             <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
                                                 onclick="showSwiftModal('Warning', 'Certificate of full payment requires approval.', 'warning', [
-                                                                                                                            {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
-                                                                                                                        ])"
+                                                                                                                                                                                                                                                            {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+                                                                                                                                                                                                                                                        ])"
                                                 data-client-id="{{ $clients->cid }}" role="button">Certificate of
                                                 Full Payment</a>
                                         @elseif($clients->CFPNO == null && $cfpApprover == 1)
                                             <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
                                                 onclick="showSwiftModal('Certificate Approval', 'You are going to approve the certificate of full payment for this client. You cannot undo this action. Continue?', 'warning', [
-                                                                                                                            {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpApproval()'},
-                                                                                                                            {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
-                                                                                                                        ])"
+                                                                                                                                                                                                                                                            {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpApproval()'},
+                                                                                                                                                                                                                                                            {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+                                                                                                                                                                                                                                                        ])"
                                                 data-client-id="{{ $clients->cid }}" role="button">Certificate of
                                                 Full Payment</a>
                                         @elseif($clients->CFPNO == "NA")
                                             <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
                                                 onclick="showSwiftModal('Certificate of Full Payment', 'Enter certificate number to proceed.', 'warning', [
-                                                                                                                            {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpWithInput()'},
-                                                                                                                            {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
-                                                                                                                        ])"
+                                                                                                                                                                                                                                                            {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpWithInput()'},
+                                                                                                                                                                                                                                                            {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+                                                                                                                                                                                                                                                        ])"
                                                 data-client-id="{{ $clients->cid }}" role="button">Certificate of
                                                 Full Payment</a>
                                         @else
@@ -1077,7 +1122,8 @@
                     <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-indigo-50">
                         <div class="flex items-center justify-between">
                             <h3 class="text-lg font-semibold text-gray-800 flex items-center">
-                                <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
@@ -1087,7 +1133,8 @@
                                 @php
                                     $loanStatusColor = $hasLoanRequest->Status == 'Verified' ? 'blue' : ($hasLoanRequest->Status == 'Approved' ? 'green' : 'gray');
                                 @endphp
-                                <span class="px-3 py-1 rounded-full text-xs font-semibold bg-{{ $loanStatusColor }}-200 text-{{ $loanStatusColor }}-700">
+                                <span
+                                    class="px-3 py-1 rounded-full text-xs font-semibold bg-{{ $loanStatusColor }}-200 text-{{ $loanStatusColor }}-700">
                                     Loan: {{ $hasLoanRequest->Status }}
                                 </span>
                             @endif
@@ -1098,43 +1145,57 @@
                             <!-- Loan Summary Cards -->
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                                 <!-- Total Loan Amount Card -->
-                                <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
+                                <div
+                                    class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
                                     <div class="flex items-center justify-between">
                                         <div>
                                             <p class="text-sm text-purple-600 font-medium mb-1">Total Loan Amount</p>
-                                            <p class="text-2xl font-bold text-purple-900">₱ {{ number_format($hasLoanRequest->Amount, 2) }}</p>
+                                            <p class="text-2xl font-bold text-purple-900">₱
+                                                {{ number_format($hasLoanRequest->Amount, 2) }}
+                                            </p>
                                         </div>
                                         <div class="bg-purple-200 rounded-full p-3">
-                                            <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
                                         </div>
                                     </div>
                                 </div>
                                 <!-- Total Paid Card -->
-                                <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
+                                <div
+                                    class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
                                     <div class="flex items-center justify-between">
                                         <div>
                                             <p class="text-sm text-green-600 font-medium mb-1">Total Paid</p>
-                                            <p class="text-2xl font-bold text-green-900">₱ {{ number_format($totalLoanPayments, 2) }}</p>
+                                            <p class="text-2xl font-bold text-green-900">₱
+                                                {{ number_format($totalLoanPayments, 2) }}
+                                            </p>
                                         </div>
                                         <div class="bg-green-200 rounded-full p-3">
-                                            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
                                         </div>
                                     </div>
                                 </div>
                                 <!-- Remaining Balance Card -->
-                                <div class="bg-gradient-to-br from-orange-50 to-red-100 rounded-lg p-4 border border-orange-200">
+                                <div
+                                    class="bg-gradient-to-br from-orange-50 to-red-100 rounded-lg p-4 border border-orange-200">
                                     <div class="flex items-center justify-between">
                                         <div>
                                             <p class="text-sm text-orange-600 font-medium mb-1">Remaining Balance</p>
-                                            <p class="text-2xl font-bold text-orange-900">₱ {{ number_format($loanBalance, 2) }}</p>
+                                            <p class="text-2xl font-bold text-orange-900">₱ {{ number_format($loanBalance, 2) }}
+                                            </p>
                                         </div>
                                         <div class="bg-orange-200 rounded-full p-3">
-                                            <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
+                                            <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
                                             </svg>
                                         </div>
                                     </div>
@@ -1145,39 +1206,56 @@
                             <div class="bg-gray-50 rounded-lg p-4 mb-6">
                                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                                     <div class="flex items-center">
-                                        <svg class="w-5 h-5 text-gray-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        <svg class="w-5 h-5 text-gray-500 mr-2" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                         </svg>
                                         <div>
                                             <p class="text-xs text-gray-500">Monthly Due</p>
-                                            <p class="text-lg font-bold text-gray-800">₱ {{ number_format($hasLoanRequest->MonthlyAmount, 2) }}</p>
+                                            <p class="text-lg font-bold text-gray-800">₱
+                                                {{ number_format($hasLoanRequest->MonthlyAmount, 2) }}
+                                            </p>
                                         </div>
                                     </div>
                                     <div class="flex items-center">
-                                        <svg class="w-5 h-5 text-indigo-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z" />
+                                        <svg class="w-5 h-5 text-indigo-500 mr-2" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z" />
                                         </svg>
                                         <div>
                                             <p class="text-xs text-gray-500">Interest Rate</p>
-                                            <p class="text-lg font-bold text-indigo-600">{{ $hasLoanRequest->InterestRate ?? 1.25 }}% <span class="text-xs font-normal">/mo</span></p>
+                                            <p class="text-lg font-bold text-indigo-600">
+                                                {{ $hasLoanRequest->InterestRate ?? 1.25 }}% <span
+                                                    class="text-xs font-normal">/mo</span>
+                                            </p>
                                         </div>
                                     </div>
                                     <div class="flex items-center">
-                                        <svg class="w-5 h-5 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        <svg class="w-5 h-5 text-blue-500 mr-2" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
                                         <div>
                                             <p class="text-xs text-gray-500">Term</p>
-                                            <p class="text-lg font-bold text-blue-600">{{ $hasLoanRequest->term_months ?? $hasLoanRequest->TermMonths ?? 12 }} months</p>
+                                            <p class="text-lg font-bold text-blue-600">
+                                                {{ $hasLoanRequest->term_months ?? $hasLoanRequest->TermMonths ?? 12 }} months
+                                            </p>
                                         </div>
                                     </div>
                                     <div class="flex items-center">
-                                        <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
                                         <div>
                                             <p class="text-xs text-gray-500">Total Repayable</p>
-                                            <p class="text-lg font-bold text-green-600">₱ {{ number_format($hasLoanRequest->total_repayable ?? $hasLoanRequest->TotalRepayable ?? $hasLoanRequest->Amount, 2) }}</p>
+                                            <p class="text-lg font-bold text-green-600">₱
+                                                {{ number_format($hasLoanRequest->total_repayable ?? $hasLoanRequest->TotalRepayable ?? $hasLoanRequest->Amount, 2) }}
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
@@ -1192,37 +1270,73 @@
                                     <table class="w-full">
                                         <thead class="bg-gradient-to-r from-purple-50 to-indigo-50">
                                             <tr>
-                                                <th class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">No</th>
-                                                <th class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">Series Code</th>
-                                                <th class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">OR No.</th>
-                                                <th class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">Amount Paid</th>
-                                                <th class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">Installment</th>
-                                                <th class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">Date</th>
-                                                <th class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">Status</th>
-                                                <th class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">Action</th>
+                                                <th
+                                                    class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
+                                                    No</th>
+                                                <th
+                                                    class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
+                                                    Series Code</th>
+                                                <th
+                                                    class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
+                                                    OR No.</th>
+                                                <th
+                                                    class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
+                                                    Amount Paid</th>
+                                                <th
+                                                    class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
+                                                    Installment</th>
+                                                <th
+                                                    class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
+                                                    Date</th>
+                                                <th
+                                                    class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
+                                                    Status</th>
+                                                <th
+                                                    class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
+                                                    Action</th>
                                             </tr>
                                         </thead>
                                         <tbody class="divide-y divide-gray-200">
                                             @foreach($loanPayments as $lp)
-                                                <tr class="hover:bg-gray-50 transition {{ $lp->status == 'void' ? 'bg-red-50 opacity-60' : '' }}">
-                                                    <td class="px-4 py-3 text-sm text-gray-900" style="padding-left: 22px;">{{ $lp->Id }}</td>
-                                                    <td class="px-4 py-3 text-sm text-gray-900" style="padding-left: 37px;">{{ $lp->SeriesCode ?? 'N/A' }}</td>
-                                                    <td class="px-4 py-3 text-sm text-gray-900" style="padding-left: 25px;">{{ $lp->ORNo }}</td>
-                                                    <td class="px-4 py-3 text-sm font-semibold text-gray-900" style="padding-left: 30px;">₱ {{ number_format($lp->Amount, 2) }}</td>
-                                                    <td class="px-4 py-3 text-sm text-gray-500" style="padding-left: 50px;">{{ $lp->Installment ?? 'N/A' }}</td>
-                                                    <td class="px-4 py-3 text-sm text-gray-900" style="padding-left: 2px;">{{ $lp->PaymentDate }}</td>
+                                                <tr
+                                                    class="hover:bg-gray-50 transition {{ $lp->status == 'void' ? 'bg-red-50 opacity-60' : '' }}">
+                                                    <td class="px-4 py-3 text-sm text-gray-900" style="padding-left: 22px;">
+                                                        {{ $lp->Id }}
+                                                    </td>
+                                                    <td class="px-4 py-3 text-sm text-gray-900" style="padding-left: 37px;">
+                                                        {{ $lp->SeriesCode ?? 'N/A' }}
+                                                    </td>
+                                                    <td class="px-4 py-3 text-sm text-gray-900" style="padding-left: 25px;">
+                                                        {{ $lp->ORNo }}
+                                                    </td>
+                                                    <td class="px-4 py-3 text-sm font-semibold text-gray-900"
+                                                        style="padding-left: 30px;">₱ {{ number_format($lp->Amount, 2) }}</td>
+                                                    <td class="px-4 py-3 text-sm text-gray-500" style="padding-left: 50px;">
+                                                        {{ $lp->Installment ?? 'N/A' }}
+                                                    </td>
+                                                    <td class="px-4 py-3 text-sm text-gray-900" style="padding-left: 2px;">
+                                                        {{ $lp->PaymentDate }}
+                                                    </td>
                                                     <td class="px-4 py-3 text-sm">
                                                         @if($lp->status == 'void')
-                                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800" style="margin-left: 40px;">
+                                                            <span
+                                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800"
+                                                                style="margin-left: 40px;">
                                                                 <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                                    <path fill-rule="evenodd"
+                                                                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                                                        clip-rule="evenodd" />
                                                                 </svg>
                                                                 Void
                                                             </span>
                                                         @else
-                                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800" style="margin-left: -13px;">
+                                                            <span
+                                                                class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800"
+                                                                style="margin-left: -13px;">
                                                                 <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A1 1 0 014 6v2a1 1 0 011 1h2a1 1 0 011 1v2a1 1 0 01-1 1H6a1 1 0 01-1-1v-2a1 1 0 011-1H7v-2a1 1 0 011-1h2z" clip-rule="evenodd" />
+                                                                    <path fill-rule="evenodd"
+                                                                        d="M16.707 5.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A1 1 0 014 6v2a1 1 0 011 1h2a1 1 0 011 1v2a1 1 0 01-1 1H6a1 1 0 01-1-1v-2a1 1 0 011-1H7v-2a1 1 0 011-1h2z"
+                                                                        clip-rule="evenodd" />
                                                                 </svg>
                                                                 Active
                                                             </span>
@@ -1230,17 +1344,27 @@
                                                     </td>
                                                     <td class="px-4 py-3 text-sm">
                                                         @if($lp->status != 'void')
-                                                            <button type="button" class="inline-flex items-center px-3 py-1.5 bg-red-100 hover:bg-red-200 border border-red-300 text-red-700 hover:text-red-800 text-xs font-semibold rounded-md shadow-sm transition duration-150 ease-in-out"
+                                                            <button type="button"
+                                                                class="inline-flex items-center px-3 py-1.5 bg-red-100 hover:bg-red-200 border border-red-300 text-red-700 hover:text-red-800 text-xs font-semibold rounded-md shadow-sm transition duration-150 ease-in-out"
                                                                 onclick="showLoanPaymentVoidModal('{{ $lp->Id }}', '{{ $lp->ORNo }}')">
-                                                                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
+                                                                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor"
+                                                                    viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        stroke-width="2"
+                                                                        d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636">
+                                                                    </path>
                                                                 </svg>
                                                                 Void
                                                             </button>
                                                         @else
-                                                            <span class="inline-flex items-center px-3 py-1.5 bg-gray-100 border border-gray-300 text-gray-500 text-xs font-semibold rounded-md">
-                                                                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                                            <span
+                                                                class="inline-flex items-center px-3 py-1.5 bg-gray-100 border border-gray-300 text-gray-500 text-xs font-semibold rounded-md">
+                                                                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor"
+                                                                    viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        stroke-width="2"
+                                                                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                                                                    </path>
                                                                 </svg>
                                                                 Locked
                                                             </span>
@@ -1259,14 +1383,17 @@
                                     <a href="/client-addloanpayment/{{ $clients->Id }}"
                                         class="inline-flex items-center px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-200 ease-in-out">
                                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                         </svg>
                                         Add Payment
                                     </a>
                                 @else
-                                    <div class="inline-flex items-center px-8 py-3 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-600 font-semibold rounded-lg">
+                                    <div
+                                        class="inline-flex items-center px-8 py-3 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-600 font-semibold rounded-lg">
                                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
                                         Loan Fully Paid
                                     </div>
@@ -1276,11 +1403,13 @@
                             <div class="flex flex-col items-center justify-center py-16">
                                 <div class="bg-gray-100 rounded-full p-6 mb-4">
                                     <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                     </svg>
                                 </div>
                                 <p class="text-gray-500 text-center text-lg font-medium">No active loan request</p>
-                                <p class="text-gray-400 text-center text-sm mt-1">Apply for a loan to see payment details here</p>
+                                <p class="text-gray-400 text-center text-sm mt-1">Apply for a loan to see payment details here
+                                </p>
                             </div>
                         @endif
                     </div>
@@ -1568,198 +1697,198 @@
         </style>
         <script src="{{ asset('js/client-view.js') }}"></script>
         <script>
-            // Function to submit complete memorial form
-            function submitCompleteMemorial() {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '/submit-complete-memorial/{{ $clients->cid }}';
+                // Function to submit complete memorial for          m
+                function submitCompleteMemorial() {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/submit-complete-memorial/{{ $clients->cid }}';
 
-                const csrfToken = document.createElement('input');
-                csrfToken.type = 'hidden';
-                csrfToken.name = '_token';
-                csrfToken.value = '{{ csrf_token() }}';
+                    const csrfToken = document.createElement('input');
+                    csrfToken.type = 'hidden';
+                    csrfToken.name = '_token';
+                    csrfToken.value = '{{ csrf_token() }}';
 
-                const method = document.createElement('input');
-                method.type = 'hidden';
-                method.name = '_method';
-                method.value = 'PUT';
+                    const method = document.createElement('input');
+                    method.type = 'hidden';
+                    method.name = '_method';
+                    method.value = 'PUT';
 
-                form.appendChild(csrfToken);
-                form.appendChild(method);
-                document.body.appendChild(form);
-                form.submit();
-            }
+                    form.appendChild(csrfToken);
+                    form.appendChild(method);
+                    document.body.appendChild(form);
+                    form.submit();
+                }
 
-            // Function to submit approve client form
-            function submitApproveClient() {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '/client-update-status/{{ $clients->cid }}';
+                // Function to submit approve client form
+                function submitApproveClient() {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/client-update-status/{{ $clients->cid }}';
 
-                const csrfToken = document.createElement('input');
-                csrfToken.type = 'hidden';
-                csrfToken.name = '_token';
-                csrfToken.value = '{{ csrf_token() }}';
+                    const csrfToken = document.createElement('input');
+                    csrfToken.type = 'hidden';
+                    csrfToken.name = '_token';
+                    csrfToken.value = '{{ csrf_token() }}';
 
-                const method = document.createElement('input');
-                method.type = 'hidden';
-                method.name = '_method';
-                method.value = 'PUT';
+                    const method = document.createElement('input');
+                    method.type = 'hidden';
+                    method.name = '_method';
+                    method.value = 'PUT';
 
-                form.appendChild(csrfToken);
-                form.appendChild(method);
-                document.body.appendChild(form);
-                form.submit();
-            }
+                    form.appendChild(csrfToken);
+                    form.appendChild(method);
+                    document.body.appendChild(form);
+                    form.submit();
+                }
 
-            // Function to submit verify client form
-            function submitVerifyClient() {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '/client-update-status/{{ $clients->cid }}';
+                // Function to submit verify client form
+                function submitVerifyClient() {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/client-update-status/{{ $clients->cid }}';
 
-                const csrfToken = document.createElement('input');
-                csrfToken.type = 'hidden';
-                csrfToken.name = '_token';
-                csrfToken.value = '{{ csrf_token() }}';
+                    const csrfToken = document.createElement('input');
+                    csrfToken.type = 'hidden';
+                    csrfToken.name = '_token';
+                    csrfToken.value = '{{ csrf_token() }}';
 
-                const method = document.createElement('input');
-                method.type = 'hidden';
-                method.name = '_method';
-                method.value = 'PUT';
+                    const method = document.createElement('input');
+                    method.type = 'hidden';
+                    method.name = '_method';
+                    method.value = 'PUT';
 
-                form.appendChild(csrfToken);
-                form.appendChild(method);
-                document.body.appendChild(form);
-                form.submit();
-            }
+                    form.appendChild(csrfToken);
+                    form.appendChild(method);
+                    document.body.appendChild(form);
+                    form.submit();
+                }
 
-            // Function to show payment void modal
-            let currentPaymentId = null;
-            function showPaymentVoidModal(paymentId, orNo) {
-                currentPaymentId = paymentId;
-                showSwiftModal('Void Payment', `You are going to void the selected payment with OR No. ${orNo}\n\nYou cannot undo this action. Continue?`, 'warning', [
-                    { text: 'Confirm', class: 'bg-red-500 hover:bg-red-600 text-white', action: 'submitPaymentVoid()' },
-                    { text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800' }
-                ]);
-            }
+                // Function to show payment void modal
+                let currentPaymentId = null;
+                function showPaymentVoidModal(paymentId, orNo) {
+                    currentPaymentId = paymentId;
+                    showSwiftModal('Void Payment', `You are going to void the selected payment with OR No. ${orNo}\n\nYou cannot undo this action. Continue?`, 'warning', [
+                        { text: 'Confirm', class: 'bg-red-500 hover:bg-red-600 text-white', action: 'submitPaymentVoid()' },
+                        { text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800' }
+                    ]);
+                }
 
-            // Function to submit payment void
-            function submitPaymentVoid() {
-                if (!currentPaymentId) return;
+                // Function to submit payment void
+                function submitPaymentVoid() {
+                    if (!currentPaymentId) return;
 
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '/submit-void-payment/' + currentPaymentId;
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/submit-void-payment/' + currentPaymentId;
 
-                const csrfToken = document.createElement('input');
-                csrfToken.type = 'hidden';
-                csrfToken.name = '_token';
-                csrfToken.value = '{{ csrf_token() }}';
+                    const csrfToken = document.createElement('input');
+                    csrfToken.type = 'hidden';
+                    csrfToken.name = '_token';
+                    csrfToken.value = '{{ csrf_token() }}';
 
-                const method = document.createElement('input');
-                method.type = 'hidden';
-                method.name = '_method';
-                method.value = 'PUT';
+                    const method = document.createElement('input');
+                    method.type = 'hidden';
+                    method.name = '_method';
+                    method.value = 'PUT';
 
-                form.appendChild(csrfToken);
-                form.appendChild(method);
-                document.body.appendChild(form);
-                form.submit();
-            }
+                    form.appendChild(csrfToken);
+                    form.appendChild(method);
+                    document.body.appendChild(form);
+                    form.submit();
+                }
 
-            // Function to show loan payment void modal
-            let currentLoanPaymentId = null;
-            function showLoanPaymentVoidModal(loanPaymentId, orNo) {
-                currentLoanPaymentId = loanPaymentId;
-                showSwiftModal('Void Loan Payment', `You are going to void the selected payment with OR No. ${orNo}\n\nYou cannot undo this action. Continue?`, 'warning', [
-                    { text: 'Confirm', class: 'bg-red-500 hover:bg-red-600 text-white', action: 'submitLoanPaymentVoid()' },
-                    { text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800' }
-                ]);
-            }
+                // Function to show loan payment void modal
+                let currentLoanPaymentId = null;
+                function showLoanPaymentVoidModal(loanPaymentId, orNo) {
+                    currentLoanPaymentId = loanPaymentId;
+                    showSwiftModal('Void Loan Payment', `You are going to void the selected payment with OR No. ${orNo}\n\nYou cannot undo this action. Continue?`, 'warning', [
+                        { text: 'Confirm', class: 'bg-red-500 hover:bg-red-600 text-white', action: 'submitLoanPaymentVoid()' },
+                        { text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800' }
+                    ]);
+                }
 
-            // Function to submit loan payment void
-            function submitLoanPaymentVoid() {
-                if (!currentLoanPaymentId) return;
+                // Function to submit loan payment void
+                function submitLoanPaymentVoid() {
+                    if (!currentLoanPaymentId) return;
 
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '/submit-void-loan-payment/' + currentLoanPaymentId;
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/submit-void-loan-payment/' + currentLoanPaymentId;
 
-                const csrfToken = document.createElement('input');
-                csrfToken.type = 'hidden';
-                csrfToken.name = '_token';
-                csrfToken.value = '{{ csrf_token() }}';
+                    const csrfToken = document.createElement('input');
+                    csrfToken.type = 'hidden';
+                    csrfToken.name = '_token';
+                    csrfToken.value = '{{ csrf_token() }}';
 
-                const method = document.createElement('input');
-                method.type = 'hidden';
-                method.name = '_method';
-                method.value = 'PUT';
+                    const method = document.createElement('input');
+                    method.type = 'hidden';
+                    method.name = '_method';
+                    method.value = 'PUT';
 
-                form.appendChild(csrfToken);
-                form.appendChild(method);
-                document.body.appendChild(form);
-                form.submit();
-            }
+                    form.appendChild(csrfToken);
+                    form.appendChild(method);
+                    document.body.appendChild(form);
+                    form.submit();
+                }
 
-            // Function to submit CFP approval
-            function submitCfpApproval() {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '/approve-cfp/{{ $clients->cid }}';
+                // Function to submit CFP approval
+                function submitCfpApproval() {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/approve-cfp/{{ $clients->cid }}';
 
-                const csrfToken = document.createElement('input');
-                csrfToken.type = 'hidden';
-                csrfToken.name = '_token';
-                csrfToken.value = '{{ csrf_token() }}';
+                    const csrfToken = document.createElement('input');
+                    csrfToken.type = 'hidden';
+                    csrfToken.name = '_token';
+                    csrfToken.value = '{{ csrf_token() }}';
 
-                form.appendChild(csrfToken);
-                document.body.appendChild(form);
-                form.submit();
-            }
+                    form.appendChild(csrfToken);
+                    document.body.appendChild(form);
+                    form.submit();
+                }
 
-            // Custom tab switching (more reliable than Bootstrap)
-            document.addEventListener('DOMContentLoaded', function () {
-                @if(request('status'))
-                    localStorage.setItem('clientStatusFilter', '{{ request('status') }}');
-                @endif
+                // Custom tab switching (more reliable than Bootstrap)
+                document.addEventListener('DOMContentLoaded', function () {
+                    @if(request('status'))
+                        localStorage.setItem('clientStatusFilter', '{{ request('status') }}');
+                    @endif
 
-                            const tabs = document.querySelectorAll('#clientTabs button[data-bs-toggle="tab"]');
-                const tabPanes = document.querySelectorAll('.tab-pane');
+                                                        const tabs = document.querySelectorAll('#clientTabs button[data-bs-toggle="tab"]');
+                    const tabPanes = document.querySelectorAll('.tab-pane');
 
-                tabs.forEach(tab => {
-                    tab.addEventListener('click', function (e) {
-                        e.preventDefault();
+                    tabs.forEach(tab => {
+                        tab.addEventListener('click', function (e) {
+                            e.preventDefault();
 
-                        // Get target pane
-                        const targetId = this.getAttribute('data-bs-target');
-                        const targetPane = document.querySelector(targetId);
+                            // Get target pane
+                            const targetId = this.getAttribute('data-bs-target');
+                            const targetPane = document.querySelector(targetId);
 
-                        if (!targetPane) return;
+                            if (!targetPane) return;
 
-                        // Remove active classes from all tabs
-                        tabs.forEach(t => {
-                            t.classList.remove('text-purple-600', 'border-b-2', 'border-purple-600', 'font-semibold');
-                            t.classList.add('text-gray-500');
-                            t.setAttribute('aria-selected', 'false');
+                            // Remove active classes from all tabs
+                            tabs.forEach(t => {
+                                t.classList.remove('text-purple-600', 'border-b-2', 'border-purple-600', 'font-semibold');
+                                t.classList.add('text-gray-500');
+                                t.setAttribute('aria-selected', 'false');
+                            });
+
+                            // Add active classes to clicked tab
+                            this.classList.remove('text-gray-500');
+                            this.classList.add('text-purple-600', 'border-b-2', 'border-purple-600', 'font-semibold');
+                            this.setAttribute('aria-selected', 'true');
+
+                            // Hide all tab panes
+                            tabPanes.forEach(pane => {
+                                pane.classList.remove('active');
+                            });
+
+                            // Show target pane
+                            targetPane.classList.add('active');
                         });
-
-                        // Add active classes to clicked tab
-                        this.classList.remove('text-gray-500');
-                        this.classList.add('text-purple-600', 'border-b-2', 'border-purple-600', 'font-semibold');
-                        this.setAttribute('aria-selected', 'true');
-
-                        // Hide all tab panes
-                        tabPanes.forEach(pane => {
-                            pane.classList.remove('active');
-                        });
-
-                        // Show target pane
-                        targetPane.classList.add('active');
                     });
-                });
 
-                console.log('✅ Custom tabs initialized:', tabs.length, 'tabs found');
-            });
-        </script>
+                    console.log('✅ Custom tabs initialized:', tabs.length, 'tabs found');
+                });
+            </script>
 @endsection

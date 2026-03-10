@@ -124,14 +124,13 @@ class ClientController extends Controller
                 $query->where('Status', '=', '3');
             } else if ($request->input('status') === 'lapse') {
                 // Lapse: Approved clients whose last valid payment exceeds
-                // the term-aware threshold (Term + Grace = 2x the term period)
-                // Monthly=2mo, Quarterly=6mo, Semi-Annual=12mo, Annual=24mo
+                // Monthly=1mo, Quarterly=3mo, Semi-Annual=6mo, Annual=12mo
                 $lapseInterval = "CASE tblpaymentterm.Term
-                    WHEN 'Monthly'     THEN 3
-                    WHEN 'Quarterly'   THEN 6
-                    WHEN 'Semi-Annual' THEN 12
-                    WHEN 'Annual'      THEN 24
-                    ELSE 2
+                    WHEN 'Monthly'     THEN 1
+                    WHEN 'Quarterly'   THEN 3
+                    WHEN 'Semi-Annual' THEN 6
+                    WHEN 'Annual'      THEN 12
+                    ELSE 1
                 END";
 
                 // Use efficient JOINs with pre-aggregated payment data
@@ -146,11 +145,8 @@ class ClientController extends Controller
                         AND (Remarks IS NULL OR Remarks IN ('Standard', 'Partial', 'Custom'))
                         GROUP BY clientid
                     ) as payment_stats"), 'tblclient.id', '=', 'payment_stats.clientid')
-                    // Lapsed: last payment beyond term+grace threshold OR no payments at all
-                    ->where(function ($q) use ($lapseInterval) {
-                        $q->whereRaw("payment_stats.last_payment_date < DATE_SUB(NOW(), INTERVAL ({$lapseInterval}) MONTH)")
-                            ->orWhereNull('payment_stats.last_payment_date');
-                    })
+                    // Lapsed: last payment OR creation date beyond term+grace threshold
+                    ->whereRaw("COALESCE(payment_stats.last_payment_date, tblclient.DateCreated) < DATE_SUB(NOW(), INTERVAL ({$lapseInterval}) MONTH)")
                     // Not fully paid yet
                     ->whereRaw("COALESCE(payment_stats.total_paid, 0) < (
                         CASE 
@@ -164,14 +160,13 @@ class ClientController extends Controller
                     )");
             } else if ($request->input('status') === 'active') {
                 // Active: Approved clients with outstanding balance and last payment
-                // within the term-aware threshold (Term + Grace = 2x the term period)
-                // Monthly=2mo, Quarterly=6mo, Semi-Annual=12mo, Annual=24mo
+                // Monthly=1mo, Quarterly=3mo, Semi-Annual=6mo, Annual=12mo
                 $lapseInterval = "CASE tblpaymentterm.Term
-                    WHEN 'Monthly'     THEN 3
-                    WHEN 'Quarterly'   THEN 6
-                    WHEN 'Semi-Annual' THEN 12
-                    WHEN 'Annual'      THEN 24
-                    ELSE 2
+                    WHEN 'Monthly'     THEN 1
+                    WHEN 'Quarterly'   THEN 3
+                    WHEN 'Semi-Annual' THEN 6
+                    WHEN 'Annual'      THEN 12
+                    ELSE 1
                 END";
 
                 // Use efficient JOINs with pre-aggregated payment data
@@ -186,8 +181,8 @@ class ClientController extends Controller
                         AND (Remarks IS NULL OR Remarks IN ('Standard', 'Partial', 'Custom'))
                         GROUP BY clientid
                     ) as payment_stats"), 'tblclient.id', '=', 'payment_stats.clientid')
-                    // Active: last payment within term+grace threshold
-                    ->whereRaw("payment_stats.last_payment_date >= DATE_SUB(NOW(), INTERVAL ({$lapseInterval}) MONTH)")
+                    // Active: last payment OR creation date within term+grace threshold
+                    ->whereRaw("COALESCE(payment_stats.last_payment_date, tblclient.DateCreated) >= DATE_SUB(NOW(), INTERVAL ({$lapseInterval}) MONTH)")
                     // Not fully paid yet
                     ->whereRaw("COALESCE(payment_stats.total_paid, 0) < (
                         CASE 
@@ -270,8 +265,8 @@ class ClientController extends Controller
                 'tblpackage.Package',
                 'tblpaymentterm.Id',
                 'tblpaymentterm.PackageId',
-                'tblpaymentterm.Term',
-                'tblpaymentterm.Price',
+                \DB::raw('tblpaymentterm.Term as ExpectedTerm'),
+                \DB::raw('tblpaymentterm.Price as TermPrice'),
                 'tblstaff.LastName as FSALastName',
                 'tblstaff.FirstName as FSAFirstName',
                 'tblstaff.MiddleName as FSAMiddleName'
@@ -286,6 +281,11 @@ class ClientController extends Controller
 
         // Resolve ALL 6 address codes in ONE batched query instead of 6 separate queries
         if ($clients) {
+            // Safe assignment to avoid Eloquent overriding issues
+            if (isset($clients->ExpectedTerm) && !empty($clients->ExpectedTerm)) {
+                $clients->Term = trim($clients->ExpectedTerm);
+            }
+
             $addressCodes = array_filter([
                 $clients->Province,
                 $clients->City,
@@ -367,11 +367,11 @@ class ClientController extends Controller
                 ->get();
 
             $totalLoanPayments = $loanPayments->sum('Amount');
-            
+
             // Use total_repayable (lowercase) first as that's what's in database
             $totalRepayable = $hasLoanRequest->total_repayable ?? $hasLoanRequest->TotalRepayable ?? $hasLoanRequest->Amount;
             $loanBalance = max(0, $totalRepayable - $totalLoanPayments);
-            
+
             // Auto-correct loan status if balance > 0 but marked as Completed
             if ($loanBalance > 0 && $hasLoanRequest->Status === 'Completed') {
                 LoanRequest::where('Id', $hasLoanRequest->Id)->update([
@@ -416,7 +416,7 @@ class ClientController extends Controller
             ->get();
 
         return view('pages.client.client-view', [
-            'clients' => $client,
+            'clients' => $clients,
             'payments' => $payments,
             'hasLoanRequest' => $hasLoanRequest,
             'loanPayments' => $loanPayments,
@@ -495,7 +495,7 @@ class ClientController extends Controller
             // Use total_repayable (lowercase) first as that's what's in database
             $totalRepayable = $hasLoanRequest->total_repayable ?? $hasLoanRequest->TotalRepayable ?? $hasLoanRequest->Amount;
             $loanBalance = max(0, $totalRepayable - $totalLoanPayments);
-            
+
             // Auto-correct loan status if balance > 0 but marked as Completed
             if ($loanBalance > 0 && $hasLoanRequest->Status === 'Completed') {
                 LoanRequest::where('Id', $hasLoanRequest->Id)->update([
@@ -504,7 +504,7 @@ class ClientController extends Controller
                 ]);
                 $hasLoanRequest->Status = 'Approved';
             }
-            
+
             // If loan is fully paid (Completed status with 0 balance), redirect back
             if ($hasLoanRequest->Status === 'Completed' && $loanBalance <= 0) {
                 return redirect('/client-view/' . $client->Id)->with('error', 'Loan is already fully paid. No more payments needed.');
@@ -523,7 +523,7 @@ class ClientController extends Controller
                 ->whereNotNull('ORId')
                 ->orderBy('date', 'desc')
                 ->first();
-            
+
             $lastOrSeriesCode = null;
             $lastOrNo = null;
             if ($lastPayment && $lastPayment->ORId) {
@@ -2968,8 +2968,8 @@ class ClientController extends Controller
                 'tblpackage.Package',
                 'tblpaymentterm.Id',
                 'tblpaymentterm.PackageId',
-                'tblpaymentterm.Term',
-                'tblpaymentterm.Price',
+                \DB::raw('tblpaymentterm.Term as ExpectedTerm'),
+                \DB::raw('tblpaymentterm.Price as TermPrice'),
                 \DB::raw('COALESCE(addr_province.description, tblprovince.Province, tblclient.Province) as ProvinceName'),
                 \DB::raw('COALESCE(addr_city.description, tblcity.City, tblclient.City) as CityName'),
                 \DB::raw('COALESCE(addr_brgy.description, tblbrgy.Barangay, tblclient.Barangay) as BarangayName')
@@ -2983,6 +2983,11 @@ class ClientController extends Controller
             ->orderBy('installment', 'desc')
             ->get();
 
+        // Safe assignment to avoid Eloquent overriding issues
+        if (isset($clients->ExpectedTerm) && !empty($clients->ExpectedTerm)) {
+            $clients->Term = trim($clients->ExpectedTerm);
+        }
+
         $name = $clients->LastName . ', ' . $clients->FirstName . ' ' . $clients->MiddleName;
         $contract_num = $clients->ContractNumber;
         $address1 = $clients->Street . ', ' . $clients->BarangayName;
@@ -2991,7 +2996,7 @@ class ClientController extends Controller
 
         $total_payment = 0;
 
-        $base_price = $clients->Price;
+        $base_price = $clients->TermPrice;
         $total_price = 0;
 
         switch ($clients->Term) {
@@ -3012,6 +3017,30 @@ class ClientController extends Controller
                 break;
             default:
                 $total_price = $base_price * 60;
+        }
+
+        // Fallback for missing/zero Term Price in DB
+        if ($total_price == 0 && $clients->PackagePrice > 0) {
+            $total_price = $clients->PackagePrice;
+            switch ($clients->Term) {
+                case "Spotcash":
+                    $base_price = $total_price;
+                    break;
+                case "Annual":
+                    $base_price = $total_price / 5;
+                    break;
+                case "Semi-Annual":
+                    $base_price = $total_price / 10;
+                    break;
+                case "Quarterly":
+                    $base_price = $total_price / 20;
+                    break;
+                case "Monthly":
+                    $base_price = $total_price / 60;
+                    break;
+                default:
+                    $base_price = $total_price;
+            }
         }
 
         $total_payment = 0;
@@ -3613,7 +3642,7 @@ class ClientController extends Controller
             $totalLoanPayments = $loanPayments->sum('Amount');
             $totalRepayable = $latestLoanRequest->total_repayable ?? $latestLoanRequest->TotalRepayable ?? $latestLoanRequest->Amount;
             $loanBalance = max(0, $totalRepayable - $totalLoanPayments); // Never show negative balance
-            
+
             // Auto-complete loan if overpaid or fully paid
             if ($loanBalance <= 0 && ($latestLoanRequest->Status ?? null) !== 'Completed') {
                 LoanRequest::where('Id', $latestLoanRequest->Id)->update([
@@ -3933,7 +3962,7 @@ class ClientController extends Controller
                 'tblpaymentterm.Id',
                 'tblpaymentterm.PackageId',
                 'tblpaymentterm.Term',
-                'tblpaymentterm.Price',
+                \DB::raw('tblpaymentterm.Price as TermPrice'),
                 \DB::raw('COALESCE(addr_province.description, tblprovince.Province, tblclient.Province) as ProvinceName'),
                 \DB::raw('COALESCE(addr_city.description, tblcity.City, tblclient.City) as CityName'),
                 \DB::raw('COALESCE(addr_brgy.description, tblbrgy.Barangay, tblclient.Barangay) as BarangayName')
@@ -3954,7 +3983,7 @@ class ClientController extends Controller
 
         $total_payment = 0;
 
-        $base_price = $clients->Price;
+        $base_price = $clients->TermPrice;
         $total_price = 0;
 
         switch ($clients->Term) {
@@ -3975,6 +4004,30 @@ class ClientController extends Controller
                 break;
             default:
                 $total_price = $base_price * 60;
+        }
+
+        // Fallback for missing/zero Term Price in DB
+        if ($total_price == 0 && $clients->PackagePrice > 0) {
+            $total_price = $clients->PackagePrice;
+            switch ($clients->Term) {
+                case "Spotcash":
+                    $base_price = $total_price;
+                    break;
+                case "Annual":
+                    $base_price = $total_price / 5;
+                    break;
+                case "Semi-Annual":
+                    $base_price = $total_price / 10;
+                    break;
+                case "Quarterly":
+                    $base_price = $total_price / 20;
+                    break;
+                case "Monthly":
+                    $base_price = $total_price / 60;
+                    break;
+                default:
+                    $base_price = $total_price;
+            }
         }
 
         $total_payment = 0;
