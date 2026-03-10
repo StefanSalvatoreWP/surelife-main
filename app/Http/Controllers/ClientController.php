@@ -264,7 +264,7 @@ class ClientController extends Controller
                 'tblbranch.BranchName',
                 'tblpackage.Package',
                 'tblpackage.Price as PackagePrice',
-                'tblpaymentterm.Id',
+                'tblpaymentterm.Id as PaymentTermTableId',
                 'tblpaymentterm.PackageId',
                 \DB::raw('tblpaymentterm.Term as ExpectedTerm'),
                 \DB::raw('tblpaymentterm.Price as TermPrice'),
@@ -348,7 +348,7 @@ class ClientController extends Controller
         // loan payments - get the latest loan request (by Id DESC) to prioritize newer loans
         $hasLoanRequest = LoanRequest::query()
             ->where('ClientId', $client->Id)
-            ->whereIn('Status', ['Verified', 'Approved', 'Completed'])
+            ->whereIn('Status', ['Pending', 'Verified', 'Approved', 'Completed'])
             ->orderBy('Id', 'desc')
             ->first();
 
@@ -413,8 +413,9 @@ class ClientController extends Controller
             )
             ->leftJoin('tblofficialreceipt', 'tblpayment.ORId', '=', 'tblofficialreceipt.id')
             ->leftJoin('tblorbatch', 'tblofficialreceipt.orbatchid', '=', 'tblorbatch.id')
-            ->where('tblpayment.clientid', $client->Id)
+            ->where('tblpayment.clientid', $clients->cid)
             ->orderBy('tblpayment.date', 'desc')
+            ->orderBy('tblpayment.installment', 'desc')
             ->get();
 
         return view('pages.client.client-view', [
@@ -485,9 +486,14 @@ class ClientController extends Controller
             // get loan payments data - get the latest loan request (by Id DESC) to prioritize newer loans
             $hasLoanRequest = LoanRequest::query()
                 ->where('ClientId', $client->Id)
-                ->whereIn('Status', ['Verified', 'Approved', 'Completed'])
+                ->whereIn('Status', ['Pending', 'Verified', 'Approved', 'Completed'])
                 ->orderBy('Id', 'desc')
                 ->first();
+
+            if (!$hasLoanRequest) {
+                return redirect('/client-view/' . $client->Id)
+                    ->with('error', 'No active loan request found for this client.');
+            }
 
             $loanPayments = LoanPayment::query()
                 ->where('clientid', $hasLoanRequest->ClientId)

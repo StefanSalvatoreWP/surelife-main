@@ -29,7 +29,8 @@
             $message = 'client';
 
             // Calculate total price based on payment term
-            $base_price = $clients->TermPrice;
+            // Use PackagePrice (actual package price) not TermPrice (term amount)
+            $base_price = $clients->PackagePrice;
             switch ($clients->Term) {
                 case "Spotcash":
                     $total_price = $base_price;
@@ -843,71 +844,87 @@
                                 </div>
                             @endif
 
-                            <!-- Payment Status Card - Hidden for fully paid clients -->
-                            @if(!$isFullyPaid)
-                                @php
-                                    $paymentStatus = 'Active';
-                                    $isLapsed = false;
+                            <!-- Payment Status Card -->
+                            @php
+                                $paymentStatus = 'Active';
+                                $isLapsed = false;
 
-                                    // Term lapse threshold in months
-                                    $lapseMonths = match ($clients->Term) {
-                                        'Monthly' => 1,
-                                        'Quarterly' => 3,
-                                        'Semi-Annual' => 6,
-                                        'Annual' => 12,
-                                        default => 1,
-                                    };
-                                    $lapseCutoff = \Carbon\Carbon::now()->subMonths($lapseMonths);
+                                // Term lapse threshold in months
+                                $lapseMonths = match ($clients->Term) {
+                                    'Monthly' => 1,
+                                    'Quarterly' => 3,
+                                    'Semi-Annual' => 6,
+                                    'Annual' => 12,
+                                    default => 1,
+                                };
+                                $lapseCutoff = \Carbon\Carbon::now()->subMonths($lapseMonths);
 
-                                    // Use $lastValidPaymentDate calculated at the top of the file
-                                    // or fallback to DateCreated if client has no valid payments
-                                    $referenceDate = $lastValidPaymentDate ?? \Carbon\Carbon::parse($clients->DateCreated);
+                                // Use $lastValidPaymentDate calculated at the top of the file
+                                // or fallback to DateCreated if client has no valid payments
+                                $referenceDate = $lastValidPaymentDate ?? \Carbon\Carbon::parse($clients->DateCreated);
 
-                                    if ($referenceDate->lt($lapseCutoff)) {
-                                        $paymentStatus = 'Lapse';
-                                        $isLapsed = true;
-                                    }
-                                @endphp
-                                @if($isLapsed)
-                                    <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-lg p-4 border border-red-200">
-                                        <div class="flex items-center justify-between">
-                                            <div>
-                                                <p class="text-sm text-red-600 font-medium mb-1">Payment Status</p>
-                                                <p class="text-2xl font-bold text-red-900">{{ $paymentStatus }}</p>
-                                                <p class="text-xs text-red-500 mt-1">{{ $clients->Term }} · Lapse after
-                                                    {{ $lapseMonths }} mos
-                                                </p>
-                                            </div>
-                                            <div class="bg-red-200 rounded-full p-3">
-                                                <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
-                                            </div>
+                                if ($referenceDate->lt($lapseCutoff)) {
+                                    $paymentStatus = 'Lapse';
+                                    $isLapsed = true;
+                                }
+                            @endphp
+                            @if($isFullyPaid)
+                                <div
+                                    class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="text-sm text-green-600 font-medium mb-1">Payment Status</p>
+                                            <p class="text-2xl font-bold text-green-900">Fully Paid</p>
+                                            <p class="text-xs text-green-600 mt-1">{{ $clients->Term }}</p>
+                                        </div>
+                                        <div class="bg-green-200 rounded-full p-3">
+                                            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
                                         </div>
                                     </div>
-                                @else
-                                    <div
-                                        class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
-                                        <div class="flex items-center justify-between">
-                                            <div>
-                                                <p class="text-sm text-green-600 font-medium mb-1">Payment Status</p>
-                                                <p class="text-2xl font-bold text-green-900">{{ $paymentStatus }}</p>
-                                                <p class="text-xs text-green-600 mt-1">{{ $clients->Term }} · Lapse after
-                                                    {{ $lapseMonths }} mos
-                                                </p>
-                                            </div>
-                                            <div class="bg-green-200 rounded-full p-3">
-                                                <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
-                                            </div>
+                                </div>
+                            @elseif($isLapsed)
+                                <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-lg p-4 border border-red-200">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="text-sm text-red-600 font-medium mb-1">Payment Status</p>
+                                            <p class="text-2xl font-bold text-red-900">{{ $paymentStatus }}</p>
+                                            <p class="text-xs text-red-500 mt-1">{{ $clients->Term }} · Lapse after
+                                                {{ $lapseMonths }} mos
+                                            </p>
+                                        </div>
+                                        <div class="bg-red-200 rounded-full p-3">
+                                            <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
                                         </div>
                                     </div>
-                                @endif
+                                </div>
+                            @else
+                                <div
+                                    class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="text-sm text-green-600 font-medium mb-1">Payment Status</p>
+                                            <p class="text-2xl font-bold text-green-900">{{ $paymentStatus }}</p>
+                                            <p class="text-xs text-green-600 mt-1">{{ $clients->Term }} · Lapse after
+                                                {{ $lapseMonths }} mos
+                                            </p>
+                                        </div>
+                                        <div class="bg-green-200 rounded-full p-3">
+                                            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
                             @endif
                         </div>
 
@@ -1025,16 +1042,16 @@
                             @if($clients->Status == '3')
                                 @if($balance > 0)
                                     @if($assignedMemberData != null)
-                                        <a href="/client-addpayment/{{ $clients->Id }}"
+                                        <a href="/client-addpayment/{{ $clients->cid }}"
                                             class="inline-flex items-center px-6 py-3 bg-white border-2 border-green-200 hover:border-green-300 text-green-800 hover:text-green-900 font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
                                             role="button">Create Full Payment</a>
                                     @else
-                                        <a href="/client-addpayment/{{ $clients->Id }}"
+                                        <a href="/client-addpayment/{{ $clients->cid }}"
                                             class="inline-flex items-center px-6 py-3 bg-white border-2 border-green-200 hover:border-green-300 text-green-800 hover:text-green-900 font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
                                             role="button">Add Payment</a>
                                     @endif
                                 @endif
-                                <a href="/client-printsoa/{{ $clients->Id }}?export=true"
+                                <a href="/client-printsoa/{{ $clients->cid }}?export=true"
                                     class="inline-flex items-center px-6 py-3 bg-white border-2 border-purple-200 hover:border-purple-300 text-purple-800 hover:text-purple-900 font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
                                     role="button" target="_blank">Statement of Account</a>
                                 @if($balance <= 0)
@@ -1043,19 +1060,19 @@
                                             onclick="showSwiftModal('Certificate Approval Required', 'Certificate of full payment requires approval.', 'warning', [{text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}])"
                                             role="button">Certificate of Full Payment</a>
                                     @elseif($clients->CFPNO == null && $cfpApprover == 1)
-                                        <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4 cursor-pointer"
+                                        <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
                                             onclick="showSwiftModal('Certificate Approval', 'You are going to approve the certificate of full payment for this client. You cannot undo this action. Continue?', 'warning', [{text: 'Confirm', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpApproval()'}, {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}])"
                                             role="button">Certificate of Full Payment</a>
                                     @elseif($clients->CFPNO == "NA")
                                         <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
                                             onclick="showSwiftModal('Certificate of Full Payment', 'Enter certificate number to proceed.', 'warning', [
-                                                                                                                                                                                                                                            {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpWithInput()'},
-                                                                                                                                                                                                                                            {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
-                                                                                                                                                                                                                                        ])"
+                                                                                                                                                                                                                                                                                    {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpWithInput()'},
+                                                                                                                                                                                                                                                                                    {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+                                                                                                                                                                                                                                                                                ])"
                                             data-client-id="{{ $clients->cid }}" role="button">Certificate of Full
                                             Payment</a>
                                     @else
-                                        <a href="/client-printcofp/{{ $clients->Id }}"
+                                        <a href="/client-printcofp/{{ $clients->cid }}"
                                             class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
                                             role="button">Certificate of Full Payment</a>
                                     @endif
@@ -1071,11 +1088,11 @@
                             @else
                                 @if($clients->Status == '3')
                                     @if($balance > 0)
-                                        <a href="/client-addpayment/{{ $clients->Id }}"
+                                        <a href="/client-addpayment/{{ $clients->cid }}"
                                             class="inline-flex items-center px-6 py-3 bg-white border-2 border-green-200 hover:border-green-300 text-green-800 hover:text-green-900 font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
                                             role="button">Add Payment</a>
                                     @endif
-                                    <a href="/client-printsoa/{{ $clients->Id }}?export=true"
+                                    <a href="/client-printsoa/{{ $clients->cid }}?export=true"
                                         class="inline-flex items-center px-6 py-3 bg-white border-2 border-purple-200 hover:border-purple-300 text-purple-800 hover:text-purple-900 font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
                                         role="button" target="_blank">Statement of Account</a>
                                     @if($balance <= 0)
@@ -1131,7 +1148,7 @@
                             </h3>
                             @if($hasLoanRequest)
                                 @php
-                                    $loanStatusColor = $hasLoanRequest->Status == 'Verified' ? 'blue' : ($hasLoanRequest->Status == 'Approved' ? 'green' : 'gray');
+                                    $loanStatusColor = $hasLoanRequest->Status == 'Pending' ? 'yellow' : ($hasLoanRequest->Status == 'Verified' ? 'blue' : ($hasLoanRequest->Status == 'Approved' ? 'green' : 'gray'));
                                 @endphp
                                 <span
                                     class="px-3 py-1 rounded-full text-xs font-semibold bg-{{ $loanStatusColor }}-200 text-{{ $loanStatusColor }}-700">
@@ -1141,7 +1158,7 @@
                         </div>
                     </div>
                     <div class="p-6">
-                        @if($hasLoanRequest && in_array($hasLoanRequest->Status, ['Approved', 'Completed']))
+                        @if($hasLoanRequest && in_array($hasLoanRequest->Status, ['Pending', 'Verified', 'Approved', 'Completed']))
                             <!-- Loan Summary Cards -->
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                                 <!-- Total Loan Amount Card -->
@@ -1264,7 +1281,7 @@
                             <!-- Payment History Table -->
                             <div class="bg-white rounded-lg border border-gray-200 overflow-hidden mb-6">
                                 <div class="px-4 py-3 bg-gray-50 border-b border-gray-200">
-                                    <h4 class="font-semibold text-gray-700">Payment History</h4>
+                                    <h4 class="font-semibold text-gray-700">Loan Payments History</h4>
                                 </div>
                                 <div class="overflow-x-auto">
                                     <table class="w-full">
@@ -1380,7 +1397,7 @@
                             <!-- Add Payment Button - Centered -->
                             <div class="flex justify-center">
                                 @if($hasLoanRequest->Status == 'Approved' && $loanBalance > 0)
-                                    <a href="/client-addloanpayment/{{ $clients->Id }}"
+                                    <a href="/client-addloanpayment/{{ $clients->cid }}"
                                         class="inline-flex items-center px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-200 ease-in-out">
                                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
