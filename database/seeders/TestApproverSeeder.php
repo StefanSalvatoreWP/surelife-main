@@ -8,10 +8,14 @@ namespace Database\Seeders;
  * ============================================================================
  * 
  * ┌─────────────────────────────────────────────────────────────────────┐
- * │  USERNAME        │  PASSWORD      │  ACCESS KEY    │  ROLE         │
+ * │  LOGIN USERNAME  │  DB USERNAME   │  PASSWORD      │  ACCESS KEY   │
  * ├─────────────────────────────────────────────────────────────────────┤
- * │  TESTAPPROVER    │  password123   │  a8821dd1f     │  Approver     │
+ * │  SLCTESTAPPROVER │  TESTAPPROVER  │  password123   │  a8821dd1f    │
  * └─────────────────────────────────────────────────────────────────────┘
+ * 
+ * ⚠️ IMPORTANT: Login requires 'SLC' prefix for admin/approver accounts!
+ *    - Enter 'SLCTESTAPPROVER' as username (with SLC prefix)
+ *    - System strips 'SLC' and looks for 'TESTAPPROVER' in database
  * 
  * LOGIN URL: /login
  * 
@@ -88,7 +92,8 @@ class TestApproverSeeder extends Seeder
         $this->command->info('🎯 TEST APPROVER CREDENTIALS');
         $this->command->info('═══════════════════════════════════════════════════════════════');
         $this->command->info('');
-        $this->command->info('   Username: TESTAPPROVER');
+        $this->command->info('   Login Username: SLCTESTAPPROVER (with SLC prefix)');
+        $this->command->info('   DB Username: TESTAPPROVER');
         $this->command->info('   Password: password123');
         $this->command->info('   Access Key: a8821dd1f');
         $this->command->info('   Role: Approver (Level 2)');
