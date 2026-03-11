@@ -29,7 +29,7 @@
         @if(session('duplicate'))
             @push('scripts')
                 <script>
-                    showSwiftModal('Error', '{{ session('duplicate') }}');
+                    showSwiftModal('Error', '{{ session('duplicate') }}', 'error');
                 </script>
             @endpush
         @endif
@@ -37,7 +37,7 @@
         @if(session('success'))
             @push('scripts')
                 <script>
-                    showSwiftModal('Success', '{{ session('success') }}');
+                    showSwiftModal('Success', '{{ session('success') }}', 'success');
                 </script>
             @endpush
         @endif

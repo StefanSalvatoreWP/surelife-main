@@ -3555,6 +3555,15 @@ class ClientController extends Controller
             ->leftJoin('tblprovince', 'tblclient.Province', '=', 'tblprovince.Id')
             ->leftJoin('tblcity', 'tblclient.City', '=', 'tblcity.Id')
             ->leftJoin('tblbrgy', 'tblclient.Barangay', '=', 'tblbrgy.Id')
+            ->leftJoin('tbladdress as addr_province', function ($join) {
+                $join->on('tblclient.Province', '=', 'addr_province.code');
+            })
+            ->leftJoin('tbladdress as addr_city', function ($join) {
+                $join->on('tblclient.City', '=', 'addr_city.code');
+            })
+            ->leftJoin('tbladdress as addr_brgy', function ($join) {
+                $join->on('tblclient.Barangay', '=', 'addr_brgy.code');
+            })
             ->select(
                 'tblclient.*',
                 'tblclient.Id as cid',
@@ -3566,9 +3575,9 @@ class ClientController extends Controller
                 'tblpaymentterm.PackageId',
                 'tblpaymentterm.Term',
                 'tblpaymentterm.Price',
-                'tblprovince.Province as ProvinceName',
-                'tblcity.City as CityName',
-                'tblbrgy.Barangay as BarangayName'
+                \DB::raw('COALESCE(addr_province.description, tblprovince.Province, tblclient.Province) as ProvinceName'),
+                \DB::raw('COALESCE(addr_city.description, tblcity.City, tblclient.City) as CityName'),
+                \DB::raw('COALESCE(addr_brgy.description, tblbrgy.Barangay, tblclient.Barangay) as BarangayName')
             )
             ->where('tblclient.id', $request['clientId'])
             ->first();

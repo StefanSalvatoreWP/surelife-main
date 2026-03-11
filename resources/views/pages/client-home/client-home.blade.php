@@ -13,312 +13,6 @@
                 </div>
             </div>
         @endif
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="main-grid">
-            <!-- Left Column - Client Information -->
-            <div id="client-info-column">
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-                    <!-- Header with Toggle Button -->
-                    <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100 flex justify-between items-center">
-                        <h3 class="text-lg font-semibold text-gray-800">Client Information</h3>
-                        <button id="toggle-client-info" class="p-2 rounded-lg hover:bg-gray-200 transition duration-200" title="Toggle client information">
-                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="p-6 space-y-6" id="client-info-content">
-                        <!-- Contract Section -->
-                        <div>
-                            <h4 class="text-sm font-bold text-gray-800 uppercase tracking-wide mb-3 pb-2 border-b-2 border-gray-200">Contract</h4>
-                            <div class="space-y-2">
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Contract No.</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->ContractNumber }}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Package</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->Package }}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Term</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->Term  . ' ( ₱ ' . number_format($clients->Price, 2) .' )' }}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Region</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->RegionName }}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Branch</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->BranchName }}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Best place to collect</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->BestPlaceToCollect }}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Best time to collect</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->BestTimeToCollect }}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Status</span>
-                                    <span class="text-gray-900 text-sm">
-                                        @if($clients->Status == '1')
-                                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-gray-200 text-gray-700">Pending</span>
-                                        @elseif($clients->Status == '2')
-                                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-200 text-blue-700">Verified</span>
-                                        @elseif($clients->Status == '3')
-                                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-200 text-green-700">Approved</span>
-                                        @endif
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Personal Section -->
-                        <div>
-                            <h4 class="text-sm font-bold text-gray-800 uppercase tracking-wide mb-3 pb-2 border-b-2 border-gray-200">Personal</h4>
-                            <div class="space-y-2">
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Name</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->LastName . ', ' . $clients->FirstName . " " . $clients->MiddleName }}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Birth Date</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->BirthDate }}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Age</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->Age }}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Gender</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->Gender }}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Civil Status</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->CivilStatus }}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Occupation</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->Occupation }}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Birth Place</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->BirthPlace }}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Province</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->ProvinceName }}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">City</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->CityName }}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Barangay</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->BarangayName }}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Street</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->Street }}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Zipcode</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->ZipCode }}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Contact Section -->
-                        <div>
-                            <h4 class="text-sm font-bold text-gray-800 uppercase tracking-wide mb-3 pb-2 border-b-2 border-gray-200">Contact</h4>
-                            <div class="space-y-2">
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Home No.</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->HomeNumber }}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Mobile No.</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->MobileNumber }}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Email Address</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->EmailAddress }}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Beneficiaries Section -->
-                        <div>
-                            <h4 class="text-sm font-bold text-gray-800 uppercase tracking-wide mb-3 pb-2 border-b-2 border-gray-200">Beneficiaries</h4>
-                            <div class="space-y-2">
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Principal (Age)</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->PrincipalBeneficiaryName . ' (' . $clients->PrincipalBeneficiaryAge . ')'}}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Beneficiary 1 (Age)</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->Secondary1Name . ' (' . $clients->Secondary1Age . ')'}}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Beneficiary 2 (Age)</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->Secondary2Name . ' (' . $clients->Secondary2Age . ')'}}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Beneficiary 3 (Age)</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->Secondary3Name . ' (' . $clients->Secondary3Age . ')'}}</span>
-                                </div>
-                                <div class="flex justify-between py-2 hover:bg-gray-50 px-2 rounded transition">
-                                    <span class="text-gray-600 font-medium text-sm">Beneficiary 4 (Age)</span>
-                                    <span class="text-gray-900 text-sm">{{ $clients->Secondary4Name . ' (' . $clients->Secondary4Age . ')'}}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Right Column - Payment History -->
-            <div>
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-                    <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-green-50 to-green-100">
-                        <h3 class="text-lg font-semibold text-gray-800">Payment History</h3>
-                    </div>
-                    <div class="p-6">
-                        @php
-                                $base_price = $clients->Price;
-                                $total_payments = 0;
-
-            switch($clients->Term){
-                case "Spotcash": $total_price = $base_price; break;	
-                case "Annual": $total_price = $base_price * 5; break;
-                case "Semi-Annual": $total_price = ($base_price * 2) * 5; break;
-                case "Quarterly": $total_price = ($base_price * 4) * 5; break;
-                case "Monthly": $total_price = $base_price * 60; break;
-                default: $total_price = $base_price * 60;
-            }
-
-            foreach ($payments as $paymentKey => $paymentIndex) {
-                if($paymentIndex->VoidStatus != '1' && 
-                    ($paymentIndex->Remarks == null || 
-                    $paymentIndex->Remarks == 'Standard' || 
-                    $paymentIndex->Remarks == 'Partial' || 
-                    $paymentIndex->Remarks == 'Custom')){
-                    $total_payments += $paymentIndex->AmountPaid;
-                }
-            }
-            $balance = $total_price - $total_payments;
-        @endphp
-
-        <!-- Modern Payment Summary Cards -->
-        <div class="mb-8">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <!-- Package Price Card -->
-                <div class="rounded-xl p-5 shadow-lg hover:shadow-xl transition-shadow duration-300" style="background-color: #3b82f6; color: white;">
-                    <div class="flex items-center justify-between">
-                        <div class="flex-1 min-w-0 pr-3">
-                            <p class="text-sm font-medium mb-1" style="color: rgba(255,255,255,0.8);">Package Price</p>
-                            <p class="text-2xl font-bold whitespace-nowrap" style="color: white;">₱ {{ number_format($total_price, 2) }}</p>
-                        </div>
-                        <div class="rounded-full p-3 flex-shrink-0" style="background-color: rgba(255,255,255,0.3);">
-                            <svg class="w-6 h-6" style="color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Total Payment Card -->
-                <div class="rounded-xl p-5 shadow-lg hover:shadow-xl transition-shadow duration-300" style="background-color: #9333ea; color: white;">
-                    <div class="flex items-center justify-between">
-                        <div class="flex-1 min-w-0 pr-3">
-                            <p class="text-sm font-medium mb-1" style="color: rgba(255,255,255,0.8);">Total Payment</p>
-                            <p class="text-2xl font-bold whitespace-nowrap" style="color: white;">₱ {{ number_format($total_payments, 2) }}</p>
-                        </div>
-                        <div class="rounded-full p-3 flex-shrink-0" style="background-color: rgba(255,255,255,0.3);">
-                            <svg class="w-6 h-6" style="color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Balance Card -->
-                @if($balance > 0)
-                    <div class="rounded-xl p-5 shadow-lg hover:shadow-xl transition-shadow duration-300" style="background-color: #ef4444; color: white;">
-                        <div class="flex items-center justify-between">
-                            <div class="flex-1 min-w-0 pr-3">
-                                <p class="text-sm font-medium mb-1" style="color: rgba(255,255,255,0.8);">Outstanding Balance</p>
-                                <p class="text-2xl font-bold whitespace-nowrap" style="color: white;">₱ {{ number_format($balance, 2) }}</p>
-                            </div>
-                            <div class="rounded-full p-3 flex-shrink-0" style="background-color: rgba(255,255,255,0.3);">
-                                <svg class="w-6 h-6" style="color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                @else
-                    <div class="rounded-xl p-5 shadow-lg hover:shadow-xl transition-shadow duration-300" style="background-color: #22c55e; color: white;">
-                        <div class="flex items-center justify-between">
-                            <div class="flex-1 min-w-0 pr-3">
-                                <p class="text-sm font-medium mb-1" style="color: rgba(255,255,255,0.8);">Balance</p>
-                                <p class="text-2xl font-bold whitespace-nowrap" style="color: white;">₱ 0.00</p>
-                                <p class="text-xs mt-1" style="color: rgba(255,255,255,0.8);">✓ Fully Paid</p>
-                            </div>
-                            <div class="rounded-full p-3 flex-shrink-0" style="background-color: rgba(255,255,255,0.3);">
-                                <svg class="w-6 h-6" style="color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                @endif
-
-                <!-- Payment Status Card -->
-                @php
-                    $paymentStatus = 'Active';
-                    $isLapsed = false;
-                    $lastPayment = $payments->where('VoidStatus', '!=', '1')->sortByDesc('Date')->first();
-                    if($lastPayment) {
-                        $lastPaymentDate = \Carbon\Carbon::parse($lastPayment->Date);
-                        $monthsDiff = $lastPaymentDate->diffInMonths(\Carbon\Carbon::now());
-                        if($monthsDiff > 3) {
-                            $paymentStatus = 'Lapse';
-                            $isLapsed = true;
-                        }
-                    } else {
-                        $paymentStatus = 'No Payment';
-                    }
-                @endphp
-                @if($isLapsed)
-                    <div class="rounded-xl p-5 shadow-lg hover:shadow-xl transition-shadow duration-300" style="background-color: #f97316; color: white;">
-                        <div class="flex items-center justify-between">
-                            <div class="flex-1 min-w-0 pr-3">
-                                <p class="text-sm font-medium mb-1" style="color: rgba(255,255,255,0.8);">Payment Status</p>
-                                <p class="text-2xl font-bold" style="color: white;">{{ $paymentStatus }}</p>
-                            </div>
-                            <div class="rounded-full p-3 flex-shrink-0" style="background-color: rgba(255,255,255,0.3);">
-                                <svg class="w-6 h-6" style="color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                @else
-                    <div class="rounded-xl p-5 shadow-lg hover:shadow-xl transition-shadow duration-300" style="background-color: #10b981; color: white;">
-                        <div class="flex items-center justify-between">
-                            <div class="flex-1 min-w-0 pr-3">
-                                <p class="text-sm font-medium mb-1" style="color: rgba(255,255,255,0.8);">Payment Status</p>
-                                <p class="text-2xl font-bold" style="color: white;">{{ $paymentStatus }}</p>
-                            </div>
-                            <div class="rounded-full p-3 flex-shrink-0" style="background-color: rgba(255,255,255,0.3);">
-                                <svg class="w-6 h-6" style="color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                @endif
-            </div>
-        </div>
 
         <!-- Main Content Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -579,6 +273,58 @@
                                 </svg>
                             </div>
                             <h3 class="text-lg font-semibold text-white">Payment History</h3>
+                        </div>
+                    </div>
+                    @php
+                        $base_price = $clients->PackagePrice ?? $clients->Price;
+                        $total_payments = 0;
+
+                        switch($clients->Term){
+                            case "Spotcash": $total_price = $base_price; break;
+                            case "Annual": $total_price = $base_price * 5; break;
+                            case "Semi-Annual": $total_price = ($base_price * 2) * 5; break;
+                            case "Quarterly": $total_price = ($base_price * 4) * 5; break;
+                            case "Monthly": $total_price = $base_price * 60; break;
+                            default: $total_price = $base_price * 60;
+                        }
+
+                        foreach ($payments as $paymentIndex) {
+                            if($paymentIndex->VoidStatus != '1' &&
+                                ($paymentIndex->Remarks == null ||
+                                $paymentIndex->Remarks == 'Standard' ||
+                                $paymentIndex->Remarks == 'Partial' ||
+                                $paymentIndex->Remarks == 'Custom')){
+                                $total_payments += $paymentIndex->AmountPaid;
+                            }
+                        }
+
+                        $computed_balance = $total_price - $total_payments;
+                        if ($computed_balance < 0) {
+                            $computed_balance = 0;
+                        }
+                    @endphp
+                    <div class="p-4 border-b border-gray-200 bg-white">
+                        <div class="grid grid-cols-1 gap-3">
+                            <div class="rounded-lg p-3" style="background-color: #3b82f6; color: white;">
+                                <p class="text-xs font-medium" style="color: rgba(255,255,255,0.8);">Package Price</p>
+                                <p class="text-lg font-bold">₱ {{ number_format($total_price, 2) }}</p>
+                            </div>
+                            <div class="rounded-lg p-3" style="background-color: #9333ea; color: white;">
+                                <p class="text-xs font-medium" style="color: rgba(255,255,255,0.8);">Total Payment</p>
+                                <p class="text-lg font-bold">₱ {{ number_format($total_payments, 2) }}</p>
+                            </div>
+                            @if($computed_balance > 0)
+                                <div class="rounded-lg p-3" style="background-color: #ef4444; color: white;">
+                                    <p class="text-xs font-medium" style="color: rgba(255,255,255,0.8);">Outstanding Balance</p>
+                                    <p class="text-lg font-bold">₱ {{ number_format($computed_balance, 2) }}</p>
+                                </div>
+                            @else
+                                <div class="rounded-lg p-3" style="background-color: #22c55e; color: white;">
+                                    <p class="text-xs font-medium" style="color: rgba(255,255,255,0.8);">Balance</p>
+                                    <p class="text-lg font-bold">₱ 0.00</p>
+                                    <p class="text-xs" style="color: rgba(255,255,255,0.8);">✓ Fully Paid</p>
+                                </div>
+                            @endif
                         </div>
                     </div>
                     <div class="p-4 max-h-96 overflow-y-auto">
