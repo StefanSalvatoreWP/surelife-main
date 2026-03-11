@@ -1851,8 +1851,22 @@
                     localStorage.setItem('clientStatusFilter', '{{ request('status') }}');
                 @endif
 
-                                                                const tabs = document.querySelectorAll('#clientTabs button[data-bs-toggle="tab"]');
+                const tabs = document.querySelectorAll('#clientTabs button[data-bs-toggle="tab"]');
                 const tabPanes = document.querySelectorAll('.tab-pane');
+
+                // Map tab IDs to hash names
+                const tabHashMap = {
+                    '#clientInfo': 'client',
+                    '#paymentHistory': 'payment',
+                    '#loanPayments': 'loan',
+                    '#assignedMember': 'assign'
+                };
+                const hashTabMap = {
+                    'client': '#clientInfo',
+                    'payment': '#paymentHistory',
+                    'loan': '#loanPayments',
+                    'assign': '#assignedMember'
+                };
 
                 tabs.forEach(tab => {
                     tab.addEventListener('click', function (e) {
@@ -1878,15 +1892,30 @@
 
                         // Hide all tab panes
                         tabPanes.forEach(pane => {
-                            pane.classList.remove('active');
+                            pane.classList.remove('active', 'show');
                         });
 
                         // Show target pane
-                        targetPane.classList.add('active');
+                        targetPane.classList.add('active', 'show');
+
+                        // Store tab in URL hash
+                        const hash = tabHashMap[targetId];
+                        if (hash) {
+                            history.replaceState(null, null, '#' + hash);
+                        }
                     });
                 });
 
-                console.log('✅ Custom tabs initialized:', tabs.length, 'tabs found');
+                // Restore tab from URL hash on page load
+                const hash = window.location.hash.substring(1);
+                if (hash && hashTabMap[hash]) {
+                    const targetTab = document.querySelector('button[data-bs-target="' + hashTabMap[hash] + '"]');
+                    if (targetTab) {
+                        targetTab.click();
+                    }
+                }
+
+                console.log('✅ Custom tabs initialized with hash persistence:', tabs.length, 'tabs found');
             });
         </script>
 @endsection
