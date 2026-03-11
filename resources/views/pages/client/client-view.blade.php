@@ -28,52 +28,28 @@
         @php
             $message = 'client';
 
-            // Calculate total price based on payment term
-            // Use PackagePrice (actual package price) not TermPrice (term amount)
-            $base_price = $clients->PackagePrice;
+            // Calculate total price and term amount based on payment term
+            $total_price = $clients->PackagePrice;
+
+            // Calculate correct base_price display
             switch ($clients->Term) {
                 case "Spotcash":
-                    $total_price = $base_price;
+                    $base_price = $total_price;
                     break;
                 case "Annual":
-                    $total_price = $base_price * 5;
+                    $base_price = $total_price / 5;
                     break;
                 case "Semi-Annual":
-                    $total_price = ($base_price * 2) * 5;
+                    $base_price = $total_price / 10;
                     break;
                 case "Quarterly":
-                    $total_price = ($base_price * 4) * 5;
+                    $base_price = $total_price / 20;
                     break;
                 case "Monthly":
-                    $total_price = $base_price * 60;
+                    $base_price = $total_price / 60;
                     break;
                 default:
-                    $total_price = $base_price;
-            }
-
-            // Fallback for missing/zero Term Price in DB
-            if ($total_price == 0 && $clients->PackagePrice > 0) {
-                $total_price = $clients->PackagePrice;
-                // Calculate correct base_price display
-                switch ($clients->Term) {
-                    case "Spotcash":
-                        $base_price = $total_price;
-                        break;
-                    case "Annual":
-                        $base_price = $total_price / 5;
-                        break;
-                    case "Semi-Annual":
-                        $base_price = $total_price / 10;
-                        break;
-                    case "Quarterly":
-                        $base_price = $total_price / 20;
-                        break;
-                    case "Monthly":
-                        $base_price = $total_price / 60;
-                        break;
-                    default:
-                        $base_price = $total_price;
-                }
+                    $base_price = $total_price;
             }
 
             // Calculate total payments and last valid payment date in a single loop
@@ -1066,9 +1042,9 @@
                                     @elseif($clients->CFPNO == "NA")
                                         <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
                                             onclick="showSwiftModal('Certificate of Full Payment', 'Enter certificate number to proceed.', 'warning', [
-                                                                                                                                                                                                                                                                                    {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpWithInput()'},
-                                                                                                                                                                                                                                                                                    {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
-                                                                                                                                                                                                                                                                                ])"
+                                                                                                                                                                                                                                                                                                        {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpWithInput()'},
+                                                                                                                                                                                                                                                                                                        {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+                                                                                                                                                                                                                                                                                                    ])"
                                             data-client-id="{{ $clients->cid }}" role="button">Certificate of Full
                                             Payment</a>
                                     @else
@@ -1099,24 +1075,24 @@
                                         @if($clients->CFPNO == null && $cfpApprover == 0)
                                             <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
                                                 onclick="showSwiftModal('Warning', 'Certificate of full payment requires approval.', 'warning', [
-                                                                                                                                                                                                                                                                                    {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
-                                                                                                                                                                                                                                                                                ])"
+                                                                                                                                                                                                                                                                                                            {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+                                                                                                                                                                                                                                                                                                        ])"
                                                 data-client-id="{{ $clients->cid }}" role="button">Certificate of
                                                 Full Payment</a>
                                         @elseif($clients->CFPNO == null && $cfpApprover == 1)
                                             <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
                                                 onclick="showSwiftModal('Certificate Approval', 'You are going to approve the certificate of full payment for this client. You cannot undo this action. Continue?', 'warning', [
-                                                                                                                                                                                                                                                                                    {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpApproval()'},
-                                                                                                                                                                                                                                                                                    {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
-                                                                                                                                                                                                                                                                                ])"
+                                                                                                                                                                                                                                                                                                            {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpApproval()'},
+                                                                                                                                                                                                                                                                                                            {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+                                                                                                                                                                                                                                                                                                        ])"
                                                 data-client-id="{{ $clients->cid }}" role="button">Certificate of
                                                 Full Payment</a>
                                         @elseif($clients->CFPNO == "NA")
                                             <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
                                                 onclick="showSwiftModal('Certificate of Full Payment', 'Enter certificate number to proceed.', 'warning', [
-                                                                                                                                                                                                                                                                                    {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpWithInput()'},
-                                                                                                                                                                                                                                                                                    {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
-                                                                                                                                                                                                                                                                                ])"
+                                                                                                                                                                                                                                                                                                            {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpWithInput()'},
+                                                                                                                                                                                                                                                                                                            {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+                                                                                                                                                                                                                                                                                                        ])"
                                                 data-client-id="{{ $clients->cid }}" role="button">Certificate of
                                                 Full Payment</a>
                                         @else
@@ -1870,7 +1846,7 @@
                     localStorage.setItem('clientStatusFilter', '{{ request('status') }}');
                 @endif
 
-                                                            const tabs = document.querySelectorAll('#clientTabs button[data-bs-toggle="tab"]');
+                                                                const tabs = document.querySelectorAll('#clientTabs button[data-bs-toggle="tab"]');
                 const tabPanes = document.querySelectorAll('.tab-pane');
 
                 tabs.forEach(tab => {
