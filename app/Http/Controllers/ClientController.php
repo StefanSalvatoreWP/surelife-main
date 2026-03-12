@@ -3729,6 +3729,7 @@ class ClientController extends Controller
             'loanStatus' => $loanStatus,
             'loanRequest' => $hasLoanRequest,
             'loanBalance' => $loanBalance,
+            'loanPayments' => $loanPayments ?? collect([]),
             'netLoanAmount' => $netLoanableAmount,
             'monthlyLoanAmount' => $monthlyDue,
             'isEligible' => $isEligible,

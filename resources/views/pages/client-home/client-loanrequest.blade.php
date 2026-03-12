@@ -276,12 +276,92 @@
                         <span>₱ {{ number_format(max(0, $paidAmount), 2) }} paid</span>
                         <span>₱ {{ number_format($actualTotalRepayable, 2) }} total</span>
                     </div>
+                    @if($loanPayments && $loanPayments->count() > 0)
+                    <button type="button" onclick="showPaymentHistoryModal()" class="mt-3 w-full flex items-center justify-center gap-2 px-3 py-2 bg-white/60 hover:bg-white/80 border border-orange-200 rounded-lg text-sm text-orange-700 font-medium transition-all duration-200 hover:shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                        </svg>
+                        View Payment History ({{ $loanPayments->count() }})
+                    </button>
+                    @endif
                 </div>
                 @else
                 <div class="mt-4 pt-4 border-t border-orange-200">
                     <p class="text-gray-500 text-sm">No outstanding balance</p>
                 </div>
                 @endif
+            </div>
+        </div>
+    </div>
+
+    <!-- PAYMENT HISTORY MODAL -->
+    <div id="paymentHistoryModal" class="fixed inset-0 hidden overflow-y-auto h-full w-full z-50" style="background-color: rgba(0, 0, 0, 0.6);">
+        <div class="relative top-20 mx-auto p-0 border w-full max-w-md rounded-xl bg-white shadow-2xl">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between px-5 py-4 border-b border-gray-200 bg-gradient-to-r from-orange-500 to-orange-600 rounded-t-xl">
+                <div class="flex items-center gap-3">
+                    <div class="bg-white/20 rounded-full p-2">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-white">Loan Payment History</h3>
+                </div>
+                <button onclick="closePaymentHistoryModal()" class="text-white/70 hover:text-white transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-4">
+                @if($loanPayments && $loanPayments->count() > 0)
+                <div class="overflow-hidden rounded-lg border border-gray-200">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Date</th>
+                                <th class="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100 bg-white">
+                            @foreach($loanPayments as $payment)
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-4 py-3 text-sm text-gray-900">
+                                    {{ ($payment->PaymentDate ?? $payment->DateCreated) ? \Carbon\Carbon::parse($payment->PaymentDate ?? $payment->DateCreated)->format('M d, Y') : '-' }}
+                                </td>
+                                <td class="px-4 py-3 text-sm text-right font-medium text-orange-600">
+                                    ₱ {{ number_format($payment->Amount ?? 0, 2) }}
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                        <tfoot class="bg-orange-50">
+                            <tr>
+                                <td class="px-4 py-3 text-sm font-semibold text-gray-700">Total Paid</td>
+                                <td class="px-4 py-3 text-sm text-right font-bold text-orange-600">
+                                    ₱ {{ number_format($loanPayments->sum('Amount'), 2) }}
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                @else
+                <div class="text-center py-8">
+                    <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    </svg>
+                    <p class="text-gray-500">No payment records found</p>
+                </div>
+                @endif
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="px-5 py-4 border-t border-gray-200 bg-gray-50 rounded-b-xl">
+                <button onclick="closePaymentHistoryModal()" class="w-full px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-lg transition-colors">
+                    Close
+                </button>
             </div>
         </div>
     </div>
@@ -754,6 +834,24 @@
         document.getElementById('loanApplicationModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeLoanModal();
+            }
+        });
+
+        // Payment History Modal Functions
+        function showPaymentHistoryModal() {
+            document.getElementById('paymentHistoryModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePaymentHistoryModal() {
+            document.getElementById('paymentHistoryModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close payment history modal on outside click
+        document.getElementById('paymentHistoryModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePaymentHistoryModal();
             }
         });
 
