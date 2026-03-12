@@ -16,7 +16,10 @@
                     <p class="text-green-600 text-sm">Transfer ownership from: <span class="font-semibold">{{$client->LastName}}, {{ $client->FirstName}} {{ $client->MiddleName }}</span></p>
                 </div>
                 <div>
-                    <a href="/client" class="inline-flex items-center px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-200" role="button">
+                    @php
+                        $statusQuery = request('status') ? ('?status=' . urlencode(request('status'))) : '';
+                    @endphp
+                    <a href="/client{{ $statusQuery }}" class="inline-flex items-center px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-200" role="button">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                         </svg>

@@ -2,18 +2,18 @@
 @extends('layouts.main')
 
 @section('styles')
-<style>
-    .custom-select {
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3e%3c/svg%3e");
-        background-repeat: no-repeat;
-        background-position: right 0.75rem center;
-        background-size: 1.25rem;
-        padding-right: 2.5rem;
-    }
-</style>
+    <style>
+        .custom-select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1.25rem;
+            padding-right: 2.5rem;
+        }
+    </style>
 @endsection
 
 @section('content')
@@ -71,7 +71,10 @@
 
         <!-- Action Buttons -->
         <div class="flex flex-wrap gap-4 mb-6">
-            <a href="/client-view/{{ $client->Id }}"
+            @php
+                $statusQuery = request('status') ? ('?status=' . urlencode(request('status'))) : '';
+            @endphp
+            <a href="/client-view/{{ $client->Id }}{{ $statusQuery }}"
                 class="inline-flex items-center px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -136,11 +139,15 @@
                                     placeholder="Enter middle name" />
                             </div>
                             <div>
-                                <label for="gender" class="block text-sm font-medium text-gray-700 mb-1">Gender <span class="text-red-500">*</span></label>
-                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-200 bg-white custom-select" id="gender" name="gender">
+                                <label for="gender" class="block text-sm font-medium text-gray-700 mb-1">Gender <span
+                                        class="text-red-500">*</span></label>
+                                <select
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-200 bg-white custom-select"
+                                    id="gender" name="gender">
                                     @php $selectedGender = old('gender'); @endphp
                                     <option value="Male" {{ $selectedGender === 'Male' ? 'selected' : '' }}>Male</option>
-                                    <option value="Female" {{ $selectedGender === 'Female' ? 'selected' : '' }}>Female</option>
+                                    <option value="Female" {{ $selectedGender === 'Female' ? 'selected' : '' }}>Female
+                                    </option>
                                 </select>
                                 @error('gender')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -176,8 +183,11 @@
                         <!-- Region & Branch -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label for="region" class="block text-sm font-medium text-gray-700 mb-1">Region <span class="text-red-500">*</span></label>
-                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-200 bg-white custom-select" id="region" name="region">
+                                <label for="region" class="block text-sm font-medium text-gray-700 mb-1">Region <span
+                                        class="text-red-500">*</span></label>
+                                <select
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-200 bg-white custom-select"
+                                    id="region" name="region">
                                     @php $selectedRegion = old('region'); @endphp
                                     @foreach($regions as $region)
                                         <option value="{{ $region->Id }}" {{ $selectedRegion == $region->Id ? 'selected' : '' }}>
@@ -190,8 +200,11 @@
                                 @enderror
                             </div>
                             <div>
-                                <label for="branch" class="block text-sm font-medium text-gray-700 mb-1">Branch <span class="text-red-500">*</span></label>
-                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-200 bg-white custom-select" id="branch" name="branch">
+                                <label for="branch" class="block text-sm font-medium text-gray-700 mb-1">Branch <span
+                                        class="text-red-500">*</span></label>
+                                <select
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-200 bg-white custom-select"
+                                    id="branch" name="branch">
                                     @php $selectedBranch = old('branch'); @endphp
                                     @foreach($branches as $branch)
                                         <option value="{{ $branch->Id }}" {{ $selectedBranch == $branch->Id ? 'selected' : '' }}>
@@ -210,8 +223,11 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 @php $selectedProvince = old('province'); @endphp
-                                <label for="province" class="block text-sm font-medium text-gray-700 mb-1">Province <span class="text-red-500">*</span></label>
-                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-200 bg-white custom-select" id="province" name="province">
+                                <label for="province" class="block text-sm font-medium text-gray-700 mb-1">Province <span
+                                        class="text-red-500">*</span></label>
+                                <select
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-200 bg-white custom-select"
+                                    id="province" name="province">
                                     @foreach($provinces as $province)
                                         <option value="{{ $province->Province }}" {{ $selectedProvince == $province->Province ? 'selected' : '' }}>
                                             {{ $province->Province }}
@@ -224,9 +240,12 @@
                             </div>
                             <div>
                                 @php $selectedCity = old('city'); @endphp
-                                <label for="city" class="block text-sm font-medium text-gray-700 mb-1">City <span class="text-red-500">*</span></label>
+                                <label for="city" class="block text-sm font-medium text-gray-700 mb-1">City <span
+                                        class="text-red-500">*</span></label>
                                 <input type="hidden" id="prevCity" value="{{ $selectedCity }}" />
-                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-200 bg-white custom-select" id="city" name="city">
+                                <select
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-200 bg-white custom-select"
+                                    id="city" name="city">
                                     @foreach($cities as $city)
                                         <option value="{{ $city->City }}" {{ $selectedCity == $city->City ? 'selected' : '' }}>
                                             {{ $city->City }}
@@ -243,9 +262,12 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 @php $selectedBarangay = old('barangay'); @endphp
-                                <label for="barangay" class="block text-sm font-medium text-gray-700 mb-1">Barangay <span class="text-red-500">*</span></label>
+                                <label for="barangay" class="block text-sm font-medium text-gray-700 mb-1">Barangay <span
+                                        class="text-red-500">*</span></label>
                                 <input type="hidden" id="prevBarangay" value="{{ $selectedBarangay }}" />
-                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-200 bg-white custom-select" id="barangay" name="barangay">
+                                <select
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-200 bg-white custom-select"
+                                    id="barangay" name="barangay">
                                     @foreach($barangays as $barangay)
                                         <option value="{{ $barangay->Barangay }}" {{ $selectedBarangay == $barangay->Barangay ? 'selected' : '' }}>
                                             {{ $barangay->Barangay }}
@@ -339,10 +361,14 @@
                         <!-- Payment Method & Payment Date -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label for="paymentMethod" class="block text-sm font-medium text-gray-700 mb-1">Payment Method</label>
-                                <select class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-200 bg-white custom-select" id="paymentMethod" name="paymentmethod">
+                                <label for="paymentMethod" class="block text-sm font-medium text-gray-700 mb-1">Payment
+                                    Method</label>
+                                <select
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-200 bg-white custom-select"
+                                    id="paymentMethod" name="paymentmethod">
                                     @php $selectedPaymentMethod = old('paymentmethod'); @endphp
-                                    <option value="Cash" {{ $selectedPaymentMethod === 'Cash' ? 'selected' : '' }}>Cash</option>
+                                    <option value="Cash" {{ $selectedPaymentMethod === 'Cash' ? 'selected' : '' }}>Cash
+                                    </option>
                                 </select>
                                 @error('paymentmethod')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>

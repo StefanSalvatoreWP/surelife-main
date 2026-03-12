@@ -38,7 +38,10 @@
 
         <!-- Return Button -->
         <div class="mb-6">
-            <a href="/client-view/{{ $clients->Id }}" class="inline-flex items-center px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-lg transition duration-200 ease-in-out">Return</a>
+            @php
+                $statusQuery = request('status') ? ('?status=' . urlencode(request('status'))) : '';
+            @endphp
+            <a href="/client-view/{{ $clients->Id }}{{ $statusQuery }}" class="inline-flex items-center px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-lg transition duration-200 ease-in-out">Return</a>
         </div>
         @php
             $canEditContractNumber = $canEditContractNumber ?? false;

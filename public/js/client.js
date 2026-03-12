@@ -76,9 +76,11 @@ $(document).ready(function () {
                     var viewIcon = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>';
                     var deleteIcon = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>';
                     var menuIcon = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/></svg>';
-                    
-                    var viewLink = '<a href="/client-view/' + row.Id + '" class="dropdown-item">' + viewIcon + ' View</a>';
-                    
+
+                    var status = new URLSearchParams(window.location.search).get('status') || '';
+                    var statusQuery = status ? '?status=' + encodeURIComponent(status) : '';
+                    var viewLink = '<a href="/client-view/' + row.Id + statusQuery + '" class="dropdown-item">' + viewIcon + ' View</a>';
+
                     var deleteLink;
                     if (row.Status != '3') {
                         deleteLink = '<a href="#" data-client-id="' + row.Id + '" data-client-name="' + row.LastName + ', ' + row.FirstName + '" class="dropdown-item dropdown-item-danger">' + deleteIcon + ' Delete</a>';
@@ -89,9 +91,9 @@ $(document).ready(function () {
                     return '<div class="action-dropdown">' +
                         '<button class="action-dropdown-btn" onclick="toggleDropdown(this)" aria-label="Actions" title="More actions">' + menuIcon + '</button>' +
                         '<div class="action-dropdown-menu" role="menu">' +
-                            viewLink + deleteLink +
+                        viewLink + deleteLink +
                         '</div>' +
-                    '</div>';
+                        '</div>';
                 }
             }
         ],
@@ -150,7 +152,7 @@ $(document).ready(function () {
     });
 
     // Global function to handle client deletion
-    window.submitDeleteClient = function(clientId) {
+    window.submitDeleteClient = function (clientId) {
         // Use fetch for AJAX delete to avoid page reload and banner
         fetch('/client-delete-submit/' + clientId, {
             method: 'DELETE',
@@ -160,44 +162,44 @@ $(document).ready(function () {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || document.querySelector('input[name="_token"]')?.value
             }
         })
-        .then(async (response) => {
-            const contentType = response.headers.get('content-type') || '';
-            const isJson = contentType.includes('application/json');
+            .then(async (response) => {
+                const contentType = response.headers.get('content-type') || '';
+                const isJson = contentType.includes('application/json');
 
-            const payload = isJson ? await response.json() : await response.text();
+                const payload = isJson ? await response.json() : await response.text();
 
-            if (!response.ok) {
-                const message = isJson
-                    ? (payload && payload.message ? payload.message : 'Failed to delete client.')
-                    : 'Failed to delete client.';
-                throw new Error(message);
-            }
+                if (!response.ok) {
+                    const message = isJson
+                        ? (payload && payload.message ? payload.message : 'Failed to delete client.')
+                        : 'Failed to delete client.';
+                    throw new Error(message);
+                }
 
-            return payload;
-        })
-        .then(data => {
-            if (data.success) {
-                // Show success modal and reload page after user clicks OK
-                showSwiftModal(
-                    'Success!',
-                    'Client deleted successfully.',
-                    'success',
-                    [
-                        {
-                            text: 'OK',
-                            class: 'bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg',
-                            action: 'window.location.reload()'
-                        }
-                    ]
-                );
-            } else {
-                showSwiftModal('Error', data.message || 'Failed to delete client.', 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Delete error:', error);
-            showSwiftModal('Error', error?.message || 'An error occurred while deleting the client.', 'error');
-        });
+                return payload;
+            })
+            .then(data => {
+                if (data.success) {
+                    // Show success modal and reload page after user clicks OK
+                    showSwiftModal(
+                        'Success!',
+                        'Client deleted successfully.',
+                        'success',
+                        [
+                            {
+                                text: 'OK',
+                                class: 'bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg',
+                                action: 'window.location.reload()'
+                            }
+                        ]
+                    );
+                } else {
+                    showSwiftModal('Error', data.message || 'Failed to delete client.', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Delete error:', error);
+                showSwiftModal('Error', error?.message || 'An error occurred while deleting the client.', 'error');
+            });
     };
 });
 
@@ -206,7 +208,7 @@ function toggleDropdown(btn) {
     const dropdown = btn.closest('.action-dropdown');
     const menu = dropdown.querySelector('.action-dropdown-menu');
     const isOpen = menu.classList.contains('show');
-    
+
     // Close all other dropdowns
     document.querySelectorAll('.action-dropdown-menu.show').forEach(m => {
         m.classList.remove('show');
@@ -215,7 +217,7 @@ function toggleDropdown(btn) {
         d.classList.remove('open');
     });
     document.body.classList.remove('dropdown-open');
-    
+
     // Toggle current dropdown
     if (!isOpen) {
         menu.classList.add('show');
@@ -225,7 +227,7 @@ function toggleDropdown(btn) {
 }
 
 // Close dropdown when clicking outside
-document.addEventListener('click', function(e) {
+document.addEventListener('click', function (e) {
     if (!e.target.closest('.action-dropdown')) {
         document.querySelectorAll('.action-dropdown-menu.show').forEach(m => {
             m.classList.remove('show');
