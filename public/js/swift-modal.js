@@ -16,6 +16,19 @@ function showSwiftModal(title, message, type = 'error', buttons = []) {
         return;
     }
 
+    // Auto-detect type from title if not explicitly set or set to default 'error'
+    // This fixes missing type parameter in blade templates
+    if (type === 'error' || !type) {
+        const titleLower = title.toLowerCase();
+        if (titleLower.includes('success')) {
+            type = 'success';
+        } else if (titleLower.includes('warning') || titleLower.includes('confirm')) {
+            type = 'warning';
+        } else if (titleLower.includes('error') || titleLower.includes('failed') || titleLower.includes('reject')) {
+            type = 'error';
+        }
+    }
+
     // Set icon based on type
     const icons = {
         success: `<svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -93,9 +106,15 @@ function showSwiftModal(title, message, type = 'error', buttons = []) {
     };
 
     if (!buttons || buttons.length === 0) {
+        // Default button styling based on modal type
+        const defaultButtonClasses = {
+            success: 'bg-green-500 hover:bg-green-600 text-white',
+            error: 'bg-red-500 hover:bg-red-600 text-white',
+            warning: 'bg-yellow-500 hover:bg-yellow-600 text-white'
+        };
         addButton({
             text: 'OK',
-            class: 'bg-gray-100 hover:bg-gray-200 text-gray-800',
+            class: defaultButtonClasses[type] || 'bg-gray-100 hover:bg-gray-200 text-gray-800',
             action: null
         });
     } else {

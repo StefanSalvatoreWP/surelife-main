@@ -3654,6 +3654,7 @@ class ClientController extends Controller
         $loanStatus = $hasLoanRequest->Status ?? 'Ready';
 
         if ($latestLoanRequest) {
+            // Get payments for current/latest loan (for balance calculation)
             $loanPayments = LoanPayment::query()
                 ->where('clientid', $clientDetails->Id)
                 ->where('loanrequestid', $latestLoanRequest->Id)

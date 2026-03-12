@@ -121,30 +121,21 @@
     </div>
 </div>
 
-<!-- Delete Modal -->
-<div id="deleteModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
-    <div class="w-full max-w-md sm:max-w-lg lg:max-w-md mx-auto bg-white rounded-lg shadow-xl">
-        <div class="p-4 sm:p-6">
-            <h3 class="text-base sm:text-lg font-medium text-gray-900 mb-3 sm:mb-4">Confirm Delete</h3>
-            <p class="text-gray-600 mb-2">Delete selected loan request?</p>
-            <p class="text-red-600 text-sm mb-4">You cannot undo this action. Continue?</p>
-            <form id="deleteForm" method="POST">
-                @csrf
-                @method('DELETE')
-                <div class="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0">
-                    <button type="button" onclick="closeDeleteModal()" 
-                        class="w-full sm:w-auto bg-gray-500 hover:bg-gray-700 text-white font-bold py-3 px-4 sm:py-2 sm:px-4 rounded focus:outline-none focus:shadow-outline text-sm sm:text-base min-h-[44px]">
-                        Cancel
-                    </button>
-                    <button type="button" onclick="confirmDelete()" 
-                        class="w-full sm:w-auto bg-red-500 hover:bg-red-700 text-white font-bold py-3 px-4 sm:py-2 sm:px-4 rounded focus:outline-none focus:shadow-outline text-sm sm:text-base min-h-[44px]">
-                        Delete
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+<!-- Delete Modal - Using Swift Modal -->
+<script>
+    function openDeleteModal(id) {
+        currentDeleteId = id;
+        showSwiftModal('Confirm Delete', 'Delete selected loan request?\n\nYou cannot undo this action. Continue?', 'warning', [
+            {text: 'Delete', class: 'bg-red-500 hover:bg-red-600 text-white', action: function() { document.getElementById('deleteForm').submit(); }},
+            {text: 'Cancel', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+        ]);
+        document.getElementById('deleteForm').action = '/submit-req-loan-delete/' + id;
+    }
+</script>
+<form id="deleteForm" method="POST" class="hidden">
+    @csrf
+    @method('DELETE')
+</form>
 
 @section('scripts')
 <script>
@@ -263,21 +254,6 @@
         document.getElementById('remarksModal').classList.add('hidden');
     }
 
-    function openDeleteModal(id) {
-        currentDeleteId = id;
-        document.getElementById('deleteForm').action = '/submit-req-loan-delete/' + id;
-        document.getElementById('deleteModal').classList.remove('hidden');
-    }
-
-    function closeDeleteModal() {
-        document.getElementById('deleteModal').classList.add('hidden');
-        currentDeleteId = null;
-    }
-
-    function confirmDelete() {
-        document.getElementById('deleteForm').submit();
-    }
-
     // Toggle dropdown for 3-dots menu
     function toggleDropdown(btn) {
         const dropdown = btn.closest('.action-dropdown');
@@ -304,12 +280,8 @@
     // Close modals when clicking outside
     window.onclick = function(event) {
         let remarksModal = document.getElementById('remarksModal');
-        let deleteModal = document.getElementById('deleteModal');
         if (event.target == remarksModal) {
             closeRemarksModal();
-        }
-        if (event.target == deleteModal) {
-            closeDeleteModal();
         }
     }
 </script>

@@ -10,11 +10,11 @@
             </div>
             @if(session('success'))
                 @push('scripts')
-                    <script>showSwiftModal('Success!', '{{ session('success') }}');</script>
+                    <script>showSwiftModal('Success!', '{{ session('success') }}', 'success');</script>
                 @endpush
             @elseif(session('error'))
                 @push('scripts')
-                    <script>showSwiftModal('Error', '{{ session('error') }}');</script>
+                    <script>showSwiftModal('Error', '{{ session('error') }}', 'error');</script>
                 @endpush
             @endif
         </div>

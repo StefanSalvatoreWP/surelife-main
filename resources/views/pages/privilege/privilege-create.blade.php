@@ -10,15 +10,15 @@
             </div>
             @if(session('error'))
                 @push('scripts')
-                    <script>showSwiftModal('Error', '{{ session('error') }}');</script>
+                    <script>showSwiftModal('Error', '{{ session('error') }}', 'error');</script>
                 @endpush
             @elseif(session('success'))
                 @push('scripts')
-                    <script>showSwiftModal('Success!', '{{ session('success') }}');</script>
+                    <script>showSwiftModal('Success!', '{{ session('success') }}', 'success');</script>
                 @endpush
             @elseif(session('warning'))
                 @push('scripts')
-                    <script>showSwiftModal('Warning', '{{ session('warning') }}');</script>
+                    <script>showSwiftModal('Warning', '{{ session('warning') }}', 'warning');</script>
                 @endpush
             @endif
             <a href="/privilege-create" class="btn btn-outline-primary btn-sm" role="button">Create new branch</a>

@@ -235,7 +235,7 @@ class LoanPaymentController extends Controller
             LoanRequest::where('id', $loanRequestData->Id)->update($updateLoanRequestData);
         }
 
-        return redirect('/client-view/' . $client->Id)->with('success', 'Added new loan payment!');
+        return redirect('/client-view/' . $client->Id . '#loan')->with('success', 'Added new loan payment!');
     }
 
     // void selected client loan payment

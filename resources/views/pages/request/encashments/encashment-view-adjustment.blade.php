@@ -10,7 +10,7 @@
             </div>
             @if(session('duplicate'))
                 @push('scripts')
-                    <script>showSwiftModal('Error', '{{ session('duplicate') }}');</script>
+                    <script>showSwiftModal('Error', '{{ session('duplicate') }}', 'error');</script>
                 @endpush
             @endif
             <a href="/view-req-encashment/{{ $encashmentData->Id }}" class="btn btn-outline-secondary btn-sm" role="button">Return</a>

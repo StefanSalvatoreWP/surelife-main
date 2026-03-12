@@ -152,9 +152,16 @@ function loadPaymentHistoryTable(clientId){
         pageLength: 10,
         lengthMenu: [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, "All"]],
         responsive: true,
+        autoWidth: false,
         columnDefs: [
             { targets: 0, visible: false },
-            { targets: 7, orderable: false }
+            { targets: 1, width: '80px' },  // Series Code
+            { targets: 2, width: '100px' }, // OR No.
+            { targets: 3, width: '120px' }, // Amount Paid
+            { targets: 4, width: '100px' }, // Installment
+            { targets: 5, width: '100px' }, // Date
+            { targets: 6, width: '150px' }, // Payment Particular
+            { targets: 7, width: '100px', orderable: false }  // Action
         ]
     });
     $('#common_dataTable_filter input').on('keyup', function() {

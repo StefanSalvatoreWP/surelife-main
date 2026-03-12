@@ -149,7 +149,7 @@ class LoanRequestController extends Controller
         LoanRequest::where('Id', $loanRequest->Id)->update($updateData);
         Log::channel('activity')->info('[StaffID] ' . session('user_id') . ' [Menu] Loan Request ' . '[Action] Update ' . '[Target] ' . $loanRequest->Id);
 
-        return redirect('/req-loans')->with('success', 'Selected loan request has been updated!');
+        return redirect('/req-loans/view/' . $loanRequest->Id)->with('success', 'Selected loan request has been updated!');
     }
 
     public function deleteLoanRequet(LoanRequest $loanRequest)
