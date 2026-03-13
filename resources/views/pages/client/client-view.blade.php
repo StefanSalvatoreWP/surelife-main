@@ -128,240 +128,699 @@
                     </script>
                 @endpush
             @else
-                    @push('scripts')
-                        <script>
-                            document.addEventListener('DOMContentLoaded', function () {
-                                showSwiftModal('Success', '{{ session('success') }}', 'success');
-                            });
-                        </script>
-                    @endpush
+                @push('scripts')
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            showSwiftModal('Success', '{{ session('success') }}', 'success');
+                        });
+                    </script>
+                @endpush
+            @endif
+        @elseif(session('warning'))
+            <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-6 rounded-lg shadow-sm">
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 text-yellow-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    <p class="text-yellow-700 font-medium">{{ session('warning') }}</p>
+                </div>
+            </div>
+        @elseif(session('approve-cfp-success'))
+            <div class="bg-green-50 border-l-4 border-green-500 p-4 mb-6 rounded-lg shadow-sm">
+                <div class="flex items-center">
                     <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd"
                             d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
                             clip-rule="evenodd" />
                     </svg>
-                    <p class="text-green-700 font-medium">{{ session('success') }}</p>
+                    <p class="text-green-700 font-medium">{{ session('approve-cfp-success') }}</p>
                 </div>
-                </div>
-            @endif
-        @elseif(session('warning'))
-        <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-6 rounded-lg shadow-sm">
-            <div class="flex items-center">
-                <svg class="w-5 h-5 text-yellow-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd"
-                        d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                        clip-rule="evenodd" />
-                </svg>
-                <p class="text-yellow-700 font-medium">{{ session('warning') }}</p>
             </div>
-        </div>
-    @elseif(session('approve-cfp-success'))
-        <div class="bg-green-50 border-l-4 border-green-500 p-4 mb-6 rounded-lg shadow-sm">
-            <div class="flex items-center">
-                <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                        clip-rule="evenodd" />
-                </svg>
-                <p class="text-green-700 font-medium">{{ session('approve-cfp-success') }}</p>
-            </div>
-        </div>
-    @endif
-
-    <!-- Action Buttons -->
-    <div class="flex flex-wrap gap-4 mb-6">
-        @php
-            $statusQuery = request('status') ? ('?status=' . urlencode(request('status'))) : '';
-        @endphp
-        <a href="{{ '/client' . $statusQuery }}"
-            class="inline-flex items-center px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Return
-        </a>
-        <a href="/client-update/{{ $clients->cid }}{{ $statusQuery }}"
-            class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-            </svg>
-            Update
-        </a>
-        <input type="hidden" id="clientid" value="{{ $clients->cid }}" />
-        @if($clients->Status == '1')
-            <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 cursor-pointer"
-                onclick="showSwiftModal('Verify Client', 'You are going to verify the selected client {{ $clients->LastName . ', ' . $clients->FirstName }}. You cannot undo this action. Continue?', 'warning', [{text: 'Confirm', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitVerifyClient()'}, {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}])"
-                role="button">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Verify
-            </a>
-        @elseif($clients->Status == '2')
-            <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 cursor-pointer"
-                onclick="showSwiftModal('Approve Client', 'You are going to approve the selected client. You cannot undo this action. Continue?', 'warning', [{text: 'Confirm', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitApproveClient()'}, {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}])"
-                role="button">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Approve
-            </a>
         @endif
-        <div class="ml-auto flex gap-4">
-            @if(!$canTransfer || ($canTransfer && $canTransfer->TransferClientId == null))
-                {{-- Enable transfer if no record exists OR if record exists but transfer not yet completed --}}
-                <a href="/transfer-client-create/{{ $clients->cid }}{{ $statusQuery }}"
-                    class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-                    role="button">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                    </svg>
-                    Transfer Ownership
-                </a>
-            @else
-                {{-- Disable transfer if a transfer is already in progress (TransferClientId is set) --}}
-                <button
-                    class="inline-flex items-center px-6 py-3 bg-gray-400 text-white font-semibold rounded-lg shadow-md cursor-not-allowed opacity-60"
-                    role="button" disabled>
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                    </svg>
-                    Transfer Ownership
-                </button>
-            @endif
 
-            @if(!$clients->CompletedMemorial || $clients->CompletedMemorial == 0)
-                <a onclick="showSwiftModal('Complete Memorial Service', 'You are going to mark the selected client as having completed the memorial service. You cannot undo this action. Continue?', 'warning', [{text: 'Confirm', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCompleteMemorial()'}, {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}])"
-                    class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer"
+        <!-- Action Buttons -->
+        <div class="flex flex-wrap gap-4 mb-6">
+            @php
+                $statusQuery = request('status') ? ('?status=' . urlencode(request('status'))) : '';
+            @endphp
+            <a href="{{ '/client' . $statusQuery }}"
+                class="inline-flex items-center px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Return
+            </a>
+            <a href="/client-update/{{ $clients->cid }}{{ $statusQuery }}"
+                class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                Update
+            </a>
+            <input type="hidden" id="clientid" value="{{ $clients->cid }}" />
+            @if($clients->Status == '1')
+                <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 cursor-pointer"
+                    onclick="showSwiftModal('Verify Client', 'You are going to verify the selected client {{ $clients->LastName . ', ' . $clients->FirstName }}. You cannot undo this action. Continue?', 'warning', [{text: 'Confirm', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitVerifyClient()'}, {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}])"
                     role="button">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    Completed Service
+                    Verify
+                </a>
+            @elseif($clients->Status == '2')
+                <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 cursor-pointer"
+                    onclick="showSwiftModal('Approve Client', 'You are going to approve the selected client. You cannot undo this action. Continue?', 'warning', [{text: 'Confirm', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitApproveClient()'}, {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}])"
+                    role="button">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Approve
                 </a>
             @endif
-        </div>
-    </div>
-    <!-- Tabs Navigation -->
-    <ul class="flex flex-wrap border-b border-gray-200 mb-6" id="clientTabs" role="tablist">
-        <li class="mr-2" role="presentation">
-            <button
-                class="inline-block px-6 py-3 rounded-t-lg {{ $message === 'client' ? 'text-purple-600 border-b-2 border-purple-600 font-semibold' : 'text-gray-500 hover:text-purple-600 hover:border-purple-300' }}"
-                id="client-info-tab" data-bs-toggle="tab" data-bs-target="#clientInfo" type="button" role="tab"
-                aria-controls="clientInfo" aria-selected="{{ $message === 'client' ? 'true' : 'false' }}">Client
-                Information</button>
-        </li>
-        <li class="mr-2" role="presentation">
-            <button
-                class="inline-block px-6 py-3 rounded-t-lg {{ $message === 'payment' ? 'text-purple-600 border-b-2 border-purple-600 font-semibold' : 'text-gray-500 hover:text-purple-600 hover:border-purple-300' }}"
-                id="payment-history-tab" data-bs-toggle="tab" data-bs-target="#paymentHistory" type="button" role="tab"
-                aria-controls="paymentHistory" aria-selected="{{ $message === 'payment' ? 'true' : 'false' }}">Payment
-                History</button>
-        </li>
-        <li class="mr-2" role="presentation">
-            <button
-                class="inline-block px-6 py-3 rounded-t-lg {{ $message === 'loan' ? 'text-purple-600 border-b-2 border-purple-600 font-semibold' : 'text-gray-500 hover:text-purple-600 hover:border-purple-300' }}"
-                id="loan-payments-tab" data-bs-toggle="tab" data-bs-target="#loanPayments" type="button" role="tab"
-                aria-controls="loanPayments" aria-selected="{{ $message === 'loan' ? 'true' : 'false' }}">Loan
-                Payments</button>
-        </li>
-        <li class="mr-2" role="presentation">
-            <button
-                class="inline-block px-6 py-3 rounded-t-lg {{ $message === 'assign' ? 'text-purple-600 border-b-2 border-purple-600 font-semibold' : 'text-gray-500 hover:text-purple-600 hover:border-purple-300' }}"
-                id="assigned-member-tab" data-bs-toggle="tab" data-bs-target="#assignedMember" type="button" role="tab"
-                aria-controls="assignedMember" aria-selected="{{ $message === 'assign' ? 'true' : 'false' }}">Assigned
-                Member</button>
-        </li>
-    </ul>
-    <div class="tab-content" id="clientTabsContent">
-        <div class="tab-pane fade {{ $message === 'client' ? 'show active' : '' }}" id="clientInfo" role="tabpanel"
-            aria-labelledby="client-info-tab">
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-indigo-50">
-                    <h3 class="text-lg font-semibold text-gray-800 flex items-center">
-                        <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="ml-auto flex gap-4">
+                @if(!$canTransfer || ($canTransfer && $canTransfer->TransferClientId == null))
+                    {{-- Enable transfer if no record exists OR if record exists but transfer not yet completed --}}
+                    <a href="/transfer-client-create/{{ $clients->cid }}{{ $statusQuery }}"
+                        class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                        role="button">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                         </svg>
-                        Client Information
-                    </h3>
-                </div>
-                <div class="p-6 space-y-6">
-                    <!-- Contract Section -->
-                    <div>
-                        <h4
-                            class="text-sm font-bold text-purple-700 uppercase tracking-wide mb-3 pb-2 border-b-2 border-purple-200">
-                            Contract</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Contract No.</label>
-                                <input type="text"
-                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
-                                    value="{{ $clients->ContractNumber }}" readonly />
+                        Transfer Ownership
+                    </a>
+                @else
+                    {{-- Disable transfer if a transfer is already in progress (TransferClientId is set) --}}
+                    <button
+                        class="inline-flex items-center px-6 py-3 bg-gray-400 text-white font-semibold rounded-lg shadow-md cursor-not-allowed opacity-60"
+                        role="button" disabled>
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                        </svg>
+                        Transfer Ownership
+                    </button>
+                @endif
+
+                @if(!$clients->CompletedMemorial || $clients->CompletedMemorial == 0)
+                    <a onclick="showSwiftModal('Complete Memorial Service', 'You are going to mark the selected client as having completed the memorial service. You cannot undo this action. Continue?', 'warning', [{text: 'Confirm', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCompleteMemorial()'}, {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}])"
+                        class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer"
+                        role="button">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Completed Service
+                    </a>
+                @endif
+            </div>
+        </div>
+        <!-- Tabs Navigation -->
+        <ul class="flex flex-wrap border-b border-gray-200 mb-6" id="clientTabs" role="tablist">
+            <li class="mr-2" role="presentation">
+                <button
+                    class="inline-block px-6 py-3 rounded-t-lg {{ $message === 'client' ? 'text-purple-600 border-b-2 border-purple-600 font-semibold' : 'text-gray-500 hover:text-purple-600 hover:border-purple-300' }}"
+                    id="client-info-tab" data-bs-toggle="tab" data-bs-target="#clientInfo" type="button" role="tab"
+                    aria-controls="clientInfo" aria-selected="{{ $message === 'client' ? 'true' : 'false' }}">Client
+                    Information</button>
+            </li>
+            <li class="mr-2" role="presentation">
+                <button
+                    class="inline-block px-6 py-3 rounded-t-lg {{ $message === 'payment' ? 'text-purple-600 border-b-2 border-purple-600 font-semibold' : 'text-gray-500 hover:text-purple-600 hover:border-purple-300' }}"
+                    id="payment-history-tab" data-bs-toggle="tab" data-bs-target="#paymentHistory" type="button" role="tab"
+                    aria-controls="paymentHistory" aria-selected="{{ $message === 'payment' ? 'true' : 'false' }}">Payment
+                    History</button>
+            </li>
+            <li class="mr-2" role="presentation">
+                <button
+                    class="inline-block px-6 py-3 rounded-t-lg {{ $message === 'loan' ? 'text-purple-600 border-b-2 border-purple-600 font-semibold' : 'text-gray-500 hover:text-purple-600 hover:border-purple-300' }}"
+                    id="loan-payments-tab" data-bs-toggle="tab" data-bs-target="#loanPayments" type="button" role="tab"
+                    aria-controls="loanPayments" aria-selected="{{ $message === 'loan' ? 'true' : 'false' }}">Loan
+                    Payments</button>
+            </li>
+            <li class="mr-2" role="presentation">
+                <button
+                    class="inline-block px-6 py-3 rounded-t-lg {{ $message === 'assign' ? 'text-purple-600 border-b-2 border-purple-600 font-semibold' : 'text-gray-500 hover:text-purple-600 hover:border-purple-300' }}"
+                    id="assigned-member-tab" data-bs-toggle="tab" data-bs-target="#assignedMember" type="button" role="tab"
+                    aria-controls="assignedMember" aria-selected="{{ $message === 'assign' ? 'true' : 'false' }}">Assigned
+                    Member</button>
+            </li>
+        </ul>
+        <div class="tab-content" id="clientTabsContent">
+            <div class="tab-pane fade {{ $message === 'client' ? 'show active' : '' }}" id="clientInfo" role="tabpanel"
+                aria-labelledby="client-info-tab">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-indigo-50">
+                        <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                            Client Information
+                        </h3>
+                    </div>
+                    <div class="p-6 space-y-6">
+                        <!-- Contract Section -->
+                        <div>
+                            <h4
+                                class="text-sm font-bold text-purple-700 uppercase tracking-wide mb-3 pb-2 border-b-2 border-purple-200">
+                                Contract</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Contract No.</label>
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->ContractNumber }}" readonly />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Package</label>
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->Package }}" readonly />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Term</label>
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->Term . ' ( ₱ ' . number_format($base_price, 2) . ' )' }}"
+                                        readonly />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Region</label>
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->RegionName }}" readonly />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Branch</label>
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->BranchName }}" readonly />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Best place to
+                                        collect</label>
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->BestPlaceToCollect }}" readonly />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Best time to collect</label>
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->BestTimeToCollect }}" readonly />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Client Status</label>
+                                    <div
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 flex items-center h-[42px] cursor-default">
+                                        @if($clients->Status == '1')
+                                            <span
+                                                class="px-3 py-1 rounded-full text-xs font-semibold bg-gray-200 text-gray-700">Pending</span>
+                                        @elseif($clients->Status == '2')
+                                            <span
+                                                class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-200 text-blue-700">Verified</span>
+                                        @elseif($clients->Status == '3')
+                                            <span
+                                                class="px-3 py-1 rounded-full text-xs font-semibold bg-green-200 text-green-700">Approved</span>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                @php
+                                    $paymentStatus = 'Active';
+                                    $statusClass = 'bg-green-200 text-green-700';
+
+                                    // Term lapse threshold in months
+                                    $lapseMonths = match ($clients->Term) {
+                                        'Monthly' => 1,
+                                        'Quarterly' => 3,
+                                        'Semi-Annual' => 6,
+                                        'Annual' => 12,
+                                        default => 1,
+                                    };
+                                    $lapseCutoff = \Carbon\Carbon::now()->subMonths($lapseMonths);
+
+                                    if ($isFullyPaid || $totalValidPayments >= $total_price) {
+                                        $paymentStatus = 'Fully Paid';
+                                        $statusClass = 'bg-green-300 text-green-800';
+                                    } else {
+                                        // If there are no valid payments, use the client's DateCreated as the reference point
+                                        $referenceDate = $lastValidPaymentDate ?? \Carbon\Carbon::parse($clients->DateCreated);
+
+                                        if ($referenceDate->lt($lapseCutoff)) {
+                                            $paymentStatus = 'Lapse';
+                                            $statusClass = 'bg-red-200 text-red-700';
+                                        }
+                                    }
+                                @endphp
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Payment Status</label>
+                                    <div
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 flex items-center h-[42px] cursor-default">
+                                        <span
+                                            class="px-3 py-1 rounded-full text-xs font-semibold {{ $statusClass }}">{{ $paymentStatus }}</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">FSA</label>
+                                    <div
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 flex items-center h-[42px] overflow-hidden cursor-default">
+                                        <span class="text-gray-900 truncate">
+                                            @if($clients->FSALastName)
+                                                {{ $clients->FSALastName . ', ' . $clients->FSAFirstName . ' ' . ($clients->FSAMiddleName ?? '') }}
+                                            @else
+                                                <span class="text-gray-400 italic">Not assigned</span>
+                                            @endif
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Package</label>
-                                <input type="text"
-                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
-                                    value="{{ $clients->Package }}" readonly />
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Term</label>
-                                <input type="text"
-                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
-                                    value="{{ $clients->Term . ' ( ₱ ' . number_format($base_price, 2) . ' )' }}"
-                                    readonly />
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Region</label>
-                                <input type="text"
-                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
-                                    value="{{ $clients->RegionName }}" readonly />
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Branch</label>
-                                <input type="text"
-                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
-                                    value="{{ $clients->BranchName }}" readonly />
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Best place to
-                                    collect</label>
-                                <input type="text"
-                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
-                                    value="{{ $clients->BestPlaceToCollect }}" readonly />
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Best time to collect</label>
-                                <input type="text"
-                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
-                                    value="{{ $clients->BestTimeToCollect }}" readonly />
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Client Status</label>
+                        </div>
+
+                        <!-- Personal Section -->
+                        <div>
+                            <h4
+                                class="text-sm font-bold text-purple-700 uppercase tracking-wide mb-3 pb-2 border-b-2 border-purple-200">
+                                Personal</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                                 <div
-                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 flex items-center h-[42px] cursor-default">
-                                    @if($clients->Status == '1')
-                                        <span
-                                            class="px-3 py-1 rounded-full text-xs font-semibold bg-gray-200 text-gray-700">Pending</span>
-                                    @elseif($clients->Status == '2')
-                                        <span
-                                            class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-200 text-blue-700">Verified</span>
-                                    @elseif($clients->Status == '3')
-                                        <span
-                                            class="px-3 py-1 rounded-full text-xs font-semibold bg-green-200 text-green-700">Approved</span>
-                                    @endif
+                                    class="md:col-span-2 lg:col-span-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                    <div class="lg:col-span-2">
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                                        <input type="text"
+                                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                            value="{{ $clients->LastName . ', ' . $clients->FirstName . " " . $clients->MiddleName }}"
+                                            readonly />
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Birth Date</label>
+                                        <input type="text"
+                                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                            value="{{ $clients->BirthDate }}" readonly />
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Age</label>
+                                        <input type="text"
+                                            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                            value="{{ $clients->Age }}" readonly />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Gender</label>
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->Gender }}" readonly />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Civil Status</label>
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->CivilStatus }}" readonly />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Occupation</label>
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->Occupation }}" readonly />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Birth Place</label>
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->BirthPlace }}" readonly />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Province</label>
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->ProvinceDisplay ?? $clients->Province }}" readonly />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">City</label>
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->CityDisplay ?? $clients->City }}" readonly />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Barangay</label>
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->BarangayDisplay ?? $clients->Barangay }}" readonly />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Zipcode</label>
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->ZipCode }}" readonly />
+                                </div>
+                                <div class="lg:col-span-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Street</label>
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->Street }}" readonly />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Home Address Section -->
+                        <div>
+                            <h4
+                                class="text-sm font-bold text-purple-700 uppercase tracking-wide mb-3 pb-2 border-b-2 border-purple-200">
+                                Home Address</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Province</label>
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->HomeProvinceDisplay ?? $clients->HomeProvince ?? '-' }}"
+                                        readonly />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">City</label>
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->HomeCityDisplay ?? $clients->HomeCity ?? '-' }}" readonly />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Barangay</label>
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->HomeBarangayDisplay ?? $clients->HomeBarangay ?? '-' }}"
+                                        readonly />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Zipcode</label>
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->homezipcode ?? '-' }}" readonly />
+                                </div>
+                                <div class="lg:col-span-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Street</label>
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->HomeStreet ?? '-' }}" readonly />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contact Section -->
+                        <div>
+                            <h4
+                                class="text-sm font-bold text-purple-700 uppercase tracking-wide mb-3 pb-2 border-b-2 border-purple-200">
+                                Contact</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Telephone</label>
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->HomeNumber }}" readonly />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Mobile No.</label>
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->MobileNumber }}" readonly />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                                    @php
+                                        // Hide email if it starts with -@
+                                        $displayEmail = $clients->EmailAddress;
+                                        if (strpos($displayEmail, '-@') === 0) {
+                                            $displayEmail = '';
+                                        }
+                                    @endphp
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $displayEmail }}" readonly />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Beneficiaries Section -->
+                        <div>
+                            <h4
+                                class="text-sm font-bold text-purple-700 uppercase tracking-wide mb-3 pb-2 border-b-2 border-purple-200">
+                                Beneficiaries</h4>
+
+                            <!-- Principal Details -->
+                            <div class="mb-5 bg-purple-50 rounded-lg p-4 border border-purple-100">
+                                <h5
+                                    class="text-xs font-bold text-purple-800 uppercase tracking-wider mb-3 flex items-center">
+                                    <svg class="w-4 h-4 mr-1.5 text-purple-600" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                    </svg>
+                                    Principal Beneficiary
+                                </h5>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-600 mb-1">Name (Age)</label>
+                                        <input type="text"
+                                            class="w-full px-4 py-2 border border-purple-200 rounded-lg bg-white text-gray-900 cursor-default"
+                                            value="{{ $clients->PrincipalBeneficiaryName . ' (' . $clients->PrincipalBeneficiaryAge . ')'}}"
+                                            readonly />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-600 mb-1">Relationship</label>
+                                        <input type="text"
+                                            class="w-full px-4 py-2 border border-purple-200 rounded-lg bg-white text-gray-900 cursor-default"
+                                            value="{{ $clients->principalbeneficiaryrelation ?? 'Not Specified' }}"
+                                            readonly />
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-600 mb-1">Valid ID</label>
+                                        @if(!empty($clients->principalbeneficiaryid_path))
+                                            <button type="button" onclick="openIdModal()"
+                                                class="inline-flex items-center justify-center w-full px-4 py-2 border border-purple-300 text-purple-700 bg-purple-100 hover:bg-purple-200 rounded-lg transition duration-150 font-medium text-sm">
+                                                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                </svg>
+                                                View ID Document
+                                            </button>
+
+                                            <!-- Valid ID Modal -->
+                                            <div id="validIdModal" class="fixed inset-0 z-50 hidden overflow-y-auto"
+                                                aria-labelledby="modal-title" role="dialog" aria-modal="true">
+                                                <div
+                                                    class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                                                    <!-- Background overlay -->
+                                                    <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity"
+                                                        aria-hidden="true" onclick="closeIdModal()"></div>
+
+                                                    <span class="hidden sm:inline-block sm:align-middle sm:h-screen"
+                                                        aria-hidden="true">&#8203;</span>
+
+                                                    <!-- Modal panel -->
+                                                    <div
+                                                        class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full">
+                                                        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 relative">
+                                                            <div class="flex justify-between items-center mb-4">
+                                                                <h3 class="text-lg leading-6 font-medium text-gray-900"
+                                                                    id="modal-title">
+                                                                    Principal Beneficiary ID
+                                                                </h3>
+                                                                <button type="button" onclick="closeIdModal()"
+                                                                    class="text-gray-400 hover:text-gray-500 focus:outline-none focus:text-gray-500 transition ease-in-out duration-150">
+                                                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                                                        stroke="currentColor">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                                            stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                                    </svg>
+                                                                </button>
+                                                            </div>
+                                                            <div
+                                                                class="mt-2 flex justify-center bg-gray-100 rounded-lg p-2 min-h-[300px]">
+                                                                <img src="{{ asset('storage/' . $clients->principalbeneficiaryid_path) }}"
+                                                                    alt="Beneficiary ID"
+                                                                    class="max-w-full max-h-[70vh] object-contain rounded shadow-sm">
+                                                            </div>
+                                                        </div>
+                                                        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                                            <button type="button" onclick="closeIdModal()"
+                                                                class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-purple-600 text-base font-medium text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 sm:ml-3 sm:w-auto sm:text-sm">
+                                                                Close
+                                                            </button>
+                                                            <a href="{{ asset('storage/' . $clients->principalbeneficiaryid_path) }}"
+                                                                target="_blank"
+                                                                class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                                                                Open in New Tab
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <script>
+                                                function openIdModal() {
+                                                    document.getElementById('validIdModal').classList.remove('hidden');
+                                                    document.body.classList.add('overflow-hidden');
+                                                }
+                                                function closeIdModal() {
+                                                    document.getElementById('validIdModal').classList.add('hidden');
+                                                    document.body.classList.remove('overflow-hidden');
+                                                }
+                                            </script>
+                                        @else
+                                            <div
+                                                class="w-full px-4 py-2 border border-purple-200 rounded-lg bg-gray-50 text-gray-500 italic flex items-center justify-center text-sm">
+                                                <svg class="w-4 h-4 mr-1.5 opacity-50" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                No ID Uploaded
+                                            </div>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
 
+                            <!-- Other Beneficiaries -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Beneficiary 1 (Age)</label>
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->Secondary1Name . ' (' . $clients->Secondary1Age . ')'}}"
+                                        readonly />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Beneficiary 2 (Age)</label>
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->Secondary2Name . ' (' . $clients->Secondary2Age . ')'}}"
+                                        readonly />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Beneficiary 3 (Age)</label>
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->Secondary3Name . ' (' . $clients->Secondary3Age . ')'}}"
+                                        readonly />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Beneficiary 4 (Age)</label>
+                                    <input type="text"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
+                                        value="{{ $clients->Secondary4Name . ' (' . $clients->Secondary4Age . ')'}}"
+                                        readonly />
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade {{ $message === 'payment' ? 'show active' : '' }}" id="paymentHistory" role="tabpanel"
+                aria-labelledby="payment-history-tab">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-indigo-50">
+                        <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                            Payment History
+                        </h3>
+                    </div>
+                    <div class="p-6">
+                        {{-- Total price and balance calculations moved to top of file --}}
+
+                        <!-- Payment Summary Cards -->
+                        <div
+                            class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-{{ !$isFullyPaid ? '4' : '3' }} gap-4 mb-6">
+                            <!-- Package Price Card -->
+                            <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
+                                <div class="flex items-center justify-between">
+                                    <div class="min-w-0">
+                                        <p class="text-sm text-blue-600 font-medium mb-1">Package Price</p>
+                                        <p class="text-2xl font-bold text-blue-900 whitespace-nowrap">₱
+                                            {{ number_format($total_price, 2) }}
+                                        </p>
+                                    </div>
+                                    <div class="bg-blue-200 rounded-full p-3 flex-shrink-0">
+                                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Total Package Payment Card -->
+                            <div
+                                class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
+                                <div class="flex items-center justify-between">
+                                    <div class="min-w-0">
+                                        <p class="text-sm text-purple-600 font-medium mb-1">Total Package Payment</p>
+                                        <p class="text-2xl font-bold text-purple-900 whitespace-nowrap">₱
+                                            {{ number_format($total_payments, 2) }}
+                                        </p>
+                                    </div>
+                                    <div class="bg-purple-200 rounded-full p-3 flex-shrink-0">
+                                        <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Balance Card -->
+
+                            @if($balance > 0)
+                                <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-lg p-4 border border-red-200">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="text-sm text-red-600 font-medium mb-1">Outstanding Balance</p>
+                                            <p class="text-2xl font-bold text-red-900">₱ {{ number_format($balance, 2) }}</p>
+                                        </div>
+                                        <div class="bg-red-200 rounded-full p-3">
+                                            <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                            @else
+                                <div
+                                    class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="text-sm text-green-600 font-medium mb-1">Balance</p>
+                                            <p class="text-2xl font-bold text-green-900">₱ {{ number_format($balance, 2) }}</p>
+                                            <p class="text-xs text-green-600 mt-1">Fully Paid</p>
+                                        </div>
+                                        <div class="bg-green-200 rounded-full p-3">
+                                            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+
+                            <!-- Payment Status Card -->
                             @php
                                 $paymentStatus = 'Active';
-                                $statusClass = 'bg-green-200 text-green-700';
+                                $isLapsed = false;
 
                                 // Term lapse threshold in months
                                 $lapseMonths = match ($clients->Term) {
@@ -373,716 +832,218 @@
                                 };
                                 $lapseCutoff = \Carbon\Carbon::now()->subMonths($lapseMonths);
 
-                                if ($isFullyPaid || $totalValidPayments >= $total_price) {
-                                    $paymentStatus = 'Fully Paid';
-                                    $statusClass = 'bg-green-300 text-green-800';
-                                } else {
-                                    // If there are no valid payments, use the client's DateCreated as the reference point
-                                    $referenceDate = $lastValidPaymentDate ?? \Carbon\Carbon::parse($clients->DateCreated);
+                                // Use $lastValidPaymentDate calculated at the top of the file
+                                // or fallback to DateCreated if client has no valid payments
+                                $referenceDate = $lastValidPaymentDate ?? \Carbon\Carbon::parse($clients->DateCreated);
 
-                                    if ($referenceDate->lt($lapseCutoff)) {
-                                        $paymentStatus = 'Lapse';
-                                        $statusClass = 'bg-red-200 text-red-700';
-                                    }
+                                if ($referenceDate->lt($lapseCutoff)) {
+                                    $paymentStatus = 'Lapse';
+                                    $isLapsed = true;
                                 }
                             @endphp
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Payment Status</label>
+                            @if($isFullyPaid)
                                 <div
-                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 flex items-center h-[42px] cursor-default">
-                                    <span
-                                        class="px-3 py-1 rounded-full text-xs font-semibold {{ $statusClass }}">{{ $paymentStatus }}</span>
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">FSA</label>
-                                <div
-                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 flex items-center h-[42px] overflow-hidden cursor-default">
-                                    <span class="text-gray-900 truncate">
-                                        @if($clients->FSALastName)
-                                            {{ $clients->FSALastName . ', ' . $clients->FSAFirstName . ' ' . ($clients->FSAMiddleName ?? '') }}
-                                        @else
-                                            <span class="text-gray-400 italic">Not assigned</span>
-                                        @endif
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Personal Section -->
-                    <div>
-                        <h4
-                            class="text-sm font-bold text-purple-700 uppercase tracking-wide mb-3 pb-2 border-b-2 border-purple-200">
-                            Personal</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                            <div class="md:col-span-2 lg:col-span-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                                <div class="lg:col-span-2">
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Name</label>
-                                    <input type="text"
-                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
-                                        value="{{ $clients->LastName . ', ' . $clients->FirstName . " " . $clients->MiddleName }}"
-                                        readonly />
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Birth Date</label>
-                                    <input type="text"
-                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
-                                        value="{{ $clients->BirthDate }}" readonly />
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Age</label>
-                                    <input type="text"
-                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
-                                        value="{{ $clients->Age }}" readonly />
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Gender</label>
-                                <input type="text"
-                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
-                                    value="{{ $clients->Gender }}" readonly />
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Civil Status</label>
-                                <input type="text"
-                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
-                                    value="{{ $clients->CivilStatus }}" readonly />
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Occupation</label>
-                                <input type="text"
-                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
-                                    value="{{ $clients->Occupation }}" readonly />
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Birth Place</label>
-                                <input type="text"
-                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
-                                    value="{{ $clients->BirthPlace }}" readonly />
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Province</label>
-                                <input type="text"
-                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
-                                    value="{{ $clients->ProvinceDisplay ?? $clients->Province }}" readonly />
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">City</label>
-                                <input type="text"
-                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
-                                    value="{{ $clients->CityDisplay ?? $clients->City }}" readonly />
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Barangay</label>
-                                <input type="text"
-                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
-                                    value="{{ $clients->BarangayDisplay ?? $clients->Barangay }}" readonly />
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Zipcode</label>
-                                <input type="text"
-                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
-                                    value="{{ $clients->ZipCode }}" readonly />
-                            </div>
-                            <div class="lg:col-span-4">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Street</label>
-                                <input type="text"
-                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
-                                    value="{{ $clients->Street }}" readonly />
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Home Address Section -->
-                    <div>
-                        <h4
-                            class="text-sm font-bold text-purple-700 uppercase tracking-wide mb-3 pb-2 border-b-2 border-purple-200">
-                            Home Address</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Province</label>
-                                <input type="text"
-                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
-                                    value="{{ $clients->HomeProvinceDisplay ?? $clients->HomeProvince ?? '-' }}" readonly />
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">City</label>
-                                <input type="text"
-                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
-                                    value="{{ $clients->HomeCityDisplay ?? $clients->HomeCity ?? '-' }}" readonly />
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Barangay</label>
-                                <input type="text"
-                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
-                                    value="{{ $clients->HomeBarangayDisplay ?? $clients->HomeBarangay ?? '-' }}" readonly />
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Zipcode</label>
-                                <input type="text"
-                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
-                                    value="{{ $clients->homezipcode ?? '-' }}" readonly />
-                            </div>
-                            <div class="lg:col-span-4">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Street</label>
-                                <input type="text"
-                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
-                                    value="{{ $clients->HomeStreet ?? '-' }}" readonly />
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Contact Section -->
-                    <div>
-                        <h4
-                            class="text-sm font-bold text-purple-700 uppercase tracking-wide mb-3 pb-2 border-b-2 border-purple-200">
-                            Contact</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Telephone</label>
-                                <input type="text"
-                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
-                                    value="{{ $clients->HomeNumber }}" readonly />
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Mobile No.</label>
-                                <input type="text"
-                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
-                                    value="{{ $clients->MobileNumber }}" readonly />
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
-                                @php
-                                    // Hide email if it starts with -@
-                                    $displayEmail = $clients->EmailAddress;
-                                    if (strpos($displayEmail, '-@') === 0) {
-                                        $displayEmail = '';
-                                    }
-                                @endphp
-                                <input type="text"
-                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
-                                    value="{{ $displayEmail }}" readonly />
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Beneficiaries Section -->
-                    <div>
-                        <h4
-                            class="text-sm font-bold text-purple-700 uppercase tracking-wide mb-3 pb-2 border-b-2 border-purple-200">
-                            Beneficiaries</h4>
-
-                        <!-- Principal Details -->
-                        <div class="mb-5 bg-purple-50 rounded-lg p-4 border border-purple-100">
-                            <h5 class="text-xs font-bold text-purple-800 uppercase tracking-wider mb-3 flex items-center">
-                                <svg class="w-4 h-4 mr-1.5 text-purple-600" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                                </svg>
-                                Principal Beneficiary
-                            </h5>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div>
-                                    <label class="block text-xs font-medium text-gray-600 mb-1">Name (Age)</label>
-                                    <input type="text"
-                                        class="w-full px-4 py-2 border border-purple-200 rounded-lg bg-white text-gray-900 cursor-default"
-                                        value="{{ $clients->PrincipalBeneficiaryName . ' (' . $clients->PrincipalBeneficiaryAge . ')'}}"
-                                        readonly />
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-gray-600 mb-1">Relationship</label>
-                                    <input type="text"
-                                        class="w-full px-4 py-2 border border-purple-200 rounded-lg bg-white text-gray-900 cursor-default"
-                                        value="{{ $clients->principalbeneficiaryrelation ?? 'Not Specified' }}" readonly />
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-gray-600 mb-1">Valid ID</label>
-                                    @if(!empty($clients->principalbeneficiaryid_path))
-                                        <button type="button" onclick="openIdModal()"
-                                            class="inline-flex items-center justify-center w-full px-4 py-2 border border-purple-300 text-purple-700 bg-purple-100 hover:bg-purple-200 rounded-lg transition duration-150 font-medium text-sm">
-                                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                            </svg>
-                                            View ID Document
-                                        </button>
-
-                                        <!-- Valid ID Modal -->
-                                        <div id="validIdModal" class="fixed inset-0 z-50 hidden overflow-y-auto"
-                                            aria-labelledby="modal-title" role="dialog" aria-modal="true">
-                                            <div
-                                                class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                                                <!-- Background overlay -->
-                                                <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity"
-                                                    aria-hidden="true" onclick="closeIdModal()"></div>
-
-                                                <span class="hidden sm:inline-block sm:align-middle sm:h-screen"
-                                                    aria-hidden="true">&#8203;</span>
-
-                                                <!-- Modal panel -->
-                                                <div
-                                                    class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full">
-                                                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 relative">
-                                                        <div class="flex justify-between items-center mb-4">
-                                                            <h3 class="text-lg leading-6 font-medium text-gray-900"
-                                                                id="modal-title">
-                                                                Principal Beneficiary ID
-                                                            </h3>
-                                                            <button type="button" onclick="closeIdModal()"
-                                                                class="text-gray-400 hover:text-gray-500 focus:outline-none focus:text-gray-500 transition ease-in-out duration-150">
-                                                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                                                                    stroke="currentColor">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                                        stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                                                </svg>
-                                                            </button>
-                                                        </div>
-                                                        <div
-                                                            class="mt-2 flex justify-center bg-gray-100 rounded-lg p-2 min-h-[300px]">
-                                                            <img src="{{ asset('storage/' . $clients->principalbeneficiaryid_path) }}"
-                                                                alt="Beneficiary ID"
-                                                                class="max-w-full max-h-[70vh] object-contain rounded shadow-sm">
-                                                        </div>
-                                                    </div>
-                                                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                                                        <button type="button" onclick="closeIdModal()"
-                                                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-purple-600 text-base font-medium text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 sm:ml-3 sm:w-auto sm:text-sm">
-                                                            Close
-                                                        </button>
-                                                        <a href="{{ asset('storage/' . $clients->principalbeneficiaryid_path) }}"
-                                                            target="_blank"
-                                                            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                                                            Open in New Tab
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                    class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="text-sm text-green-600 font-medium mb-1">Payment Status</p>
+                                            <p class="text-2xl font-bold text-green-900">Fully Paid</p>
+                                            <p class="text-xs text-green-600 mt-1">{{ $clients->Term }}</p>
                                         </div>
-
-                                        <script>
-                                            function openIdModal() {
-                                                document.getElementById('validIdModal').classList.remove('hidden');
-                                                document.body.classList.add('overflow-hidden');
-                                            }
-                                            function closeIdModal() {
-                                                document.getElementById('validIdModal').classList.add('hidden');
-                                                document.body.classList.remove('overflow-hidden');
-                                            }
-                                        </script>
-                                    @else
-                                        <div
-                                            class="w-full px-4 py-2 border border-purple-200 rounded-lg bg-gray-50 text-gray-500 italic flex items-center justify-center text-sm">
-                                            <svg class="w-4 h-4 mr-1.5 opacity-50" fill="none" stroke="currentColor"
+                                        <div class="bg-green-200 rounded-full p-3">
+                                            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
-                                            No ID Uploaded
                                         </div>
-                                    @endif
+                                    </div>
                                 </div>
-                            </div>
+                            @elseif($isLapsed)
+                                <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-lg p-4 border border-red-200">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="text-sm text-red-600 font-medium mb-1">Payment Status</p>
+                                            <p class="text-2xl font-bold text-red-900">{{ $paymentStatus }}</p>
+                                            <p class="text-xs text-red-500 mt-1">{{ $clients->Term }} · Lapse after
+                                                {{ $lapseMonths }} mos
+                                            </p>
+                                        </div>
+                                        <div class="bg-red-200 rounded-full p-3">
+                                            <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                            @else
+                                <div
+                                    class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="text-sm text-green-600 font-medium mb-1">Payment Status</p>
+                                            <p class="text-2xl font-bold text-green-900">{{ $paymentStatus }}</p>
+                                            <p class="text-xs text-green-600 mt-1">{{ $clients->Term }} · Lapse after
+                                                {{ $lapseMonths }} mos
+                                            </p>
+                                        </div>
+                                        <div class="bg-green-200 rounded-full p-3">
+                                            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
                         </div>
 
-                        <!-- Other Beneficiaries -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Beneficiary 1 (Age)</label>
-                                <input type="text"
-                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
-                                    value="{{ $clients->Secondary1Name . ' (' . $clients->Secondary1Age . ')'}}" readonly />
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Beneficiary 2 (Age)</label>
-                                <input type="text"
-                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
-                                    value="{{ $clients->Secondary2Name . ' (' . $clients->Secondary2Age . ')'}}" readonly />
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Beneficiary 3 (Age)</label>
-                                <input type="text"
-                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
-                                    value="{{ $clients->Secondary3Name . ' (' . $clients->Secondary3Age . ')'}}" readonly />
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Beneficiary 4 (Age)</label>
-                                <input type="text"
-                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 cursor-default"
-                                    value="{{ $clients->Secondary4Name . ' (' . $clients->Secondary4Age . ')'}}" readonly />
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-        <div class="tab-pane fade {{ $message === 'payment' ? 'show active' : '' }}" id="paymentHistory" role="tabpanel"
-            aria-labelledby="payment-history-tab">
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-indigo-50">
-                    <h3 class="text-lg font-semibold text-gray-800 flex items-center">
-                        <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                        </svg>
-                        Payment History
-                    </h3>
-                </div>
-                <div class="p-6">
-                    {{-- Total price and balance calculations moved to top of file --}}
-
-                    <!-- Payment Summary Cards -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-{{ !$isFullyPaid ? '4' : '3' }} gap-4 mb-6">
-                        <!-- Package Price Card -->
-                        <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
-                            <div class="flex items-center justify-between">
-                                <div class="min-w-0">
-                                    <p class="text-sm text-blue-600 font-medium mb-1">Package Price</p>
-                                    <p class="text-2xl font-bold text-blue-900 whitespace-nowrap">₱
-                                        {{ number_format($total_price, 2) }}
-                                    </p>
-                                </div>
-                                <div class="bg-blue-200 rounded-full p-3 flex-shrink-0">
-                                    <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                </div>
-                            </div>
+                        <!-- Filter Buttons -->
+                        <div class="flex flex-wrap gap-2 mb-6">
+                            <button id="filter-clear"
+                                class="payment-filter-btn px-4 py-2 bg-white border-2 border-green-200 text-green-800 rounded-lg font-semibold text-sm hover:border-green-300 hover:text-green-900 transition duration-200 active"
+                                data-filter="clear">
+                                Clear Filter
+                            </button>
+                            <button id="filter-plan"
+                                class="payment-filter-btn px-4 py-2 bg-white border-2 border-green-200 text-green-800 rounded-lg font-semibold text-sm hover:border-green-300 hover:text-green-900 transition duration-200"
+                                data-filter="Plan">
+                                Plan
+                            </button>
+                            <button id="filter-others"
+                                class="payment-filter-btn px-4 py-2 bg-white border-2 border-green-200 text-green-800 rounded-lg font-semibold text-sm hover:border-green-300 hover:text-green-900 transition duration-200"
+                                data-filter="Others">
+                                Others
+                            </button>
+                            <button id="filter-void"
+                                class="payment-filter-btn px-4 py-2 bg-white border-2 border-green-200 text-green-800 rounded-lg font-semibold text-sm hover:border-green-300 hover:text-green-900 transition duration-200"
+                                data-filter="Void">
+                                Void
+                            </button>
                         </div>
 
-                        <!-- Total Package Payment Card -->
-                        <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
-                            <div class="flex items-center justify-between">
-                                <div class="min-w-0">
-                                    <p class="text-sm text-purple-600 font-medium mb-1">Total Package Payment</p>
-                                    <p class="text-2xl font-bold text-purple-900 whitespace-nowrap">₱
-                                        {{ number_format($total_payments, 2) }}
-                                    </p>
-                                </div>
-                                <div class="bg-purple-200 rounded-full p-3 flex-shrink-0">
-                                    <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Balance Card -->
-
-                        @if($balance > 0)
-                            <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-lg p-4 border border-red-200">
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <p class="text-sm text-red-600 font-medium mb-1">Outstanding Balance</p>
-                                        <p class="text-2xl font-bold text-red-900">₱ {{ number_format($balance, 2) }}</p>
-                                    </div>
-                                    <div class="bg-red-200 rounded-full p-3">
-                                        <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                    </div>
-                                </div>
-                            </div>
-                        @else
-                            <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <p class="text-sm text-green-600 font-medium mb-1">Balance</p>
-                                        <p class="text-2xl font-bold text-green-900">₱ {{ number_format($balance, 2) }}</p>
-                                        <p class="text-xs text-green-600 mt-1">Fully Paid</p>
-                                    </div>
-                                    <div class="bg-green-200 rounded-full p-3">
-                                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
-
-                        <!-- Payment Status Card -->
-                        @php
-                            $paymentStatus = 'Active';
-                            $isLapsed = false;
-
-                            // Term lapse threshold in months
-                            $lapseMonths = match ($clients->Term) {
-                                'Monthly' => 1,
-                                'Quarterly' => 3,
-                                'Semi-Annual' => 6,
-                                'Annual' => 12,
-                                default => 1,
-                            };
-                            $lapseCutoff = \Carbon\Carbon::now()->subMonths($lapseMonths);
-
-                            // Use $lastValidPaymentDate calculated at the top of the file
-                            // or fallback to DateCreated if client has no valid payments
-                            $referenceDate = $lastValidPaymentDate ?? \Carbon\Carbon::parse($clients->DateCreated);
-
-                            if ($referenceDate->lt($lapseCutoff)) {
-                                $paymentStatus = 'Lapse';
-                                $isLapsed = true;
-                            }
-                        @endphp
-                        @if($isFullyPaid)
-                            <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <p class="text-sm text-green-600 font-medium mb-1">Payment Status</p>
-                                        <p class="text-2xl font-bold text-green-900">Fully Paid</p>
-                                        <p class="text-xs text-green-600 mt-1">{{ $clients->Term }}</p>
-                                    </div>
-                                    <div class="bg-green-200 rounded-full p-3">
-                                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                    </div>
-                                </div>
-                            </div>
-                        @elseif($isLapsed)
-                            <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-lg p-4 border border-red-200">
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <p class="text-sm text-red-600 font-medium mb-1">Payment Status</p>
-                                        <p class="text-2xl font-bold text-red-900">{{ $paymentStatus }}</p>
-                                        <p class="text-xs text-red-500 mt-1">{{ $clients->Term }} · Lapse after
-                                            {{ $lapseMonths }} mos
-                                        </p>
-                                    </div>
-                                    <div class="bg-red-200 rounded-full p-3">
-                                        <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                    </div>
-                                </div>
-                            </div>
-                        @else
-                            <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <p class="text-sm text-green-600 font-medium mb-1">Payment Status</p>
-                                        <p class="text-2xl font-bold text-green-900">{{ $paymentStatus }}</p>
-                                        <p class="text-xs text-green-600 mt-1">{{ $clients->Term }} · Lapse after
-                                            {{ $lapseMonths }} mos
-                                        </p>
-                                    </div>
-                                    <div class="bg-green-200 rounded-full p-3">
-                                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
-                    </div>
-
-                    <!-- Filter Buttons -->
-                    <div class="flex flex-wrap gap-2 mb-6">
-                        <button id="filter-clear"
-                            class="payment-filter-btn px-4 py-2 bg-white border-2 border-green-200 text-green-800 rounded-lg font-semibold text-sm hover:border-green-300 hover:text-green-900 transition duration-200 active"
-                            data-filter="clear">
-                            Clear Filter
-                        </button>
-                        <button id="filter-plan"
-                            class="payment-filter-btn px-4 py-2 bg-white border-2 border-green-200 text-green-800 rounded-lg font-semibold text-sm hover:border-green-300 hover:text-green-900 transition duration-200"
-                            data-filter="Plan">
-                            Plan
-                        </button>
-                        <button id="filter-others"
-                            class="payment-filter-btn px-4 py-2 bg-white border-2 border-green-200 text-green-800 rounded-lg font-semibold text-sm hover:border-green-300 hover:text-green-900 transition duration-200"
-                            data-filter="Others">
-                            Others
-                        </button>
-                        <button id="filter-void"
-                            class="payment-filter-btn px-4 py-2 bg-white border-2 border-green-200 text-green-800 rounded-lg font-semibold text-sm hover:border-green-300 hover:text-green-900 transition duration-200"
-                            data-filter="Void">
-                            Void
-                        </button>
-                    </div>
-
-                    <!-- Payment Table -->
-                    <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                        <table id="common_dataTable" class="table table-hover font-sm w-100">
-                            <thead class="bg-gradient-to-r from-purple-50 to-indigo-50">
-                                <tr>
-                                    <th scope="col"
-                                        class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
-                                        No</th>
-                                    <th scope="col"
-                                        class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
-                                        Series Code</th>
-                                    <th scope="col"
-                                        class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
-                                        OR No.</th>
-                                    <th scope="col"
-                                        class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
-                                        Amount Paid</th>
-                                    <th scope="col"
-                                        class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
-                                        Installment</th>
-                                    <th scope="col"
-                                        class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
-                                        Date</th>
-                                    <th scope="col"
-                                        class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
-                                        Payment Particular</th>
-                                    <th scope="col"
-                                        class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
-                                        Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($payments as $payment)
-                                    <tr data-remarks="{{ $payment->Remarks }}" data-void="{{ $payment->VoidStatus }}">
-                                        <td class="px-4 py-3 text-sm text-gray-900">{{ $payment->Id }}</td>
-                                        <td class="px-4 py-3 text-sm text-gray-900">{{ $payment->SeriesCode ?? 'N/A' }}</td>
-                                        <td class="px-4 py-3 text-sm text-gray-900">{{ $payment->ORNo }}</td>
-                                        <td class="px-4 py-3 text-sm text-gray-900">₱
-                                            {{ number_format($payment->AmountPaid, 2) }}
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-900">{{ $payment->Installment ?? 'N/A' }}
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-900">{{ $payment->Date }}</td>
-                                        <td class="px-4 py-3 text-sm text-gray-900">
-                                            @if($payment->VoidStatus == 1)
-                                                <span
-                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Void</span>
-                                            @elseif($payment->Remarks == null || $payment->Remarks == 'Standard' || $payment->Remarks == 'Partial')
-                                                <span
-                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">{{ $payment->Remarks ?? 'Standard' }}</span>
-                                            @else
-                                                <span
-                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">{{ $payment->Remarks }}</span>
-                                            @endif
-                                        </td>
-                                        <td class="px-4 py-3 text-sm text-gray-900">
-                                            @if($payment->VoidStatus != 1)
-                                                <button type="button"
-                                                    class="inline-flex items-center px-3 py-1.5 bg-red-100 hover:bg-red-200 border border-red-300 text-red-700 hover:text-red-800 text-xs font-semibold rounded-md shadow-sm transition duration-150 ease-in-out"
-                                                    onclick="showPaymentVoidModal('{{ $payment->Id }}', '{{ $payment->ORNo }}')">
-                                                    <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                            d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636">
-                                                        </path>
-                                                    </svg>
-                                                    Void
-                                                </button>
-                                            @else
-                                                <span
-                                                    class="inline-flex items-center px-3 py-1.5 bg-gray-100 border border-gray-300 text-gray-500 text-xs font-semibold rounded-md">
-                                                    <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
-                                                        </path>
-                                                    </svg>
-                                                    Locked
-                                                </span>
-                                            @endif
-                                        </td>
+                        <!-- Payment Table -->
+                        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                            <table id="common_dataTable" class="table table-hover font-sm w-100">
+                                <thead class="bg-gradient-to-r from-purple-50 to-indigo-50">
+                                    <tr>
+                                        <th scope="col"
+                                            class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
+                                            No</th>
+                                        <th scope="col"
+                                            class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
+                                            Series Code</th>
+                                        <th scope="col"
+                                            class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
+                                            OR No.</th>
+                                        <th scope="col"
+                                            class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
+                                            Amount Paid</th>
+                                        <th scope="col"
+                                            class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
+                                            Installment</th>
+                                        <th scope="col"
+                                            class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
+                                            Date</th>
+                                        <th scope="col"
+                                            class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
+                                            Payment Particular</th>
+                                        <th scope="col"
+                                            class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
+                                            Action</th>
                                     </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                    @if(!$canTransfer)
-                        @if($clients->Status == '3')
-                            @if($balance > 0)
-                                @if($assignedMemberData != null)
-                                    <a href="/client-addpayment/{{ $clients->cid }}{{ $statusQuery }}"
-                                        class="inline-flex items-center px-6 py-3 bg-white border-2 border-green-200 hover:border-green-300 text-green-800 hover:text-green-900 font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
-                                        role="button">Create Full Payment</a>
-                                @else
-                                    <a href="/client-addpayment/{{ $clients->cid }}{{ $statusQuery }}"
-                                        class="inline-flex items-center px-6 py-3 bg-white border-2 border-green-200 hover:border-green-300 text-green-800 hover:text-green-900 font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
-                                        role="button">Add Payment</a>
-                                @endif
-                            @endif
-                            <a href="/client-printsoa/{{ $clients->cid }}?export=true"
-                                class="inline-flex items-center px-6 py-3 bg-white border-2 border-purple-200 hover:border-purple-300 text-purple-800 hover:text-purple-900 font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
-                                role="button" target="_blank">Statement of Account</a>
-                            @if($balance <= 0)
-                                @if($clients->CFPNO == null && $cfpApprover == 0)
-                                    <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4 cursor-pointer"
-                                        onclick="showSwiftModal('Certificate Approval Required', 'Certificate of full payment requires approval.', 'warning', [{text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}])"
-                                        role="button">Certificate of Full Payment</a>
-                                @elseif($clients->CFPNO == null && $cfpApprover == 1)
-                                    <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
-                                        onclick="showSwiftModal('Certificate Approval', 'You are going to approve the certificate of full payment for this client. You cannot undo this action. Continue?', 'warning', [{text: 'Confirm', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpApproval()'}, {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}])"
-                                        role="button">Certificate of Full Payment</a>
-                                @elseif($clients->CFPNO == "NA")
-                                    <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
-                                        onclick="showSwiftModal('Certificate of Full Payment', 'Enter certificate number to proceed.', 'warning', [
-                                                                                                                                                                                                                                                                                                                                                                                                            {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpWithInput()'},
-                                                                                                                                                                                                                                                                                                                                                                                                            {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
-                                                                                                                                                                                                                                                                                                                                                                                                        ])"
-                                        data-client-id="{{ $clients->cid }}" role="button">Certificate of Full
-                                        Payment</a>
-                                @else
-                                    <a href="/client-printcofp/{{ $clients->cid }}"
-                                        class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
-                                        role="button">Certificate of Full Payment</a>
-                                @endif
-                            @endif
-                        @else
-                            <p class="mt-4 text-gray-500">** Client needs to be approved to add a new payment.</p>
-                        @endif
-                    @else
-                        @if($canTransfer->TransferClientId != null)
-                            <p class="mt-4 text-gray-500">** Ownership has been transferred to this <a
-                                    href="/client-view/{{ $canTransfer->TransferClientId }}"
-                                    class="text-purple-600 hover:text-purple-700 underline">client</a></p>
-                        @else
+                                </thead>
+                                <tbody>
+                                    @foreach($payments as $payment)
+                                        <tr data-remarks="{{ $payment->Remarks }}" data-void="{{ $payment->VoidStatus }}">
+                                            <td class="px-4 py-3 text-sm text-gray-900">{{ $payment->Id }}</td>
+                                            <td class="px-4 py-3 text-sm text-gray-900">{{ $payment->SeriesCode ?? 'N/A' }}</td>
+                                            <td class="px-4 py-3 text-sm text-gray-900">{{ $payment->ORNo }}</td>
+                                            <td class="px-4 py-3 text-sm text-gray-900">₱
+                                                {{ number_format($payment->AmountPaid, 2) }}
+                                            </td>
+                                            <td class="px-4 py-3 text-sm text-gray-900">{{ $payment->Installment ?? 'N/A' }}
+                                            </td>
+                                            <td class="px-4 py-3 text-sm text-gray-900">{{ $payment->Date }}</td>
+                                            <td class="px-4 py-3 text-sm text-gray-900">
+                                                @if($payment->VoidStatus == 1)
+                                                    <span
+                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Void</span>
+                                                @elseif($payment->Remarks == null || $payment->Remarks == 'Standard' || $payment->Remarks == 'Partial')
+                                                    <span
+                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">{{ $payment->Remarks ?? 'Standard' }}</span>
+                                                @else
+                                                    <span
+                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">{{ $payment->Remarks }}</span>
+                                                @endif
+                                            </td>
+                                            <td class="px-4 py-3 text-sm text-gray-900">
+                                                @if($payment->VoidStatus != 1)
+                                                    <button type="button"
+                                                        class="inline-flex items-center px-3 py-1.5 bg-red-100 hover:bg-red-200 border border-red-300 text-red-700 hover:text-red-800 text-xs font-semibold rounded-md shadow-sm transition duration-150 ease-in-out"
+                                                        onclick="showPaymentVoidModal('{{ $payment->Id }}', '{{ $payment->ORNo }}')">
+                                                        <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636">
+                                                            </path>
+                                                        </svg>
+                                                        Void
+                                                    </button>
+                                                @else
+                                                    <span
+                                                        class="inline-flex items-center px-3 py-1.5 bg-gray-100 border border-gray-300 text-gray-500 text-xs font-semibold rounded-md">
+                                                        <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                                                            </path>
+                                                        </svg>
+                                                        Locked
+                                                    </span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                        @if(!$canTransfer)
                             @if($clients->Status == '3')
                                 @if($balance > 0)
-                                    <a href="/client-addpayment/{{ $clients->cid }}{{ $statusQuery }}"
-                                        class="inline-flex items-center px-6 py-3 bg-white border-2 border-green-200 hover:border-green-300 text-green-800 hover:text-green-900 font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
-                                        role="button">Add Payment</a>
+                                    @if($assignedMemberData != null)
+                                        <a href="/client-addpayment/{{ $clients->cid }}{{ $statusQuery }}"
+                                            class="inline-flex items-center px-6 py-3 bg-white border-2 border-green-200 hover:border-green-300 text-green-800 hover:text-green-900 font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
+                                            role="button">Create Full Payment</a>
+                                    @else
+                                        <a href="/client-addpayment/{{ $clients->cid }}{{ $statusQuery }}"
+                                            class="inline-flex items-center px-6 py-3 bg-white border-2 border-green-200 hover:border-green-300 text-green-800 hover:text-green-900 font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
+                                            role="button">Add Payment</a>
+                                    @endif
                                 @endif
                                 <a href="/client-printsoa/{{ $clients->cid }}?export=true"
                                     class="inline-flex items-center px-6 py-3 bg-white border-2 border-purple-200 hover:border-purple-300 text-purple-800 hover:text-purple-900 font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
                                     role="button" target="_blank">Statement of Account</a>
                                 @if($balance <= 0)
                                     @if($clients->CFPNO == null && $cfpApprover == 0)
-                                        <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
-                                            onclick="showSwiftModal('Warning', 'Certificate of full payment requires approval.', 'warning', [
-                                                                                                                                                                                                                                                                                                                                                                                                                                    {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
-                                                                                                                                                                                                                                                                                                                                                                                                                                ])"
-                                            data-client-id="{{ $clients->cid }}" role="button">Certificate of
-                                            Full Payment</a>
+                                        <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4 cursor-pointer"
+                                            onclick="showSwiftModal('Certificate Approval Required', 'Certificate of full payment requires approval.', 'warning', [{text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}])"
+                                            role="button">Certificate of Full Payment</a>
                                     @elseif($clients->CFPNO == null && $cfpApprover == 1)
                                         <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
-                                            onclick="showSwiftModal('Certificate Approval', 'You are going to approve the certificate of full payment for this client. You cannot undo this action. Continue?', 'warning', [
-                                                                                                                                                                                                                                                                                                                                                                                                                                    {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpApproval()'},
-                                                                                                                                                                                                                                                                                                                                                                                                                                    {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
-                                                                                                                                                                                                                                                                                                                                                                                                                                ])"
-                                            data-client-id="{{ $clients->cid }}" role="button">Certificate of
-                                            Full Payment</a>
+                                            onclick="showSwiftModal('Certificate Approval', 'You are going to approve the certificate of full payment for this client. You cannot undo this action. Continue?', 'warning', [{text: 'Confirm', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpApproval()'}, {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}])"
+                                            role="button">Certificate of Full Payment</a>
                                     @elseif($clients->CFPNO == "NA")
                                         <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
                                             onclick="showSwiftModal('Certificate of Full Payment', 'Enter certificate number to proceed.', 'warning', [
-                                                                                                                                                                                                                                                                                                                                                                                                                                    {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpWithInput()'},
-                                                                                                                                                                                                                                                                                                                                                                                                                                    {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
-                                                                                                                                                                                                                                                                                                                                                                                                                                ])"
-                                            data-client-id="{{ $clients->cid }}" role="button">Certificate of
-                                            Full Payment</a>
+                                                                                                                                                                                                                                                                                                                                                                                                                                {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpWithInput()'},
+                                                                                                                                                                                                                                                                                                                                                                                                                                {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+                                                                                                                                                                                                                                                                                                                                                                                                                            ])"
+                                            data-client-id="{{ $clients->cid }}" role="button">Certificate of Full
+                                            Payment</a>
                                     @else
                                         <a href="/client-printcofp/{{ $clients->cid }}"
                                             class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
@@ -1092,805 +1053,861 @@
                             @else
                                 <p class="mt-4 text-gray-500">** Client needs to be approved to add a new payment.</p>
                             @endif
-                        @endif
-                    @endif
-                </div>
-            </div>
-        </div>
-        <div class="tab-pane fade {{ $message === 'loan' ? 'show active' : '' }}" id="loanPayments" role="tabpanel"
-            aria-labelledby="loan-payments-tab">
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-indigo-50">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-lg font-semibold text-gray-800 flex items-center">
-                            <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            Loan Payments
-                        </h3>
-                        @if($hasLoanRequest)
-                            @php
-                                $loanStatusColor = $hasLoanRequest->Status == 'Pending' ? 'yellow' : ($hasLoanRequest->Status == 'Verified' ? 'blue' : ($hasLoanRequest->Status == 'Approved' ? 'green' : 'gray'));
-                            @endphp
-                            <span
-                                class="px-3 py-1 rounded-full text-xs font-semibold bg-{{ $loanStatusColor }}-200 text-{{ $loanStatusColor }}-700">
-                                Loan: {{ $hasLoanRequest->Status }}
-                            </span>
+                        @else
+                            @if($canTransfer->TransferClientId != null)
+                                <p class="mt-4 text-gray-500">** Ownership has been transferred to this <a
+                                        href="/client-view/{{ $canTransfer->TransferClientId }}"
+                                        class="text-purple-600 hover:text-purple-700 underline">client</a></p>
+                            @else
+                                @if($clients->Status == '3')
+                                    @if($balance > 0)
+                                        <a href="/client-addpayment/{{ $clients->cid }}{{ $statusQuery }}"
+                                            class="inline-flex items-center px-6 py-3 bg-white border-2 border-green-200 hover:border-green-300 text-green-800 hover:text-green-900 font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
+                                            role="button">Add Payment</a>
+                                    @endif
+                                    <a href="/client-printsoa/{{ $clients->cid }}?export=true"
+                                        class="inline-flex items-center px-6 py-3 bg-white border-2 border-purple-200 hover:border-purple-300 text-purple-800 hover:text-purple-900 font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
+                                        role="button" target="_blank">Statement of Account</a>
+                                    @if($balance <= 0)
+                                        @if($clients->CFPNO == null && $cfpApprover == 0)
+                                            <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
+                                                onclick="showSwiftModal('Warning', 'Certificate of full payment requires approval.', 'warning', [
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                        ])"
+                                                data-client-id="{{ $clients->cid }}" role="button">Certificate of
+                                                Full Payment</a>
+                                        @elseif($clients->CFPNO == null && $cfpApprover == 1)
+                                            <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
+                                                onclick="showSwiftModal('Certificate Approval', 'You are going to approve the certificate of full payment for this client. You cannot undo this action. Continue?', 'warning', [
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpApproval()'},
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                        ])"
+                                                data-client-id="{{ $clients->cid }}" role="button">Certificate of
+                                                Full Payment</a>
+                                        @elseif($clients->CFPNO == "NA")
+                                            <a class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
+                                                onclick="showSwiftModal('Certificate of Full Payment', 'Enter certificate number to proceed.', 'warning', [
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            {text: 'Submit', class: 'bg-green-500 hover:bg-green-600 text-white', action: 'submitCfpWithInput()'},
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            {text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                        ])"
+                                                data-client-id="{{ $clients->cid }}" role="button">Certificate of
+                                                Full Payment</a>
+                                        @else
+                                            <a href="/client-printcofp/{{ $clients->cid }}"
+                                                class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4"
+                                                role="button">Certificate of Full Payment</a>
+                                        @endif
+                                    @endif
+                                @else
+                                    <p class="mt-4 text-gray-500">** Client needs to be approved to add a new payment.</p>
+                                @endif
+                            @endif
                         @endif
                     </div>
                 </div>
-                <div class="p-6">
-                    @if($hasLoanRequest && in_array($hasLoanRequest->Status, ['Pending', 'Verified', 'Approved', 'Completed']))
-                        <!-- Loan Summary Cards -->
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                            <!-- Total Loan Amount Card -->
-                            <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <p class="text-sm text-purple-600 font-medium mb-1">Total Loan Amount</p>
-                                        <p class="text-2xl font-bold text-purple-900">₱
-                                            {{ number_format($hasLoanRequest->Amount, 2) }}
-                                        </p>
+            </div>
+            <div class="tab-pane fade {{ $message === 'loan' ? 'show active' : '' }}" id="loanPayments" role="tabpanel"
+                aria-labelledby="loan-payments-tab">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-indigo-50">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+                                <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Loan Payments
+                            </h3>
+                            @if($hasLoanRequest)
+                                @php
+                                    $loanStatusColor = $hasLoanRequest->Status == 'Pending' ? 'yellow' : ($hasLoanRequest->Status == 'Verified' ? 'blue' : ($hasLoanRequest->Status == 'Approved' ? 'green' : 'gray'));
+                                @endphp
+                                <span
+                                    class="px-3 py-1 rounded-full text-xs font-semibold bg-{{ $loanStatusColor }}-200 text-{{ $loanStatusColor }}-700">
+                                    Loan: {{ $hasLoanRequest->Status }}
+                                </span>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        @if($hasLoanRequest && in_array($hasLoanRequest->Status, ['Pending', 'Verified', 'Approved', 'Completed']))
+                            <!-- Loan Summary Cards -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                                <!-- Total Loan Amount Card -->
+                                <div
+                                    class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="text-sm text-purple-600 font-medium mb-1">Total Loan Amount</p>
+                                            <p class="text-2xl font-bold text-purple-900">₱
+                                                {{ number_format($hasLoanRequest->Amount, 2) }}
+                                            </p>
+                                        </div>
+                                        <div class="bg-purple-200 rounded-full p-3">
+                                            <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </div>
                                     </div>
-                                    <div class="bg-purple-200 rounded-full p-3">
-                                        <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
+                                </div>
+                                <!-- Total Paid Card -->
+                                <div
+                                    class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="text-sm text-green-600 font-medium mb-1">Total Paid</p>
+                                            <p class="text-2xl font-bold text-green-900">₱
+                                                {{ number_format($totalLoanPayments, 2) }}
+                                            </p>
+                                        </div>
+                                        <div class="bg-green-200 rounded-full p-3">
+                                            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Remaining Balance Card -->
+                                <div
+                                    class="bg-gradient-to-br from-orange-50 to-red-100 rounded-lg p-4 border border-orange-200">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="text-sm text-orange-600 font-medium mb-1">Remaining Balance</p>
+                                            <p class="text-2xl font-bold text-orange-900">₱ {{ number_format($loanBalance, 2) }}
+                                            </p>
+                                        </div>
+                                        <div class="bg-orange-200 rounded-full p-3">
+                                            <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
+                                            </svg>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <!-- Total Paid Card -->
-                            <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <p class="text-sm text-green-600 font-medium mb-1">Total Paid</p>
-                                        <p class="text-2xl font-bold text-green-900">₱
-                                            {{ number_format($totalLoanPayments, 2) }}
-                                        </p>
+
+                            <!-- Monthly Due Info -->
+                            <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    <div class="flex items-center">
+                                        <svg class="w-5 h-5 text-gray-500 mr-2" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        <div>
+                                            <p class="text-xs text-gray-500">Monthly Due</p>
+                                            <p class="text-lg font-bold text-gray-800">₱
+                                                {{ number_format($hasLoanRequest->MonthlyAmount, 2) }}
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div class="bg-green-200 rounded-full p-3">
-                                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor"
+                                    <div class="flex items-center">
+                                        <svg class="w-5 h-5 text-indigo-500 mr-2" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z" />
+                                        </svg>
+                                        <div>
+                                            <p class="text-xs text-gray-500">Interest Rate</p>
+                                            <p class="text-lg font-bold text-indigo-600">
+                                                {{ $hasLoanRequest->InterestRate ?? 1.25 }}% <span
+                                                    class="text-xs font-normal">/mo</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <svg class="w-5 h-5 text-blue-500 mr-2" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        <div>
+                                            <p class="text-xs text-gray-500">Term</p>
+                                            <p class="text-lg font-bold text-blue-600">
+                                                {{ $hasLoanRequest->term_months ?? $hasLoanRequest->TermMonths ?? 12 }} months
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
+                                        <div>
+                                            <p class="text-xs text-gray-500">Total Repayable</p>
+                                            <p class="text-lg font-bold text-green-600">₱
+                                                {{ number_format($hasLoanRequest->total_repayable ?? $hasLoanRequest->TotalRepayable ?? $hasLoanRequest->Amount, 2) }}
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <!-- Remaining Balance Card -->
-                            <div class="bg-gradient-to-br from-orange-50 to-red-100 rounded-lg p-4 border border-orange-200">
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <p class="text-sm text-orange-600 font-medium mb-1">Remaining Balance</p>
-                                        <p class="text-2xl font-bold text-orange-900">₱ {{ number_format($loanBalance, 2) }}
-                                        </p>
-                                    </div>
-                                    <div class="bg-orange-200 rounded-full p-3">
-                                        <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
-                                        </svg>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
-                        <!-- Monthly Due Info -->
-                        <div class="bg-gray-50 rounded-lg p-4 mb-6">
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                <div class="flex items-center">
-                                    <svg class="w-5 h-5 text-gray-500 mr-2" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
-                                    <div>
-                                        <p class="text-xs text-gray-500">Monthly Due</p>
-                                        <p class="text-lg font-bold text-gray-800">₱
-                                            {{ number_format($hasLoanRequest->MonthlyAmount, 2) }}
-                                        </p>
-                                    </div>
+                            <!-- Payment History Table -->
+                            <div class="bg-white rounded-lg border border-gray-200 overflow-hidden mb-6">
+                                <div class="px-4 py-3 bg-gray-50 border-b border-gray-200">
+                                    <h4 class="font-semibold text-gray-700">Loan Payments History</h4>
                                 </div>
-                                <div class="flex items-center">
-                                    <svg class="w-5 h-5 text-indigo-500 mr-2" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z" />
-                                    </svg>
-                                    <div>
-                                        <p class="text-xs text-gray-500">Interest Rate</p>
-                                        <p class="text-lg font-bold text-indigo-600">
-                                            {{ $hasLoanRequest->InterestRate ?? 1.25 }}% <span
-                                                class="text-xs font-normal">/mo</span>
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center">
-                                    <svg class="w-5 h-5 text-blue-500 mr-2" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    <div>
-                                        <p class="text-xs text-gray-500">Term</p>
-                                        <p class="text-lg font-bold text-blue-600">
-                                            {{ $hasLoanRequest->term_months ?? $hasLoanRequest->TermMonths ?? 12 }} months
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center">
-                                    <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    <div>
-                                        <p class="text-xs text-gray-500">Total Repayable</p>
-                                        <p class="text-lg font-bold text-green-600">₱
-                                            {{ number_format($hasLoanRequest->total_repayable ?? $hasLoanRequest->TotalRepayable ?? $hasLoanRequest->Amount, 2) }}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Payment History Table -->
-                        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden mb-6">
-                            <div class="px-4 py-3 bg-gray-50 border-b border-gray-200">
-                                <h4 class="font-semibold text-gray-700">Loan Payments History</h4>
-                            </div>
-                            <div class="overflow-x-auto">
-                                <table class="w-full">
-                                    <thead class="bg-gradient-to-r from-purple-50 to-indigo-50">
-                                        <tr>
-                                            <th
-                                                class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
-                                                No</th>
-                                            <th
-                                                class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
-                                                Series Code</th>
-                                            <th
-                                                class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
-                                                OR No.</th>
-                                            <th
-                                                class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
-                                                Amount Paid</th>
-                                            <th
-                                                class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
-                                                Installment</th>
-                                            <th
-                                                class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
-                                                Date</th>
-                                            <th
-                                                class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
-                                                Status</th>
-                                            <th
-                                                class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
-                                                Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-gray-200">
-                                        @foreach($loanPayments as $lp)
-                                            <tr
-                                                class="hover:bg-gray-50 transition {{ $lp->status == 'void' ? 'bg-red-50 opacity-60' : '' }}">
-                                                <td class="px-4 py-3 text-sm text-gray-900" style="padding-left: 22px;">
-                                                    {{ $lp->Id }}
-                                                </td>
-                                                <td class="px-4 py-3 text-sm text-gray-900" style="padding-left: 37px;">
-                                                    {{ $lp->SeriesCode ?? 'N/A' }}
-                                                </td>
-                                                <td class="px-4 py-3 text-sm text-gray-900" style="padding-left: 25px;">
-                                                    {{ $lp->ORNo }}
-                                                </td>
-                                                <td class="px-4 py-3 text-sm font-semibold text-gray-900"
-                                                    style="padding-left: 30px;">₱ {{ number_format($lp->Amount, 2) }}</td>
-                                                <td class="px-4 py-3 text-sm text-gray-500" style="padding-left: 50px;">
-                                                    {{ $lp->Installment ?? 'N/A' }}
-                                                </td>
-                                                <td class="px-4 py-3 text-sm text-gray-900" style="padding-left: 2px;">
-                                                    {{ $lp->PaymentDate }}
-                                                </td>
-                                                <td class="px-4 py-3 text-sm">
-                                                    @if($lp->status == 'void')
-                                                        <span
-                                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800"
-                                                            style="margin-left: 40px;">
-                                                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                                <path fill-rule="evenodd"
-                                                                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                                                                    clip-rule="evenodd" />
-                                                            </svg>
-                                                            Void
-                                                        </span>
-                                                    @else
-                                                        <span
-                                                            class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800"
-                                                            style="margin-left: -13px;">
-                                                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                                <path fill-rule="evenodd"
-                                                                    d="M16.707 5.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A1 1 0 014 6v2a1 1 0 011 1h2a1 1 0 011 1v2a1 1 0 01-1 1H6a1 1 0 01-1-1v-2a1 1 0 011-1H7v-2a1 1 0 011-1h2z"
-                                                                    clip-rule="evenodd" />
-                                                            </svg>
-                                                            Active
-                                                        </span>
-                                                    @endif
-                                                </td>
-                                                <td class="px-4 py-3 text-sm">
-                                                    @if($lp->status != 'void')
-                                                        <button type="button"
-                                                            class="inline-flex items-center px-3 py-1.5 bg-red-100 hover:bg-red-200 border border-red-300 text-red-700 hover:text-red-800 text-xs font-semibold rounded-md shadow-sm transition duration-150 ease-in-out"
-                                                            onclick="showLoanPaymentVoidModal('{{ $lp->Id }}', '{{ $lp->ORNo }}')">
-                                                            <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor"
-                                                                viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                                    d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636">
-                                                                </path>
-                                                            </svg>
-                                                            Void
-                                                        </button>
-                                                    @else
-                                                        <span
-                                                            class="inline-flex items-center px-3 py-1.5 bg-gray-100 border border-gray-300 text-gray-500 text-xs font-semibold rounded-md">
-                                                            <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor"
-                                                                viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
-                                                                </path>
-                                                            </svg>
-                                                            Locked
-                                                        </span>
-                                                    @endif
-                                                </td>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full">
+                                        <thead class="bg-gradient-to-r from-purple-50 to-indigo-50">
+                                            <tr>
+                                                <th
+                                                    class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
+                                                    No</th>
+                                                <th
+                                                    class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
+                                                    Series Code</th>
+                                                <th
+                                                    class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
+                                                    OR No.</th>
+                                                <th
+                                                    class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
+                                                    Amount Paid</th>
+                                                <th
+                                                    class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
+                                                    Installment</th>
+                                                <th
+                                                    class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
+                                                    Date</th>
+                                                <th
+                                                    class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
+                                                    Status</th>
+                                                <th
+                                                    class="px-4 py-3 text-left text-xs font-semibold text-purple-900 uppercase tracking-wider">
+                                                    Action</th>
                                             </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <!-- Add Payment Button - Centered -->
-                        <div class="flex justify-center">
-                            @if($hasLoanRequest->Status == 'Approved' && $loanBalance > 0)
-                                <a href="/client-addloanpayment/{{ $clients->cid }}{{ $statusQuery }}"
-                                    class="inline-flex items-center px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-200 ease-in-out">
-                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                    </svg>
-                                    Add Payment
-                                </a>
-                            @else
-                                <div
-                                    class="inline-flex items-center px-8 py-3 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-600 font-semibold rounded-lg">
-                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    Loan Fully Paid
+                                        </thead>
+                                        <tbody class="divide-y divide-gray-200">
+                                            @foreach($loanPayments as $lp)
+                                                <tr
+                                                    class="hover:bg-gray-50 transition {{ $lp->status == 'void' ? 'bg-red-50 opacity-60' : '' }}">
+                                                    <td class="px-4 py-3 text-sm text-gray-900" style="padding-left: 22px;">
+                                                        {{ $lp->Id }}
+                                                    </td>
+                                                    <td class="px-4 py-3 text-sm text-gray-900" style="padding-left: 37px;">
+                                                        {{ $lp->SeriesCode ?? 'N/A' }}
+                                                    </td>
+                                                    <td class="px-4 py-3 text-sm text-gray-900" style="padding-left: 25px;">
+                                                        {{ $lp->ORNo }}
+                                                    </td>
+                                                    <td class="px-4 py-3 text-sm font-semibold text-gray-900"
+                                                        style="padding-left: 30px;">₱ {{ number_format($lp->Amount, 2) }}</td>
+                                                    <td class="px-4 py-3 text-sm text-gray-500" style="padding-left: 50px;">
+                                                        {{ $lp->Installment ?? 'N/A' }}
+                                                    </td>
+                                                    <td class="px-4 py-3 text-sm text-gray-900" style="padding-left: 2px;">
+                                                        {{ $lp->PaymentDate }}
+                                                    </td>
+                                                    <td class="px-4 py-3 text-sm">
+                                                        @if($lp->status == 'void')
+                                                            <span
+                                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800"
+                                                                style="margin-left: 40px;">
+                                                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                                    <path fill-rule="evenodd"
+                                                                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                                                        clip-rule="evenodd" />
+                                                                </svg>
+                                                                Void
+                                                            </span>
+                                                        @else
+                                                            <span
+                                                                class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800"
+                                                                style="margin-left: -13px;">
+                                                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                                    <path fill-rule="evenodd"
+                                                                        d="M16.707 5.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A1 1 0 014 6v2a1 1 0 011 1h2a1 1 0 011 1v2a1 1 0 01-1 1H6a1 1 0 01-1-1v-2a1 1 0 011-1H7v-2a1 1 0 011-1h2z"
+                                                                        clip-rule="evenodd" />
+                                                                </svg>
+                                                                Active
+                                                            </span>
+                                                        @endif
+                                                    </td>
+                                                    <td class="px-4 py-3 text-sm">
+                                                        @if($lp->status != 'void')
+                                                            <button type="button"
+                                                                class="inline-flex items-center px-3 py-1.5 bg-red-100 hover:bg-red-200 border border-red-300 text-red-700 hover:text-red-800 text-xs font-semibold rounded-md shadow-sm transition duration-150 ease-in-out"
+                                                                onclick="showLoanPaymentVoidModal('{{ $lp->Id }}', '{{ $lp->ORNo }}')">
+                                                                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor"
+                                                                    viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        stroke-width="2"
+                                                                        d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636">
+                                                                    </path>
+                                                                </svg>
+                                                                Void
+                                                            </button>
+                                                        @else
+                                                            <span
+                                                                class="inline-flex items-center px-3 py-1.5 bg-gray-100 border border-gray-300 text-gray-500 text-xs font-semibold rounded-md">
+                                                                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor"
+                                                                    viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        stroke-width="2"
+                                                                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                                                                    </path>
+                                                                </svg>
+                                                                Locked
+                                                            </span>
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
                                 </div>
-                            @endif
-                        </div>
-                    @else
-                        <div class="flex flex-col items-center justify-center py-16">
-                            <div class="bg-gray-100 rounded-full p-6 mb-4">
-                                <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
                             </div>
-                            <p class="text-gray-500 text-center text-lg font-medium">No active loan request</p>
-                            <p class="text-gray-400 text-center text-sm mt-1">Apply for a loan to see payment details here
-                            </p>
-                        </div>
-                    @endif
+
+                            <!-- Add Payment Button - Centered -->
+                            <div class="flex justify-center">
+                                @if($hasLoanRequest->Status == 'Approved' && $loanBalance > 0)
+                                    <a href="/client-addloanpayment/{{ $clients->cid }}{{ $statusQuery }}"
+                                        class="inline-flex items-center px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-200 ease-in-out">
+                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                        </svg>
+                                        Add Payment
+                                    </a>
+                                @else
+                                    <div
+                                        class="inline-flex items-center px-8 py-3 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-600 font-semibold rounded-lg">
+                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Loan Fully Paid
+                                    </div>
+                                @endif
+                            </div>
+                        @else
+                            <div class="flex flex-col items-center justify-center py-16">
+                                <div class="bg-gray-100 rounded-full p-6 mb-4">
+                                    <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                </div>
+                                <p class="text-gray-500 text-center text-lg font-medium">No active loan request</p>
+                                <p class="text-gray-400 text-center text-sm mt-1">Apply for a loan to see payment details here
+                                </p>
+                            </div>
+                        @endif
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="tab-pane fade {{ $message === 'assign' ? 'show active' : '' }}" id="assignedMember" role="tabpanel"
-            aria-labelledby="assigned-member-tab">
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-indigo-50">
-                    <h3 class="text-lg font-semibold text-gray-800 flex items-center">
-                        <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                        </svg>
-                        Assigned Member
-                    </h3>
-                </div>
-                <div class="p-6">
-                    @if($assignedMemberData != null)
-                        <div class="space-y-2">
-                            <div class="flex justify-between py-2 hover:bg-purple-50 px-2 rounded transition">
-                                <span class="text-gray-600 font-medium">Name</span>
-                                <span class="text-gray-900">{{ $assignedMemberData->LastName }} ,
-                                    {{ $assignedMemberData->FirstName }} {{ $assignedMemberData->MiddleName }}</span>
+            <div class="tab-pane fade {{ $message === 'assign' ? 'show active' : '' }}" id="assignedMember" role="tabpanel"
+                aria-labelledby="assigned-member-tab">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-indigo-50">
+                        <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                            Assigned Member
+                        </h3>
+                    </div>
+                    <div class="p-6">
+                        @if($assignedMemberData != null)
+                            <div class="space-y-2">
+                                <div class="flex justify-between py-2 hover:bg-purple-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium">Name</span>
+                                    <span class="text-gray-900">{{ $assignedMemberData->LastName }} ,
+                                        {{ $assignedMemberData->FirstName }} {{ $assignedMemberData->MiddleName }}</span>
+                                </div>
+                                <div class="flex justify-between py-2 hover:bg-purple-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium">Gender</span>
+                                    <span class="text-gray-900">{{ $assignedMemberData->Gender }}</span>
+                                </div>
+                                <div class="flex justify-between py-2 hover:bg-purple-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium">Birth Date</span>
+                                    <span class="text-gray-900">{{ $assignedMemberData->BirthDate }}</span>
+                                </div>
+                                <div class="flex justify-between py-2 hover:bg-purple-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium">Age</span>
+                                    <span class="text-gray-900">{{ $assignedMemberData->Age }}</span>
+                                </div>
+                                <div class="flex justify-between py-2 hover:bg-purple-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium">Province</span>
+                                    <span class="text-gray-900">{{ $assignedMemberData->Province }}</span>
+                                </div>
+                                <div class="flex justify-between py-2 hover:bg-purple-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium">City</span>
+                                    <span class="text-gray-900">{{ $assignedMemberData->City }}</span>
+                                </div>
+                                <div class="flex justify-between py-2 hover:bg-purple-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium">Barangay</span>
+                                    <span class="text-gray-900">{{ $assignedMemberData->Barangay }}</span>
+                                </div>
+                                <div class="flex justify-between py-2 hover:bg-purple-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium">Zipcode</span>
+                                    <span class="text-gray-900">{{ $assignedMemberData->Zipcode }}</span>
+                                </div>
+                                <div class="flex justify-between py-2 hover:bg-purple-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium">Date Assigned</span>
+                                    <span class="text-gray-900">{{ $assignedMemberData->DateCreated }}</span>
+                                </div>
+                                <div class="flex justify-between py-2 hover:bg-purple-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium">Assigned By</span>
+                                    <span class="text-gray-900">{{ $staff->LastName }} , {{ $staff->FirstName }}
+                                        {{ $staff->MiddleName }}</span>
+                                </div>
+                                <div class="flex justify-between py-2 hover:bg-purple-50 px-2 rounded transition">
+                                    <span class="text-gray-600 font-medium">Attachment</span>
+                                    <span class="text-gray-900">
+                                        @if($assignedMemberData->Attachment != null)
+                                            <a href="{{ asset('uploads/assignedplans/' . $assignedMemberData->Attachment) }}"
+                                                target="_blank" class="text-purple-600 hover:text-purple-700 underline">View</a>
+                                        @else
+                                            <span class="text-gray-400">No image available</span>
+                                        @endif
+                                    </span>
+                                </div>
                             </div>
-                            <div class="flex justify-between py-2 hover:bg-purple-50 px-2 rounded transition">
-                                <span class="text-gray-600 font-medium">Gender</span>
-                                <span class="text-gray-900">{{ $assignedMemberData->Gender }}</span>
-                            </div>
-                            <div class="flex justify-between py-2 hover:bg-purple-50 px-2 rounded transition">
-                                <span class="text-gray-600 font-medium">Birth Date</span>
-                                <span class="text-gray-900">{{ $assignedMemberData->BirthDate }}</span>
-                            </div>
-                            <div class="flex justify-between py-2 hover:bg-purple-50 px-2 rounded transition">
-                                <span class="text-gray-600 font-medium">Age</span>
-                                <span class="text-gray-900">{{ $assignedMemberData->Age }}</span>
-                            </div>
-                            <div class="flex justify-between py-2 hover:bg-purple-50 px-2 rounded transition">
-                                <span class="text-gray-600 font-medium">Province</span>
-                                <span class="text-gray-900">{{ $assignedMemberData->Province }}</span>
-                            </div>
-                            <div class="flex justify-between py-2 hover:bg-purple-50 px-2 rounded transition">
-                                <span class="text-gray-600 font-medium">City</span>
-                                <span class="text-gray-900">{{ $assignedMemberData->City }}</span>
-                            </div>
-                            <div class="flex justify-between py-2 hover:bg-purple-50 px-2 rounded transition">
-                                <span class="text-gray-600 font-medium">Barangay</span>
-                                <span class="text-gray-900">{{ $assignedMemberData->Barangay }}</span>
-                            </div>
-                            <div class="flex justify-between py-2 hover:bg-purple-50 px-2 rounded transition">
-                                <span class="text-gray-600 font-medium">Zipcode</span>
-                                <span class="text-gray-900">{{ $assignedMemberData->Zipcode }}</span>
-                            </div>
-                            <div class="flex justify-between py-2 hover:bg-purple-50 px-2 rounded transition">
-                                <span class="text-gray-600 font-medium">Date Assigned</span>
-                                <span class="text-gray-900">{{ $assignedMemberData->DateCreated }}</span>
-                            </div>
-                            <div class="flex justify-between py-2 hover:bg-purple-50 px-2 rounded transition">
-                                <span class="text-gray-600 font-medium">Assigned By</span>
-                                <span class="text-gray-900">{{ $staff->LastName }} , {{ $staff->FirstName }}
-                                    {{ $staff->MiddleName }}</span>
-                            </div>
-                            <div class="flex justify-between py-2 hover:bg-purple-50 px-2 rounded transition">
-                                <span class="text-gray-600 font-medium">Attachment</span>
-                                <span class="text-gray-900">
-                                    @if($assignedMemberData->Attachment != null)
-                                        <a href="{{ asset('uploads/assignedplans/' . $assignedMemberData->Attachment) }}"
-                                            target="_blank" class="text-purple-600 hover:text-purple-700 underline">View</a>
-                                    @else
-                                        <span class="text-gray-400">No image available</span>
+                            <form class="mt-6" action="/submit-client-assign-attachment/{{ $assignedMemberData->Id }}"
+                                method="POST" enctype="multipart/form-data">
+                                @csrf
+                                @method('PUT')
+                                <div class="border-t border-gray-200 pt-6">
+                                    @php
+                                        $prevAssignAttachment = old('assignattachment');
+                                    @endphp
+                                    <label for="assignAttachment" class="block text-sm font-medium text-gray-700 mb-2">Upload
+                                        Attachment</label>
+                                    <input type="file"
+                                        class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
+                                        id="assignAttachment" name="assignattachment" />
+                                    @error('assignattachment')
+                                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                                    @enderror
+                                    <button type="submit"
+                                        class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4">Upload</button>
+                                </div>
+                            </form>
+                        @else
+                            @if($clients->Status == 3)
+                                <div class="mt-3">
+                                    <p class="text-gray-500 mb-4">** No data available **</p>
+                                </div>
+                                @if($canTransfer)
+                                    @if($canTransfer->TransferClientId == null)
+                                        <a href="/client-assignplan/{{ $clients->cid }}{{ $statusQuery }}"
+                                            class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out"
+                                            role="button">Assign Now</a>
                                     @endif
-                                </span>
-                            </div>
-                        </div>
-                        <form class="mt-6" action="/submit-client-assign-attachment/{{ $assignedMemberData->Id }}" method="POST"
-                            enctype="multipart/form-data">
-                            @csrf
-                            @method('PUT')
-                            <div class="border-t border-gray-200 pt-6">
-                                @php
-                                    $prevAssignAttachment = old('assignattachment');
-                                @endphp
-                                <label for="assignAttachment" class="block text-sm font-medium text-gray-700 mb-2">Upload
-                                    Attachment</label>
-                                <input type="file"
-                                    class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
-                                    id="assignAttachment" name="assignattachment" />
-                                @error('assignattachment')
-                                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                                @enderror
-                                <button type="submit"
-                                    class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out mt-4">Upload</button>
-                            </div>
-                        </form>
-                    @else
-                        @if($clients->Status == 3)
-                            <div class="mt-3">
-                                <p class="text-gray-500 mb-4">** No data available **</p>
-                            </div>
-                            @if($canTransfer)
-                                @if($canTransfer->TransferClientId == null)
+                                @else
                                     <a href="/client-assignplan/{{ $clients->cid }}{{ $statusQuery }}"
                                         class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out"
                                         role="button">Assign Now</a>
                                 @endif
                             @else
-                                <a href="/client-assignplan/{{ $clients->cid }}{{ $statusQuery }}"
-                                    class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 transition duration-200 ease-in-out"
-                                    role="button">Assign Now</a>
+                                <p class="mt-2 text-gray-500">** Client needs to be approved to perform this action.</p>
                             @endif
-                        @else
-                            <p class="mt-2 text-gray-500">** Client needs to be approved to perform this action.</p>
                         @endif
-                    @endif
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- MODAL APPROVAL FOR CERTIFICATE OF FULL PAYMENT ERROR -->
-    <div class="modal fade" id="showApproveCfpErrorInputModal" data-bs-backdrop="static" data-bs-keyboard="false"
-        tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" style="display: none;">
-        <div class="modal-dialog">
-            <div class="modal-content rounded-xl shadow-2xl border-0">
-                <div class="modal-header bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-0 rounded-t-xl">
-                    <h5 class="modal-title font-bold flex items-center" id="staticBackdropLabel">
-                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                        </svg>
-                        Warning
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-6">
-                    <p class="text-gray-700 text-base">Certificate of full payment requires approval.</p>
-                </div>
-                <div class="modal-footer border-0 px-6 pb-6">
-                    <button type="button"
-                        class="px-6 py-2.5 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-lg shadow-md transition duration-200"
-                        data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL APPROVAL FOR CERTIFICATE OF FULL PAYMENT -->
-    <div class="modal fade" id="showApproveCfpInputModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-        aria-labelledby="staticBackdropLabel" aria-hidden="true" style="display: none;">
-        <div class="modal-dialog">
-            <div class="modal-content rounded-xl shadow-2xl border-0">
-                <div class="modal-header bg-gradient-to-r from-purple-600 to-purple-700 text-white border-0 rounded-t-xl">
-                    <h5 class="modal-title font-bold flex items-center" id="staticBackdropLabel">
-                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        Certificate Approval
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-6">
-                    <div class="space-y-3">
-                        <p class="text-gray-700 text-base">You are going to approve the certificate of full payment for
-                            this client.</p>
-                        <p class="font-bold text-red-600 flex items-center">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <!-- MODAL APPROVAL FOR CERTIFICATE OF FULL PAYMENT ERROR -->
+        <div class="modal fade" id="showApproveCfpErrorInputModal" data-bs-backdrop="static" data-bs-keyboard="false"
+            tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" style="display: none;">
+            <div class="modal-dialog">
+                <div class="modal-content rounded-xl shadow-2xl border-0">
+                    <div
+                        class="modal-header bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-0 rounded-t-xl">
+                        <h5 class="modal-title font-bold flex items-center" id="staticBackdropLabel">
+                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                             </svg>
-                            You cannot undo this action. Continue?
-                        </p>
+                            Warning
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
                     </div>
-                </div>
-                <div class="modal-footer border-0 px-6 pb-6 gap-3">
-                    <button type="button"
-                        class="px-6 py-2.5 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-lg shadow-md transition duration-200"
-                        data-bs-dismiss="modal">Close</button>
-                    <button type="button"
-                        class="px-6 py-2.5 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md transition duration-200"
-                        id="cofpApproval">Submit</button>
+                    <div class="modal-body p-6">
+                        <p class="text-gray-700 text-base">Certificate of full payment requires approval.</p>
+                    </div>
+                    <div class="modal-footer border-0 px-6 pb-6">
+                        <button type="button"
+                            class="px-6 py-2.5 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-lg shadow-md transition duration-200"
+                            data-bs-dismiss="modal">Close</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- MODAL CLIENT STATUS -->
-    <div class="modal fade" id="clientStatusModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-        aria-labelledby="staticBackdropLabel" aria-hidden="true" style="display: none;">
-        <div class="modal-dialog">
-            <div class="modal-content rounded-xl shadow-2xl border-0">
-                <div class="modal-header bg-gradient-to-r from-blue-600 to-blue-700 text-white border-0 rounded-t-xl">
-                    <h5 class="modal-title font-bold flex items-center" id="staticBackdropLabel">
-                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
-                        </svg>
-                        Confirmation
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-6">
-                    <div class="space-y-3">
-                        @if($clients->Status == '1')
-                            <p class="text-gray-700 text-base">You are going to verify the selected client <span
-                                    class="font-semibold text-purple-600" id="clientStatus"></span>.</p>
-                        @elseif($clients->Status == '2')
-                            <p class="text-gray-700 text-base">You are going to approve the selected client <span
-                                    class="font-semibold text-purple-600" id="clientStatus"></span>. Once approved, payment
-                                details cannot be changed.</p>
-                        @endif
-                        <p class="font-bold text-red-600 flex items-center">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <!-- MODAL APPROVAL FOR CERTIFICATE OF FULL PAYMENT -->
+        <div class="modal fade" id="showApproveCfpInputModal" data-bs-backdrop="static" data-bs-keyboard="false"
+            tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" style="display: none;">
+            <div class="modal-dialog">
+                <div class="modal-content rounded-xl shadow-2xl border-0">
+                    <div
+                        class="modal-header bg-gradient-to-r from-purple-600 to-purple-700 text-white border-0 rounded-t-xl">
+                        <h5 class="modal-title font-bold flex items-center" id="staticBackdropLabel">
+                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            You cannot undo this action. Continue?
-                        </p>
+                            Certificate Approval
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
                     </div>
-                </div>
-                <form id="clientStatusForm" method="POST">
-                    @csrf
-                    @method('PUT')
+                    <div class="modal-body p-6">
+                        <div class="space-y-3">
+                            <p class="text-gray-700 text-base">You are going to approve the certificate of full payment for
+                                this client.</p>
+                            <p class="font-bold text-red-600 flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                You cannot undo this action. Continue?
+                            </p>
+                        </div>
+                    </div>
                     <div class="modal-footer border-0 px-6 pb-6 gap-3">
                         <button type="button"
                             class="px-6 py-2.5 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-lg shadow-md transition duration-200"
                             data-bs-dismiss="modal">Close</button>
                         <button type="button"
-                            class="px-6 py-2.5 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold rounded-lg shadow-md transition duration-200"
-                            id="confirmClientStatus">Confirm</button>
+                            class="px-6 py-2.5 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg shadow-md transition duration-200"
+                            id="cofpApproval">Submit</button>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
-    </div>
 
-    <style>
-        /* Tab pane visibility control */
-        .tab-pane {
-            display: none;
-        }
+        <!-- MODAL CLIENT STATUS -->
+        <div class="modal fade" id="clientStatusModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+            aria-labelledby="staticBackdropLabel" aria-hidden="true" style="display: none;">
+            <div class="modal-dialog">
+                <div class="modal-content rounded-xl shadow-2xl border-0">
+                    <div class="modal-header bg-gradient-to-r from-blue-600 to-blue-700 text-white border-0 rounded-t-xl">
+                        <h5 class="modal-title font-bold flex items-center" id="staticBackdropLabel">
+                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                            </svg>
+                            Confirmation
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-6">
+                        <div class="space-y-3">
+                            @if($clients->Status == '1')
+                                <p class="text-gray-700 text-base">You are going to verify the selected client <span
+                                        class="font-semibold text-purple-600" id="clientStatus"></span>.</p>
+                            @elseif($clients->Status == '2')
+                                <p class="text-gray-700 text-base">You are going to approve the selected client <span
+                                        class="font-semibold text-purple-600" id="clientStatus"></span>. Once approved, payment
+                                    details cannot be changed.</p>
+                            @endif
+                            <p class="font-bold text-red-600 flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                You cannot undo this action. Continue?
+                            </p>
+                        </div>
+                    </div>
+                    <form id="clientStatusForm" method="POST">
+                        @csrf
+                        @method('PUT')
+                        <div class="modal-footer border-0 px-6 pb-6 gap-3">
+                            <button type="button"
+                                class="px-6 py-2.5 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-lg shadow-md transition duration-200"
+                                data-bs-dismiss="modal">Close</button>
+                            <button type="button"
+                                class="px-6 py-2.5 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold rounded-lg shadow-md transition duration-200"
+                                id="confirmClientStatus">Confirm</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
 
-        .tab-pane.active {
-            display: block;
-        }
-
-        /* Payment filter button active states */
-        .payment-filter-btn.active {
-            background-color: #76df9dff !important;
-            /* green-500 */
-            border-color: #1aec67ff !important;
-            /* green-600 */
-            color: #ffffff !important;
-            /* white text */
-        }
-
-        /* Global pagination styling now handled in app.css */
-
-        /* Void action button styling */
-        .action-void {
-            color: #dc2626 !important;
-            /* red-600 */
-            text-decoration: underline;
-            cursor: pointer;
-        }
-
-        .action-void:hover {
-            color: #b91c1c !important;
-            /* red-700 */
-        }
-
-        .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
-            background: #f9fafb !important;
-            /* gray-50 */
-            border-color: #e5e7eb !important;
-            /* gray-200 */
-            color: #9ca3af !important;
-            /* gray-400 */
-        }
-    </style>
-    <script src="{{ asset('js/client-view.js') }}"></script>
-    <script>
-        // Function to submit complete memorial for          m
-        function submitCompleteMemorial() {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = '/submit-complete-memorial/{{ $clients->cid }}';
-
-            const csrfToken = document.createElement('input');
-            csrfToken.type = 'hidden';
-            csrfToken.name = '_token';
-            csrfToken.value = '{{ csrf_token() }}';
-
-            const method = document.createElement('input');
-            method.type = 'hidden';
-            method.name = '_method';
-            method.value = 'PUT';
-
-            form.appendChild(csrfToken);
-            form.appendChild(method);
-            document.body.appendChild(form);
-            form.submit();
-        }
-
-        // Function to submit approve client form
-        function submitApproveClient() {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = '/client-update-status/{{ $clients->cid }}';
-
-            const csrfToken = document.createElement('input');
-            csrfToken.type = 'hidden';
-            csrfToken.name = '_token';
-            csrfToken.value = '{{ csrf_token() }}';
-
-            const method = document.createElement('input');
-            method.type = 'hidden';
-            method.name = '_method';
-            method.value = 'PUT';
-
-            form.appendChild(csrfToken);
-            form.appendChild(method);
-            document.body.appendChild(form);
-            form.submit();
-        }
-
-        // Function to submit verify client form
-        function submitVerifyClient() {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = '/client-update-status/{{ $clients->cid }}';
-
-            const csrfToken = document.createElement('input');
-            csrfToken.type = 'hidden';
-            csrfToken.name = '_token';
-            csrfToken.value = '{{ csrf_token() }}';
-
-            const method = document.createElement('input');
-            method.type = 'hidden';
-            method.name = '_method';
-            method.value = 'PUT';
-
-            form.appendChild(csrfToken);
-            form.appendChild(method);
-            document.body.appendChild(form);
-            form.submit();
-        }
-
-        // Function to show payment void modal
-        let currentPaymentId = null;
-        function showPaymentVoidModal(paymentId, orNo) {
-            currentPaymentId = paymentId;
-            showSwiftModal('Void Payment', `You are going to void the selected payment with OR No. ${orNo}\n\nYou cannot undo this action. Continue?`, 'warning', [
-                { text: 'Confirm', class: 'bg-red-500 hover:bg-red-600 text-white', action: 'submitPaymentVoid()' },
-                { text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800' }
-            ]);
-        }
-
-        // Function to submit payment void
-        function submitPaymentVoid() {
-            if (!currentPaymentId) return;
-
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = '/submit-void-payment/' + currentPaymentId;
-
-            const csrfToken = document.createElement('input');
-            csrfToken.type = 'hidden';
-            csrfToken.name = '_token';
-            csrfToken.value = '{{ csrf_token() }}';
-
-            const method = document.createElement('input');
-            method.type = 'hidden';
-            method.name = '_method';
-            method.value = 'PUT';
-
-            form.appendChild(csrfToken);
-            form.appendChild(method);
-            document.body.appendChild(form);
-            form.submit();
-        }
-
-        // Function to show loan payment void modal
-        let currentLoanPaymentId = null;
-        function showLoanPaymentVoidModal(loanPaymentId, orNo) {
-            currentLoanPaymentId = loanPaymentId;
-            showSwiftModal('Void Loan Payment', `You are going to void the selected payment with OR No. ${orNo}\n\nYou cannot undo this action. Continue?`, 'warning', [
-                { text: 'Confirm', class: 'bg-red-500 hover:bg-red-600 text-white', action: 'submitLoanPaymentVoid()' },
-                { text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800' }
-            ]);
-        }
-
-        // Function to submit loan payment void
-        function submitLoanPaymentVoid() {
-            if (!currentLoanPaymentId) return;
-
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = '/submit-void-loan-payment/' + currentLoanPaymentId;
-
-            const csrfToken = document.createElement('input');
-            csrfToken.type = 'hidden';
-            csrfToken.name = '_token';
-            csrfToken.value = '{{ csrf_token() }}';
-
-            const method = document.createElement('input');
-            method.type = 'hidden';
-            method.name = '_method';
-            method.value = 'PUT';
-
-            form.appendChild(csrfToken);
-            form.appendChild(method);
-            document.body.appendChild(form);
-            form.submit();
-        }
-
-        // Function to submit CFP approval
-        function submitCfpApproval() {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = '/approve-cfp/{{ $clients->cid }}';
-
-            const csrfToken = document.createElement('input');
-            csrfToken.type = 'hidden';
-            csrfToken.name = '_token';
-            csrfToken.value = '{{ csrf_token() }}';
-
-            form.appendChild(csrfToken);
-            document.body.appendChild(form);
-            form.submit();
-        }
-
-        // Custom tab switching (more reliable than Bootstrap)
-        document.addEventListener('DOMContentLoaded', function () {
-            @if(request('status'))
-                localStorage.setItem('clientStatusFilter', '{{ request('status') }}');
-            @endif
-
-                                    const tabs = document.querySelectorAll('#clientTabs button[data-bs-toggle="tab"]');
-            const tabPanes = document.querySelectorAll('.tab-pane');
-
-            // Map tab IDs to hash names
-            const tabHashMap = {
-                '#clientInfo': 'client',
-                '#paymentHistory': 'payment',
-                '#loanPayments': 'loan',
-                '#assignedMember': 'assign'
-            };
-            const hashTabMap = {
-                'client': '#clientInfo',
-                'payment': '#paymentHistory',
-                'loan': '#loanPayments',
-                'assign': '#assignedMember'
-            };
-
-            tabs.forEach(tab => {
-                tab.addEventListener('click', function (e) {
-                    e.preventDefault();
-
-                    // Get target pane
-                    const targetId = this.getAttribute('data-bs-target');
-                    const targetPane = document.querySelector(targetId);
-
-                    if (!targetPane) return;
-
-                    // Remove active classes from all tabs
-                    tabs.forEach(t => {
-                        t.classList.remove('text-purple-600', 'border-b-2', 'border-purple-600', 'font-semibold');
-                        t.classList.add('text-gray-500');
-                        t.setAttribute('aria-selected', 'false');
-                    });
-
-                    // Add active classes to clicked tab
-                    this.classList.remove('text-gray-500');
-                    this.classList.add('text-purple-600', 'border-b-2', 'border-purple-600', 'font-semibold');
-                    this.setAttribute('aria-selected', 'true');
-
-                    // Hide all tab panes
-                    tabPanes.forEach(pane => {
-                        pane.classList.remove('active', 'show');
-                    });
-
-                    // Show target pane
-                    targetPane.classList.add('active', 'show');
-
-                    // Store tab in URL hash
-                    const hash = tabHashMap[targetId];
-                    if (hash) {
-                        history.replaceState(null, null, '#' + hash);
-                    }
-                });
-            });
-
-            // Restore tab from URL hash on page load
-            const hash = window.location.hash.substring(1);
-            if (hash && hashTabMap[hash]) {
-                const targetTab = document.querySelector('button[data-bs-target="' + hashTabMap[hash] + '"]');
-                if (targetTab) {
-                    targetTab.click();
-                }
+        <style>
+            /* Tab pane visibility control */
+            .tab-pane {
+                display: none;
             }
 
-            console.log('✅ Custom tabs initialized with hash persistence:', tabs.length, 'tabs found');
-        });
-    </script>
+            .tab-pane.active {
+                display: block;
+            }
+
+            /* Payment filter button active states */
+            .payment-filter-btn.active {
+                background-color: #76df9dff !important;
+                /* green-500 */
+                border-color: #1aec67ff !important;
+                /* green-600 */
+                color: #ffffff !important;
+                /* white text */
+            }
+
+            /* Global pagination styling now handled in app.css */
+
+            /* Void action button styling */
+            .action-void {
+                color: #dc2626 !important;
+                /* red-600 */
+                text-decoration: underline;
+                cursor: pointer;
+            }
+
+            .action-void:hover {
+                color: #b91c1c !important;
+                /* red-700 */
+            }
+
+            .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+                background: #f9fafb !important;
+                /* gray-50 */
+                border-color: #e5e7eb !important;
+                /* gray-200 */
+                color: #9ca3af !important;
+                /* gray-400 */
+            }
+        </style>
+        <script src="{{ asset('js/client-view.js') }}"></script>
+        <script>
+            // Function to submit complete memorial for          m
+            function submitCompleteMemorial() {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/submit-complete-memorial/{{ $clients->cid }}';
+
+                const csrfToken = document.createElement('input');
+                csrfToken.type = 'hidden';
+                csrfToken.name = '_token';
+                csrfToken.value = '{{ csrf_token() }}';
+
+                const method = document.createElement('input');
+                method.type = 'hidden';
+                method.name = '_method';
+                method.value = 'PUT';
+
+                form.appendChild(csrfToken);
+                form.appendChild(method);
+                document.body.appendChild(form);
+                form.submit();
+            }
+
+            // Function to submit approve client form
+            function submitApproveClient() {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/client-update-status/{{ $clients->cid }}';
+
+                const csrfToken = document.createElement('input');
+                csrfToken.type = 'hidden';
+                csrfToken.name = '_token';
+                csrfToken.value = '{{ csrf_token() }}';
+
+                const method = document.createElement('input');
+                method.type = 'hidden';
+                method.name = '_method';
+                method.value = 'PUT';
+
+                form.appendChild(csrfToken);
+                form.appendChild(method);
+                document.body.appendChild(form);
+                form.submit();
+            }
+
+            // Function to submit verify client form
+            function submitVerifyClient() {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/client-update-status/{{ $clients->cid }}';
+
+                const csrfToken = document.createElement('input');
+                csrfToken.type = 'hidden';
+                csrfToken.name = '_token';
+                csrfToken.value = '{{ csrf_token() }}';
+
+                const method = document.createElement('input');
+                method.type = 'hidden';
+                method.name = '_method';
+                method.value = 'PUT';
+
+                form.appendChild(csrfToken);
+                form.appendChild(method);
+                document.body.appendChild(form);
+                form.submit();
+            }
+
+            // Function to show payment void modal
+            let currentPaymentId = null;
+            function showPaymentVoidModal(paymentId, orNo) {
+                currentPaymentId = paymentId;
+                showSwiftModal('Void Payment', `You are going to void the selected payment with OR No. ${orNo}\n\nYou cannot undo this action. Continue?`, 'warning', [
+                    { text: 'Confirm', class: 'bg-red-500 hover:bg-red-600 text-white', action: 'submitPaymentVoid()' },
+                    { text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800' }
+                ]);
+            }
+
+            // Function to submit payment void
+            function submitPaymentVoid() {
+                if (!currentPaymentId) return;
+
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/submit-void-payment/' + currentPaymentId;
+
+                const csrfToken = document.createElement('input');
+                csrfToken.type = 'hidden';
+                csrfToken.name = '_token';
+                csrfToken.value = '{{ csrf_token() }}';
+
+                const method = document.createElement('input');
+                method.type = 'hidden';
+                method.name = '_method';
+                method.value = 'PUT';
+
+                form.appendChild(csrfToken);
+                form.appendChild(method);
+                document.body.appendChild(form);
+                form.submit();
+            }
+
+            // Function to show loan payment void modal
+            let currentLoanPaymentId = null;
+            function showLoanPaymentVoidModal(loanPaymentId, orNo) {
+                currentLoanPaymentId = loanPaymentId;
+                showSwiftModal('Void Loan Payment', `You are going to void the selected payment with OR No. ${orNo}\n\nYou cannot undo this action. Continue?`, 'warning', [
+                    { text: 'Confirm', class: 'bg-red-500 hover:bg-red-600 text-white', action: 'submitLoanPaymentVoid()' },
+                    { text: 'Close', class: 'bg-gray-200 hover:bg-gray-300 text-gray-800' }
+                ]);
+            }
+
+            // Function to submit loan payment void
+            function submitLoanPaymentVoid() {
+                if (!currentLoanPaymentId) return;
+
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/submit-void-loan-payment/' + currentLoanPaymentId;
+
+                const csrfToken = document.createElement('input');
+                csrfToken.type = 'hidden';
+                csrfToken.name = '_token';
+                csrfToken.value = '{{ csrf_token() }}';
+
+                const method = document.createElement('input');
+                method.type = 'hidden';
+                method.name = '_method';
+                method.value = 'PUT';
+
+                form.appendChild(csrfToken);
+                form.appendChild(method);
+                document.body.appendChild(form);
+                form.submit();
+            }
+
+            // Function to submit CFP approval
+            function submitCfpApproval() {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/approve-cfp/{{ $clients->cid }}';
+
+                const csrfToken = document.createElement('input');
+                csrfToken.type = 'hidden';
+                csrfToken.name = '_token';
+                csrfToken.value = '{{ csrf_token() }}';
+
+                form.appendChild(csrfToken);
+                document.body.appendChild(form);
+                form.submit();
+            }
+
+            // Custom tab switching (more reliable than Bootstrap)
+            document.addEventListener('DOMContentLoaded', function () {
+                @if(request('status'))
+                    localStorage.setItem('clientStatusFilter', '{{ request('status') }}');
+                @endif
+
+                                        const tabs = document.querySelectorAll('#clientTabs button[data-bs-toggle="tab"]');
+                const tabPanes = document.querySelectorAll('.tab-pane');
+
+                // Map tab IDs to hash names
+                const tabHashMap = {
+                    '#clientInfo': 'client',
+                    '#paymentHistory': 'payment',
+                    '#loanPayments': 'loan',
+                    '#assignedMember': 'assign'
+                };
+                const hashTabMap = {
+                    'client': '#clientInfo',
+                    'payment': '#paymentHistory',
+                    'loan': '#loanPayments',
+                    'assign': '#assignedMember'
+                };
+
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', function (e) {
+                        e.preventDefault();
+
+                        // Get target pane
+                        const targetId = this.getAttribute('data-bs-target');
+                        const targetPane = document.querySelector(targetId);
+
+                        if (!targetPane) return;
+
+                        // Remove active classes from all tabs
+                        tabs.forEach(t => {
+                            t.classList.remove('text-purple-600', 'border-b-2', 'border-purple-600', 'font-semibold');
+                            t.classList.add('text-gray-500');
+                            t.setAttribute('aria-selected', 'false');
+                        });
+
+                        // Add active classes to clicked tab
+                        this.classList.remove('text-gray-500');
+                        this.classList.add('text-purple-600', 'border-b-2', 'border-purple-600', 'font-semibold');
+                        this.setAttribute('aria-selected', 'true');
+
+                        // Hide all tab panes
+                        tabPanes.forEach(pane => {
+                            pane.classList.remove('active', 'show');
+                        });
+
+                        // Show target pane
+                        targetPane.classList.add('active', 'show');
+
+                        // Store tab in URL hash
+                        const hash = tabHashMap[targetId];
+                        if (hash) {
+                            history.replaceState(null, null, '#' + hash);
+                        }
+                    });
+                });
+
+                // Restore tab from URL hash on page load
+                const hash = window.location.hash.substring(1);
+                if (hash && hashTabMap[hash]) {
+                    const targetTab = document.querySelector('button[data-bs-target="' + hashTabMap[hash] + '"]');
+                    if (targetTab) {
+                        targetTab.click();
+                    }
+                }
+
+                console.log('✅ Custom tabs initialized with hash persistence:', tabs.length, 'tabs found');
+            });
+        </script>
 @endsection
