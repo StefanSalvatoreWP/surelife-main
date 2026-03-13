@@ -138,11 +138,11 @@ class ClientController extends Controller
                     ->leftJoin(\DB::raw("(
                         SELECT 
                             clientid,
-                            SUM(AmountPaid) as total_paid,
+                            SUM(CASE WHEN Remarks IS NULL OR Remarks IN ('Standard', 'Partial', 'Custom') THEN AmountPaid ELSE 0 END) as total_paid,
                             MAX(Date) as last_payment_date
                         FROM tblpayment
                         WHERE VoidStatus != '1'
-                        AND (Remarks IS NULL OR Remarks IN ('Standard', 'Partial', 'Custom'))
+                        AND (Remarks IS NULL OR Remarks IN ('Standard', 'Partial', 'Custom', 'Reinstatement'))
                         GROUP BY clientid
                     ) as payment_stats"), 'tblclient.id', '=', 'payment_stats.clientid')
                     // Lapsed: last payment OR creation date beyond term+grace threshold
@@ -174,11 +174,11 @@ class ClientController extends Controller
                     ->leftJoin(\DB::raw("(
                         SELECT 
                             clientid,
-                            SUM(AmountPaid) as total_paid,
+                            SUM(CASE WHEN Remarks IS NULL OR Remarks IN ('Standard', 'Partial', 'Custom') THEN AmountPaid ELSE 0 END) as total_paid,
                             MAX(Date) as last_payment_date
                         FROM tblpayment
                         WHERE VoidStatus != '1'
-                        AND (Remarks IS NULL OR Remarks IN ('Standard', 'Partial', 'Custom'))
+                        AND (Remarks IS NULL OR Remarks IN ('Standard', 'Partial', 'Custom', 'Reinstatement'))
                         GROUP BY clientid
                     ) as payment_stats"), 'tblclient.id', '=', 'payment_stats.clientid')
                     // Active: last payment OR creation date within term+grace threshold
