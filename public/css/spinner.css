@@ -1,0 +1,120 @@
+/* ============================================================
+   SureLife Loading Indicator — Minimal Theme-Matched Design
+   Primary: Green (#16a34a / #10b981)
+   ============================================================ */
+
+/* ── Keyframes ─────────────────────────────────────────────── */
+@keyframes slc-pulse-dot {
+
+    0%,
+    100% {
+        opacity: 0.3;
+        transform: scale(0.7);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes slc-shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+/* ── Wrapper — transparent, no card background ──────────────── */
+.slc-spinner-card {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 4px 0;
+    min-width: 100px;
+}
+
+/* ── Rings are hidden ───────────────────────────────────────── */
+.slc-rings {
+    display: none;
+}
+
+/* ── "LOADING" label + bouncing dots ───────────────────────── */
+.slc-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8125rem;
+    /* 13px */
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: #059669;
+    /* emerald-600 */
+    line-height: 1;
+    font-family: inherit;
+    text-transform: uppercase;
+}
+
+.slc-dots {
+    display: inline-flex;
+    gap: 3px;
+    align-items: flex-end;
+}
+
+.slc-dots span {
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background: #10b981;
+    border-radius: 50%;
+    animation: slc-pulse-dot 1.2s ease-in-out infinite;
+}
+
+.slc-dots span:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.slc-dots span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.slc-dots span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+/* ── Shimmer bar ────────────────────────────────────────────── */
+.slc-bar {
+    width: 100%;
+    height: 3px;
+    border-radius: 999px;
+    background: linear-gradient(90deg,
+            #d1fae5 0%,
+            #10b981 40%,
+            #059669 60%,
+            #d1fae5 100%);
+    background-size: 200% 100%;
+    animation: slc-shimmer 1.6s linear infinite;
+}
+
+/* ── DataTables processing container ───────────────────────── */
+/* Do NOT override display — DataTables controls visibility via display:none */
+.dataTables_processing {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 4px 0 !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* Hide DataTables' own built-in animated dots (blue dots) */
+.dataTables_processing>*:not(.slc-spinner-card) {
+    display: none !important;
+}
