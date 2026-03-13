@@ -34,6 +34,18 @@
             color: #374151;
             font-size: 0.875rem;
         }
+        
+        /* Fix: Disable table row hover when dropdown is open */
+        body.dropdown-open #loanrequest-table tbody tr:hover {
+            background: white !important;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+        
+        /* Fix: Keep the open dropdown row hover effect */
+        body.dropdown-open #loanrequest-table tbody tr:has(.action-dropdown.open):hover {
+            background: #ecfeff !important;
+        }
     </style>
 @endsection
 
